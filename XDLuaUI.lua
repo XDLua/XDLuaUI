@@ -55,7 +55,7 @@ function XDLuaUI:CreateWindow(title)
     -- เพิ่มข้อความหัวเรื่อง
     local titleLabel = Instance.new("TextLabel", mainFrame)
     titleLabel.Size = UDim2.new(1, 0, 0, 35)
-    titleLabel.Text = title or "🔹 XDLua UI 🔹"
+    titleLabel.Text = title or "🔹 FORSAKEN 🔹"
     titleLabel.TextColor3 = Color3.fromRGB(255, 50, 255)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Font = Enum.Font.GothamBlack
@@ -123,6 +123,12 @@ function XDLuaUI:CreateWindow(title)
             tab.Content.Visible = false
         end
         selectedTab.Content.Visible = true
+
+        -- อัปเดตข้อความหัวเรื่องแท็บ
+        local titleLabel = selectedTab.Content:FindFirstChild("TextLabel")
+        if titleLabel then
+            titleLabel.Text = selectedTab.Button.Text
+        end
     end
 
     -- เมธอดเพิ่มแท็บ
@@ -160,6 +166,15 @@ function XDLuaUI:CreateWindow(title)
         tabContent.Name = "Tab" .. tabIndex
         tabContent.Visible = false
         tabContent.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+
+        -- เพิ่มข้อความหัวเรื่องแท็บ
+        local label = Instance.new("TextLabel", tabContent)
+        label.Size = UDim2.new(1, 0, 0, 30)
+        label.Text = tabName -- แสดงชื่อแท็บ
+        label.BackgroundTransparency = 1
+        label.TextColor3 = Color3.fromRGB(255, 255, 255)
+        label.Font = Enum.Font.GothamBold
+        label.TextSize = 16
 
         -- เพิ่มลงในตารางแท็บ
         tabs[tabIndex] = {
@@ -218,78 +233,6 @@ function XDLuaUI:CreateWindow(title)
             toggleButton.Text = (isToggled and "เปิด " or "ปิด ") .. toggleText
             callback(isToggled)
         end)
-    end
-    
-    -- เมธอดเพิ่มคำอธิบายและเครดิต
-function XDLuaUI:AddDescription(tabContent, descriptionText, creditText)
-    -- เพิ่มคำอธิบาย
-    local descriptionLabel = Instance.new("TextLabel", tabContent)
-    descriptionLabel.Size = UDim2.new(0.9, 0, 0, 60)
-    descriptionLabel.Position = UDim2.new(0.05, 0, 0, 50)
-    descriptionLabel.Text = descriptionText
-    descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    descriptionLabel.BackgroundTransparency = 1
-    descriptionLabel.Font = Enum.Font.GothamBold
-    descriptionLabel.TextSize = 14
-    descriptionLabel.TextWrapped = true
-
-    -- เพิ่มเครดิต
-    local creditLabel = Instance.new("TextLabel", tabContent)
-    creditLabel.Size = UDim2.new(0.9, 0, 0, 30)
-    creditLabel.Position = UDim2.new(0.05, 0, 0, 100)
-    creditLabel.Text = creditText
-    creditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    creditLabel.BackgroundTransparency = 1
-    creditLabel.Font = Enum.Font.GothamBold
-    creditLabel.TextSize = 12
-    creditLabel.TextWrapped = true
-end
-
--- เมธอดเพิ่มปุ่มคัดลอกลิงค์ YouTube
-function XDLuaUI:AddCopyYoutubeButton(tabContent, youtubeLink)
-    local copyYoutubeButton = Instance.new("TextButton", tabContent)
-    copyYoutubeButton.Size = UDim2.new(0.9, 0, 0, 30)
-    copyYoutubeButton.Position = UDim2.new(0.05, 0, 0, 150)
-    copyYoutubeButton.Text = "📋 คัดลอกลิงค์ YouTube"
-    copyYoutubeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    copyYoutubeButton.Font = Enum.Font.GothamBold
-    copyYoutubeButton.TextSize = 14
-    copyYoutubeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-
-    local youtubeCorner = Instance.new("UICorner", copyYoutubeButton)
-    youtubeCorner.CornerRadius = UDim.new(0, 8)
-
-    copyYoutubeButton.MouseButton1Click:Connect(function()
-        setclipboard(youtubeLink)
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "คัดลอกลิงค์ YouTube",
-            Text = "คัดลอกลิงค์เรียบร้อยแล้ว!",
-            Duration = 3
-        })
-    end)
-end
-
--- เมธอดเพิ่มปุ่มคัดลอกลิงค์ดิสคอร์ด
-function XDLuaUI:AddCopyDiscordButton(tabContent)
-    local copyDiscordButton = Instance.new("TextButton", tabContent)
-    copyDiscordButton.Size = UDim2.new(0.9, 0, 0, 30)
-    copyDiscordButton.Position = UDim2.new(0.05, 0, 0, 190)
-    copyDiscordButton.Text = "📋 คัดลอกลิงค์ดิสคอร์ด"
-    copyDiscordButton.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
-    copyDiscordButton.Font = Enum.Font.GothamBold
-    copyDiscordButton.TextSize = 14
-    copyDiscordButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-
-    local discordCorner = Instance.new("UICorner", copyDiscordButton)
-    discordCorner.CornerRadius = UDim.new(0, 8)
-
-    copyDiscordButton.MouseButton1Click:Connect(function()
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "ขออภัย",
-            Text = "ตอนนี้ยังไม่มีกลุ่มดิสครับ",
-            Duration = 3
-        })
-    end)
     end
 
     -- เมธอดเพิ่มปุ่มสไลด์
@@ -373,12 +316,84 @@ function XDLuaUI:AddCopyDiscordButton(tabContent)
         end)
     end
 
+    -- เมธอดเพิ่มคำอธิบายและเครดิต
+    function XDLuaUI:AddDescription(tabContent, descriptionText, creditText)
+        -- เพิ่มคำอธิบาย
+        local descriptionLabel = Instance.new("TextLabel", tabContent)
+        descriptionLabel.Size = UDim2.new(0.9, 0, 0, 60)
+        descriptionLabel.Position = UDim2.new(0.05, 0, 0, 50)
+        descriptionLabel.Text = descriptionText
+        descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        descriptionLabel.BackgroundTransparency = 1
+        descriptionLabel.Font = Enum.Font.GothamBold
+        descriptionLabel.TextSize = 14
+        descriptionLabel.TextWrapped = true
+
+        -- เพิ่มเครดิต
+        local creditLabel = Instance.new("TextLabel", tabContent)
+        creditLabel.Size = UDim2.new(0.9, 0, 0, 30)
+        creditLabel.Position = UDim2.new(0.05, 0, 0, 100)
+        creditLabel.Text = creditText
+        creditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        creditLabel.BackgroundTransparency = 1
+        creditLabel.Font = Enum.Font.GothamBold
+        creditLabel.TextSize = 12
+        creditLabel.TextWrapped = true
+    end
+
+    -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ YouTube
+    function XDLuaUI:Youtube(tabContent, youtubeLink)
+        local Youtube = Instance.new("TextButton", tabContent)
+        Youtube.Size = UDim2.new(0.9, 0, 0, 30)
+        Youtube.Position = UDim2.new(0.05, 0, 0, 150)
+        Youtube.Text = "📋 คัดลอกลิงค์ YouTube"
+        Youtube.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        Youtube.Font = Enum.Font.GothamBold
+        Youtube.TextSize = 14
+        Youtube.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+        local youtubeCorner = Instance.new("UICorner", Youtube)
+        youtubeCorner.CornerRadius = UDim.new(0, 8)
+
+        Youtube.MouseButton1Click:Connect(function()
+            setclipboard(youtubeLink)
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "คัดลอกลิงค์ YouTube",
+                Text = "คัดลอกลิงค์เรียบร้อยแล้ว!",
+                Duration = 3
+            })
+        end)
+    end
+
+    -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ดิสคอร์ด
+    function XDLuaUI:Discord(tabContent)
+        local Discord = Instance.new("TextButton", tabContent)
+        Discord.Size = UDim2.new(0.9, 0, 0, 30)
+        Discord.Position = UDim2.new(0.05, 0, 0, 190)
+        Discord.Text = "📋 คัดลอกลิงค์ดิสคอร์ด"
+        Discord.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
+        Discord.Font = Enum.Font.GothamBold
+        Discord.TextSize = 14
+        Discord.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+        local discordCorner = Instance.new("UICorner", Discord)
+        discordCorner.CornerRadius = UDim.new(0, 8)
+
+        Discord.MouseButton1Click:Connect(function()
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "ขออภัย",
+                Text = "ตอนนี้ยังไม่มีกลุ่มดิสครับ",
+                Duration = 3
+            })
+        end)
+    end
+
     -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อนเฟรมหลัก
     logoButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
     end)
 
-    -- คืนค่าตัวแป��� UI Library
+    -- คืนค่าตัวแปร UI Library
     return XDLuaUI
 end
 
