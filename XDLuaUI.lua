@@ -522,7 +522,7 @@ function XDLuaUI:AddSlider(tabContent, sliderText, minValue, maxValue, defaultVa
                 local value = math.floor(minValue + (maxValue - minValue) * math.clamp(relativeX, 0, 1))
                 updateSlider(value)
             end
-        end
+        end)
     end
 
     -- เชื่อมต่อเหตุการณ์สำหรับเมาส์
