@@ -442,81 +442,103 @@ function XDLuaUI:CreateWindow(title)
         end)
     end
 
-    -- เมธอดเพิ่มปุ่มสไลด์
-    function XDLuaUI:AddSlider(tabContent, sliderText, minValue, maxValue, defaultValue, callback)
-        local sliderFrame = Instance.new("Frame", tabContent)
-        sliderFrame.Size = UDim2.new(0.9, 0, 0, 50)
-        sliderFrame.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 60)
-        sliderFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        sliderFrame.BackgroundTransparency = 0.5
-        sliderFrame.BorderSizePixel = 0
+    -- เมธอดเพิ่มปุ่มสไลด์ (รองรับมือถือ)
+function XDLuaUI:AddSlider(tabContent, sliderText, minValue, maxValue, defaultValue, callback)
+    local sliderFrame = Instance.new("Frame", tabContent)
+    sliderFrame.Size = UDim2.new(0.9, 0, 0, 50)
+    sliderFrame.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 60)
+    sliderFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    sliderFrame.BackgroundTransparency = 0.5
+    sliderFrame.BorderSizePixel = 0
 
-        local sliderCorner = Instance.new("UICorner", sliderFrame)
-        sliderCorner.CornerRadius = UDim.new(0, 8)
+    local sliderCorner = Instance.new("UICorner", sliderFrame)
+    sliderCorner.CornerRadius = UDim.new(0, 8)
 
-        -- เพิ่มข้อความแสดงค่าปัจจุบัน
-        local sliderValueLabel = Instance.new("TextLabel", sliderFrame)
-        sliderValueLabel.Size = UDim2.new(1, 0, 0, 20)
-        sliderValueLabel.Position = UDim2.new(0, 0, 0, 0)
-        sliderValueLabel.Text = sliderText .. ": " .. defaultValue
-        sliderValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        sliderValueLabel.BackgroundTransparency = 1
-        sliderValueLabel.Font = Enum.Font.GothamBold
-        sliderValueLabel.TextSize = 14
+    -- เพิ่มข้อความแสดงค่าปัจจุบัน
+    local sliderValueLabel = Instance.new("TextLabel", sliderFrame)
+    sliderValueLabel.Size = UDim2.new(1, 0, 0, 20)
+    sliderValueLabel.Position = UDim2.new(0, 0, 0, 0)
+    sliderValueLabel.Text = sliderText .. ": " .. defaultValue
+    sliderValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    sliderValueLabel.BackgroundTransparency = 1
+    sliderValueLabel.Font = Enum.Font.GothamBold
+    sliderValueLabel.TextSize = 14
 
-        -- เพิ่ม Slider Bar
-        local sliderBar = Instance.new("Frame", sliderFrame)
-        sliderBar.Size = UDim2.new(0.9, 0, 0, 5)
-        sliderBar.Position = UDim2.new(0.05, 0, 0, 30)
-        sliderBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        sliderBar.BorderSizePixel = 0
+    -- เพิ่ม Slider Bar
+    local sliderBar = Instance.new("Frame", sliderFrame)
+    sliderBar.Size = UDim2.new(0.9, 0, 0, 5)
+    sliderBar.Position = UDim2.new(0.05, 0, 0, 30)
+    sliderBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    sliderBar.BorderSizePixel = 0
 
-        local sliderBarCorner = Instance.new("UICorner", sliderBar)
-        sliderBarCorner.CornerRadius = UDim.new(0, 5)
+    local sliderBarCorner = Instance.new("UICorner", sliderBar)
+    sliderBarCorner.CornerRadius = UDim.new(0, 5)
 
-        -- เพิ่ม Slider Handle
-        local sliderHandle = Instance.new("TextButton", sliderBar)
-        sliderHandle.Size = UDim2.new(0, 15, 0, 15)
-        sliderHandle.Position = UDim2.new((defaultValue - minValue) / (maxValue - minValue), -7.5, 0, -5)
-        sliderHandle.Text = ""
-        sliderHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
-        sliderHandle.BorderSizePixel = 0
+    -- เพิ่ม Slider Handle
+    local sliderHandle = Instance.new("TextButton", sliderBar)
+    sliderHandle.Size = UDim2.new(0, 15, 0, 15)
+    sliderHandle.Position = UDim2.new((defaultValue - minValue) / (maxValue - minValue), -7.5, 0, -5)
+    sliderHandle.Text = ""
+    sliderHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
+    sliderHandle.BorderSizePixel = 0
 
-        local sliderHandleCorner = Instance.new("UICorner", sliderHandle)
-        sliderHandleCorner.CornerRadius = UDim.new(0, 10)
+    local sliderHandleCorner = Instance.new("UICorner", sliderHandle)
+    sliderHandleCorner.CornerRadius = UDim.new(0, 10)
 
-        -- ฟังก์ชันอัปเดตค่า Slider
-        local function updateSlider(value)
-            local clampedValue = math.clamp(value, minValue, maxValue)
-            sliderValueLabel.Text = sliderText .. ": " .. clampedValue
-            local percent = (clampedValue - minValue) / (maxValue - minValue)
-            sliderHandle.Position = UDim2.new(percent, -7.5, 0, -5)
-            callback(clampedValue)
-        end
+    -- ฟังก์ชันอัปเดตค่า Slider
+    local function updateSlider(value)
+        local clampedValue = math.clamp(value, minValue, maxValue)
+        sliderValueLabel.Text = sliderText .. ": " .. clampedValue
+        local percent = (clampedValue - minValue) / (maxValue - minValue)
+        sliderHandle.Position = UDim2.new(percent, -7.5, 0, -5)
+        callback(clampedValue)
+    end
 
-        -- ฟังก์ชันเมื่อคลิกและลาก Slider
-        local isDragging = false
-        sliderHandle.MouseButton1Down:Connect(function()
-            isDragging = true
-        end)
+    -- ตัวแปรเก็บสถานะการลาก
+    local isDragging = false
 
-        game:GetService("UserInputService").InputEnded:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                isDragging = false
+    -- ฟังก์ชันเมื่อเริ่มลาก (รองรับทั้งเมาส์และ Touch)
+    local function startDrag()
+        isDragging = true
+    end
+
+    -- ฟังก์ชันเมื่อหยุดลาก (รองรับทั้งเมาส์และ Touch)
+    local function endDrag()
+        isDragging = false
+    end
+
+    -- ฟังก์ชันเมื่อลาก (รองรับทั้งเมาส์และ Touch)
+    local function onDrag(input)
+        if isDragging then
+            local mousePosition
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                mousePosition = input.Position
             end
-        end)
 
-        game:GetService("UserInputService").InputChanged:Connect(function(input)
-            if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                local mousePosition = game:GetService("UserInputService"):GetMouseLocation()
+            if mousePosition then
                 local sliderBarPosition = sliderBar.AbsolutePosition
                 local sliderBarSize = sliderBar.AbsoluteSize
                 local relativeX = (mousePosition.X - sliderBarPosition.X) / sliderBarSize.X
                 local value = math.floor(minValue + (maxValue - minValue) * math.clamp(relativeX, 0, 1))
                 updateSlider(value)
             end
-        end)
+        end
     end
+
+    -- เชื่อมต่อเหตุการณ์สำหรับเมาส์
+    sliderHandle.MouseButton1Down:Connect(startDrag)
+    game:GetService("UserInputService").InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            endDrag()
+        end
+    end)
+    game:GetService("UserInputService").InputChanged:Connect(onDrag)
+
+    -- เชื่อมต่อเหตุการณ์สำหรับ Touch
+    sliderHandle.TouchTapIn:Connect(startDrag)
+    game:GetService("UserInputService").TouchEnded:Connect(endDrag)
+    game:GetService("UserInputService").TouchMoved:Connect(onDrag)
+end
 
     -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อนเฟรมหลัก
     logoButton.MouseButton1Click:Connect(function()
