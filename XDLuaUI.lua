@@ -55,7 +55,7 @@ function XDLuaUI:CreateWindow(title)
     -- เพิ่มข้อความหัวเรื่อง
     local titleLabel = Instance.new("TextLabel", mainFrame)
     titleLabel.Size = UDim2.new(1, 0, 0, 35)
-    titleLabel.Text = title or "🔹 FORSAKEN 🔹"
+    titleLabel.Text = title or "🔹 XDLua UI 🔹"
     titleLabel.TextColor3 = Color3.fromRGB(255, 50, 255)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Font = Enum.Font.GothamBlack
