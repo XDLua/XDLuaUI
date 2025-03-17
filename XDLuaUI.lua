@@ -341,6 +341,82 @@ function XDLuaUI:CreateWindow(title)
         creditLabel.TextWrapped = true
     end
 
+    -- เมธอดเพิ่มคำอธิบายของ Tab
+function XDLuaUI:AddTabDescription(tabContent, descriptionText)
+    local descriptionLabel = Instance.new("TextLabel", tabContent)
+    descriptionLabel.Size = UDim2.new(0.9, 0, 0, 40)
+    descriptionLabel.Position = UDim2.new(0.05, 0, 0, 10) -- อยู่ด้านบนของเนื้อหา
+    descriptionLabel.Text = descriptionText
+    descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    descriptionLabel.BackgroundTransparency = 1
+    descriptionLabel.Font = Enum.Font.GothamBold
+    descriptionLabel.TextSize = 14
+    descriptionLabel.TextWrapped = true
+end
+
+-- เมธอดเพิ่มคำอธิบายของ Button
+function XDLuaUI:AddButton2(tabContent, buttonText, descriptionText, callback)
+    -- เพิ่มคำอธิบาย
+    local descriptionLabel = Instance.new("TextLabel", tabContent)
+    descriptionLabel.Size = UDim2.new(0.9, 0, 0, 20)
+    descriptionLabel.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40)
+    descriptionLabel.Text = descriptionText
+    descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    descriptionLabel.BackgroundTransparency = 1
+    descriptionLabel.Font = Enum.Font.GothamBold
+    descriptionLabel.TextSize = 12
+    descriptionLabel.TextWrapped = true
+
+    -- เพิ่มปุ่ม
+    local button = Instance.new("TextButton", tabContent)
+    button.Size = UDim2.new(0.9, 0, 0, 30)
+    button.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40 + 20)
+    button.Text = buttonText
+    button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 14
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+    local buttonCorner = Instance.new("UICorner", button)
+    buttonCorner.CornerRadius = UDim.new(0, 8)
+
+    button.MouseButton1Click:Connect(callback)
+end
+
+-- เมธอดเพิ่มคำอธิบายของ Toggle
+function XDLuaUI:AddToggle2(tabContent, toggleText, descriptionText, defaultState, callback)
+    -- เพิ่มคำอธิบาย
+    local descriptionLabel = Instance.new("TextLabel", tabContent)
+    descriptionLabel.Size = UDim2.new(0.9, 0, 0, 20)
+    descriptionLabel.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40)
+    descriptionLabel.Text = descriptionText
+    descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    descriptionLabel.BackgroundTransparency = 1
+    descriptionLabel.Font = Enum.Font.GothamBold
+    descriptionLabel.TextSize = 12
+    descriptionLabel.TextWrapped = true
+
+    -- เพิ่ม Toggle
+    local toggleButton = Instance.new("TextButton", tabContent)
+    toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
+    toggleButton.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40 + 20)
+    toggleButton.Text = (defaultState and "เปิด " or "ปิด ") .. toggleText
+    toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+    toggleButton.Font = Enum.Font.GothamBold
+    toggleButton.TextSize = 14
+    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+    local toggleCorner = Instance.new("UICorner", toggleButton)
+    toggleCorner.CornerRadius = UDim.new(0, 8)
+
+    local isToggled = defaultState or false
+    toggleButton.MouseButton1Click:Connect(function()
+        isToggled = not isToggled
+        toggleButton.Text = (isToggled and "เปิด " or "ปิด ") .. toggleText
+        callback(isToggled)
+    end)
+    end
+
     -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ YouTube
     function XDLuaUI:Youtube(tabContent, youtubeLink)
         local Youtube = Instance.new("TextButton", tabContent)
