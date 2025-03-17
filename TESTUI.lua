@@ -131,109 +131,128 @@ function XDLuaUI:CreateWindow(title)
         end
     end
 
-    -- เมธอดเพิ่มแท็บ
-    function XDLuaUI:AddTab(tabName)
-        local tabIndex = #tabs + 1
+    -- เมธอดเพิ่มแท็บพร้อมคำอธิบาย
+function XDLuaUI:AddTab(tabName, description)
+    local tabIndex = #tabs + 1
 
-        -- สร้างปุ่มแท็บ
-        local tabButton = Instance.new("TextButton", tabScrollingFrame)
-        tabButton.Size = UDim2.new(1, 0, 0, 40)
-        tabButton.Position = UDim2.new(0, 0, 0, (tabIndex - 1) * 45)
-        tabButton.Text = tabName
-        tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        tabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        tabButton.Font = Enum.Font.GothamBold
-        tabButton.TextSize = 14
-        tabButton.AutoButtonColor = false
-        tabButton.MouseButton1Click:Connect(function()
-            switchTab(tabIndex)
-        end)
+    -- สร้างปุ่มแท็บ
+    local tabButton = Instance.new("TextButton", tabScrollingFrame)
+    tabButton.Size = UDim2.new(1, 0, 0, 40)
+    tabButton.Position = UDim2.new(0, 0, 0, (tabIndex - 1) * 45)
+    tabButton.Text = tabName
+    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    tabButton.Font = Enum.Font.GothamBold
+    tabButton.TextSize = 14
+    tabButton.AutoButtonColor = false
+    tabButton.MouseButton1Click:Connect(function()
+        switchTab(tabIndex)
+    end)
 
-        -- เพิ่มเส้นขอบให้ปุ่มแท็บ
-        local buttonGlow = Instance.new("UIStroke", tabButton)
-        buttonGlow.Name = "Stroke"
-        buttonGlow.Thickness = 2
-        buttonGlow.Color = Color3.fromRGB(255, 50, 255)
-        buttonGlow.Transparency = 1
+    -- เพิ่มเส้นขอบให้ปุ่มแท็บ
+    local buttonGlow = Instance.new("UIStroke", tabButton)
+    buttonGlow.Name = "Stroke"
+    buttonGlow.Thickness = 2
+    buttonGlow.Color = Color3.fromRGB(255, 50, 255)
+    buttonGlow.Transparency = 1
 
-        -- ปรับมุมโค้งของปุ่มแท็บ
-        local tabCorner = Instance.new("UICorner", tabButton)
-        tabCorner.CornerRadius = UDim.new(0, 5)
+    -- ปรับมุมโค้งของปุ่มแท็บ
+    local tabCorner = Instance.new("UICorner", tabButton)
+    tabCorner.CornerRadius = UDim.new(0, 5)
 
-        -- สร้างเฟรมเนื้อหาแท็บ
-        local tabContent = Instance.new("Frame", contentScrollingFrame)
-        tabContent.Size = UDim2.new(1, 0, 1, 0)
-        tabContent.Name = "Tab" .. tabIndex
-        tabContent.Visible = false
-        tabContent.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    -- สร้างเฟรมเนื้อหาแท็บ
+    local tabContent = Instance.new("Frame", contentScrollingFrame)
+    tabContent.Size = UDim2.new(1, 0, 1, 0)
+    tabContent.Name = "Tab" .. tabIndex
+    tabContent.Visible = false
+    tabContent.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 
-        -- เพิ่มข้อความหัวเรื่องแท็บ
-        local label = Instance.new("TextLabel", tabContent)
-        label.Size = UDim2.new(1, 0, 0, 30)
-        label.Text = tabName -- แสดงชื่อแท็บ
-        label.BackgroundTransparency = 1
-        label.TextColor3 = Color3.fromRGB(255, 255, 255)
-        label.Font = Enum.Font.GothamBold
-        label.TextSize = 16
+    -- เพิ่มคำอธิบายของแท็บ
+    local tabDescriptionLabel = Instance.new("TextLabel", tabContent)
+    tabDescriptionLabel.Size = UDim2.new(0.9, 0, 0, 40)
+    tabDescriptionLabel.Position = UDim2.new(0.05, 0, 0, 10) -- ระยะห่างจากด้านบน 10 pixels
+    tabDescriptionLabel.Text = description or "คำอธิบายของแท็บ " .. tabName
+    tabDescriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tabDescriptionLabel.BackgroundTransparency = 1
+    tabDescriptionLabel.Font = Enum.Font.GothamBold
+    tabDescriptionLabel.TextSize = 14
+    tabDescriptionLabel.TextWrapped = true
 
-        -- เพิ่มลงในตารางแท็บ
-        tabs[tabIndex] = {
-            Button = tabButton,
-            Content = tabContent
-        }
+    -- เพิ่มลงในตารางแท็บ
+    tabs[tabIndex] = {
+        Button = tabButton,
+        Content = tabContent
+    }
 
-        -- เปิดแท็บแรกโดย default
-        if tabIndex == 1 then
-            switchTab(1)
-        end
-
-        -- คืนค่าแท็บเพื่อให้ผู้ใช้เพิ่มเนื้อหา
-        return tabContent
+    -- เปิดแท็บแรกโดย default
+    if tabIndex == 1 then
+        switchTab(1)
     end
 
-    -- เมธอดแก้ไข Title
-    function XDLuaUI:SetTitle(newTitle)
-        titleLabel.Text = newTitle
-    end
+    -- คืนค่าแท็บเพื่อให้ผู้ใช้เพิ่มเนื้อหา
+    return tabContent
+end
 
-    -- เมธอดเพิ่มปุ่มปกติ
-    function XDLuaUI:AddButton(tabContent, buttonText, callback)
-        local button = Instance.new("TextButton", tabContent)
-        button.Size = UDim2.new(0.9, 0, 0, 30)
-        button.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40)
-        button.Text = buttonText
-        button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
-        button.Font = Enum.Font.GothamBold
-        button.TextSize = 14
-        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+-- เมธอดเพิ่มปุ่มพร้อมคำอธิบาย
+function XDLuaUI:AddButton(tabContent, buttonText, description, callback)
+    local button = Instance.new("TextButton", tabContent)
+    button.Size = UDim2.new(0.9, 0, 0, 30)
+    button.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40 + 10) -- ระยะห่างจากด้านบน 10 pixels
+    button.Text = buttonText
+    button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 14
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-        local buttonCorner = Instance.new("UICorner", button)
-        buttonCorner.CornerRadius = UDim.new(0, 8)
+    local buttonCorner = Instance.new("UICorner", button)
+    buttonCorner.CornerRadius = UDim.new(0, 8)
 
-        button.MouseButton1Click:Connect(callback)
-    end
+    -- เพิ่มคำอธิบายของปุ่ม
+    local buttonDescriptionLabel = Instance.new("TextLabel", tabContent)
+    buttonDescriptionLabel.Size = UDim2.new(0.9, 0, 0, 20)
+    buttonDescriptionLabel.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40 + 40) -- ระยะห่างจากปุ่ม 10 pixels
+    buttonDescriptionLabel.Text = description or "คำอธิบายของปุ่ม " .. buttonText
+    buttonDescriptionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    buttonDescriptionLabel.BackgroundTransparency = 1
+    buttonDescriptionLabel.Font = Enum.Font.Gotham
+    buttonDescriptionLabel.TextSize = 12
+    buttonDescriptionLabel.TextWrapped = true
 
-    -- เมธอดเพิ่มปุ่มเปิด/ปิด
-    function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
-        local toggleButton = Instance.new("TextButton", tabContent)
-        toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
-        toggleButton.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40)
-        toggleButton.Text = (defaultState and "เปิด " or "ปิด ") .. toggleText
-        toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
-        toggleButton.Font = Enum.Font.GothamBold
-        toggleButton.TextSize = 14
-        toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.MouseButton1Click:Connect(callback)
+end
 
-        local toggleCorner = Instance.new("UICorner", toggleButton)
-        toggleCorner.CornerRadius = UDim.new(0, 8)
+-- เมธอดเพิ่ม Toggle พร้อมคำอธิบาย
+function XDLuaUI:AddToggle(tabContent, toggleText, description, defaultState, callback)
+    local toggleButton = Instance.new("TextButton", tabContent)
+    toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
+    toggleButton.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40 + 10) -- ระยะห่างจากด้านบน 10 pixels
+    toggleButton.Text = (defaultState and "เปิด " or "ปิด ") .. toggleText
+    toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+    toggleButton.Font = Enum.Font.GothamBold
+    toggleButton.TextSize = 14
+    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-        local isToggled = defaultState or false
-        toggleButton.MouseButton1Click:Connect(function()
-            isToggled = not isToggled
-            toggleButton.Text = (isToggled and "เปิด " or "ปิด ") .. toggleText
-            callback(isToggled)
-        end)
-    end
+    local toggleCorner = Instance.new("UICorner", toggleButton)
+    toggleCorner.CornerRadius = UDim.new(0, 8)
+
+    -- เพิ่มคำอธิบายของ Toggle
+    local toggleDescriptionLabel = Instance.new("TextLabel", tabContent)
+    toggleDescriptionLabel.Size = UDim2.new(0.9, 0, 0, 20)
+    toggleDescriptionLabel.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40 + 40) -- ระยะห่างจาก Toggle 10 pixels
+    toggleDescriptionLabel.Text = description or "คำอธิบายของ Toggle " .. toggleText
+    toggleDescriptionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    toggleDescriptionLabel.BackgroundTransparency = 1
+    toggleDescriptionLabel.Font = Enum.Font.Gotham
+    toggleDescriptionLabel.TextSize = 12
+    toggleDescriptionLabel.TextWrapped = true
+
+    local isToggled = defaultState or false
+    toggleButton.MouseButton1Click:Connect(function()
+        isToggled = not isToggled
+        toggleButton.Text = (isToggled and "เปิด " or "ปิด ") .. toggleText
+        callback(isToggled)
+    end)
+end
 
     -- เมธอดเพิ่มปุ่มสไลด์
     function XDLuaUI:AddSlider(tabContent, sliderText, minValue, maxValue, defaultValue, callback)
