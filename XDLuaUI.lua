@@ -93,15 +93,35 @@ function XDLuaUI:CreateWindow(title)
     local contentCorner = Instance.new("UICorner", contentFrame)
     contentCorner.CornerRadius = UDim.new(0, 10)
 
-    -- สร้าง ScrollingFrame สำหรับเนื้อหา
-    local contentScrollingFrame = Instance.new("ScrollingFrame", contentFrame)
-    contentScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
-    contentScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
-    contentScrollingFrame.BackgroundTransparency = 1
-    contentScrollingFrame.ScrollBarThickness = 5
-    contentScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
-    contentScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    -- ในส่วนของการสร้าง ScrollingFrame สำหรับเนื้อหา
+local contentScrollingFrame = Instance.new("ScrollingFrame", contentFrame)
+contentScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+contentScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
+contentScrollingFrame.BackgroundTransparency = 1
+contentScrollingFrame.ScrollBarThickness = 5
+contentScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
+contentScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y -- ตั้งค่าให้ CanvasSize ขยายตามเนื้อหา
+contentScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0) -- ตั้งค่าเริ่มต้น
 
+-- เพิ่ม UIListLayout เพื่อจัดการตำแหน่งของเนื้อหา
+local contentListLayout = Instance.new("UIListLayout", contentScrollingFrame)
+contentListLayout.Padding = UDim.new(0, 10) -- ระยะห่างระหว่างเนื้อหา
+contentListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- ฟังก์ชันอัปเดต CanvasSize
+local function updateCanvasSize()
+    local totalHeight = 0
+    for _, child in pairs(contentScrollingFrame:GetChildren()) do
+        if child:IsA("GuiObject") and child ~= contentListLayout then
+            totalHeight += child.Size.Y.Offset + contentListLayout.Padding.Offset
+        end
+    end
+    contentScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+end
+
+-- อัปเดต CanvasSize เมื่อเนื้อหาเปลี่ยนแปลง
+contentListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateCanvasSize)
+    
     -- ตัวแปรเก็บแท็บและเนื้อหา
     local tabs = {}
     local selectedTab = nil
