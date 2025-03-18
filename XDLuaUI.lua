@@ -189,7 +189,7 @@ contentListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(update
 
         -- เพิ่มข้อความหัวเรื่องแท็บ
         local label = Instance.new("TextLabel", tabContent)
-        label.Size = UDim2.new(1, 0, 0, 50)
+        label.Size = UDim2.new(1, 0, 10, 30)
         label.Text = tabName -- แสดงชื่อแท็บ
         label.BackgroundTransparency = 1
         label.TextColor3 = Color3.fromRGB(255, 255, 255)
