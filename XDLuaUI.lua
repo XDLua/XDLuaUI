@@ -220,7 +220,7 @@ contentListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(update
     function XDLuaUI:AddButton(tabContent, buttonText, callback)
         local button = Instance.new("TextButton", tabContent)
         button.Size = UDim2.new(0.9, 0, 0, 30)
-        button.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40)
+        button.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 30)
         button.Text = buttonText
         button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         button.Font = Enum.Font.GothamBold
@@ -237,7 +237,7 @@ contentListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(update
     function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
         local toggleButton = Instance.new("TextButton", tabContent)
         toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
-        toggleButton.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40)
+        toggleButton.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 30)
         toggleButton.Text = (defaultState and "เปิด " or "ปิด ") .. toggleText
         toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         toggleButton.Font = Enum.Font.GothamBold
