@@ -235,45 +235,26 @@ contentListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(update
 
     -- เมธอดเพิ่มปุ่มเปิด/ปิด
     function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
-        local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0, 100, 0, 50)
-toggleButton.Position = UDim2.new(0.5, -50, 0.5, -25)
-toggleButton.BackgroundTransparency = 1
-toggleButton.Text = ""
+        local toggleButton = Instance.new("TextButton", tabContent)
+        toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
+        toggleButton.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40)
+        toggleButton.Text = (defaultState and "เปิด " or "ปิด ") .. toggleText
+        toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+        toggleButton.Font = Enum.Font.GothamBold
+        toggleButton.TextSize = 14
+        toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-local switchFrame = Instance.new("Frame", toggleButton)
-switchFrame.Size = UDim2.new(1, 0, 1, 0)
-switchFrame.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
-switchFrame.BorderSizePixel = 2
+        local toggleCorner = Instance.new("UICorner", toggleButton)
+        toggleCorner.CornerRadius = UDim.new(0, 8)
 
-local uicorner = Instance.new("UICorner", switchFrame)
-uicorner.CornerRadius = UDim.new(0.5, 0)  -- ทำให้เป็นวงรี
-
-local switchCircle = Instance.new("Frame", switchFrame)
-switchCircle.Size = UDim2.new(0.5, 0, 1, 0)
-switchCircle.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
-switchCircle.Position = UDim2.new(0, 0, 0, 0) -- เริ่มจากด้านซ้าย
-switchCircle.BorderSizePixel = 2
-
-local circleCorner = Instance.new("UICorner", switchCircle)
-circleCorner.CornerRadius = UDim.new(0.5, 0) -- ให้เป็นวงกลม
-
-local isOn = false  -- สถานะเปิด/ปิด
-
-toggleButton.MouseButton1Click:Connect(function()
-    isOn = not isOn
-
-    if isOn then
-        switchFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200) -- สีขณะเปิด
-        switchCircle.Position = UDim2.new(0.5, 0, 0, 0) -- เลื่อนวงกลมไปทางขวา
-    else
-        switchFrame.BackgroundColor3 = Color3.fromRGB(150, 150, 150) -- สีขณะปิด
-        switchCircle.Position = UDim2.new(0, 0, 0, 0) -- เลื่อนวงกลมไปทางซ้าย
-    end
-end)
-
-toggleButton.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("ScreenGui")
-    -- เมธอดเพิ่มปุ่มสไลด์
+        local isToggled = defaultState or false
+        toggleButton.MouseButton1Click:Connect(function()
+            isToggled = not isToggled
+            toggleButton.Text = (isToggled and "เปิด " or "ปิด ") .. toggleText
+            callback(isToggled)
+        end)
+        end
+        
     function XDLuaUI:AddSlider(tabContent, sliderText, minValue, maxValue, defaultValue, callback)
         local sliderFrame = Instance.new("Frame", tabContent)
         sliderFrame.Size = UDim2.new(0.9, 0, 0, 50)
