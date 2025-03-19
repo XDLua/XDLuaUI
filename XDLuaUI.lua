@@ -238,39 +238,21 @@ contentListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(update
     local toggleFrame = Instance.new("Frame", tabContent)
     toggleFrame.Size = UDim2.new(0.9, 0, 0, 30)
     toggleFrame.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40)
-    toggleFrame.BackgroundTransparency = 1 -- ทำให้พื้นหลังเป็นแบบโปร่งใส
+    toggleFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     toggleFrame.BorderSizePixel = 0
 
-    -- สร้างสวิตช์ (Switch)
-    local switchFrame = Instance.new("Frame", toggleFrame)
-    switchFrame.Size = UDim2.new(0, 50, 0, 25)
-    switchFrame.Position = UDim2.new(0, 0, 0.5, -12.5)
-    switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    switchFrame.BorderSizePixel = 0
+    local toggleCorner = Instance.new("UICorner", toggleFrame)
+    toggleCorner.CornerRadius = UDim.new(0, 15)
 
-    local switchCorner = Instance.new("UICorner", switchFrame)
-    switchCorner.CornerRadius = UDim.new(0, 15)
+    -- สร้างสวิตช์ (วงกลม)
+    local switch = Instance.new("Frame", toggleFrame)
+    switch.Size = UDim2.new(0, 20, 0, 20)
+    switch.Position = UDim2.new(0, 5, 0.5, -10)
+    switch.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    switch.BorderSizePixel = 0
 
-    -- สวิตช์วงกลม (Handle)
-    local switchHandle = Instance.new("Frame", switchFrame)
-    switchHandle.Size = UDim2.new(0, 20, 0, 20)
-    switchHandle.Position = UDim2.new(0, 3, 0.5, -10)
-    switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    switchHandle.BorderSizePixel = 0
-
-    local handleCorner = Instance.new("UICorner", switchHandle)
-    handleCorner.CornerRadius = UDim.new(0, 10)
-
-    -- ข้อความชื่อ Toggle
-    local toggleLabel = Instance.new("TextLabel", toggleFrame)
-    toggleLabel.Size = UDim2.new(0.7, 0, 1, 0)
-    toggleLabel.Position = UDim2.new(0.55, 0, 0, 0)
-    toggleLabel.Text = toggleText -- เช่น "ปุ่มบลาๆๆ"
-    toggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggleLabel.BackgroundTransparency = 1
-    toggleLabel.Font = Enum.Font.GothamBold
-    toggleLabel.TextSize = 14
-    toggleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    local switchCorner = Instance.new("UICorner", switch)
+    switchCorner.CornerRadius = UDim.new(0, 10)
 
     -- ตัวแปรเก็บสถานะ Toggle
     local isToggled = defaultState or false
@@ -278,20 +260,20 @@ contentListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(update
     -- ฟังก์ชันอัปเดตสวิตช์
     local function updateSwitch()
         if isToggled then
-            switchHandle.Position = UDim2.new(1, -23, 0.5, -10) -- เลื่อนไปทางขวา (เปิด)
-            switchFrame.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- เปลี่ยนสีพื้นหลังเป็นสีเขียว
+            switch.Position = UDim2.new(0, 5, 0.5, -10) -- เลื่อนไปทางขวา (เปิด)
+            toggleFrame.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- เปลี่ยนสีพื้นหลังเป็นสีเขียว
         else
-            switchHandle.Position = UDim2.new(0, 3, 0.5, -10) -- เลื่อนไปทางซ้าย (ปิด)
-            switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- เปลี่ยนสีพื้นหลังเป็นสีเทา
+            switch.Position = UDim2.new(1, -25, 0.5, -10) -- เลื่อนไปทางซ้าย (ปิด)
+            toggleFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- เปลี่ยนสีพื้นหลังเป็นสีเทา
         end
     end
 
     -- อัปเดตสวิตช์ตามสถานะเริ่มต้น
     updateSwitch()
 
-    -- เมื่อคลิกที่สวิตช์
-    switchFrame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    -- เมื่อคลิกหรือแตะที่สวิตช์ (รองรับทั้งเมาส์และ Touch)
+    toggleFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             isToggled = not isToggled
             updateSwitch()
             callback(isToggled)
