@@ -236,23 +236,7 @@ function XDLuaUI:AddToggle(tabContent, toggleText, description, defaultState, ca
     toggleCorner.CornerRadius = UDim.new(0, 8)
 
     -- เพิ่มคำอธิบายของ Toggle
-    local toggleDescriptionLabel = Instance.new("TextLabel", tabContent)
-    toggleDescriptionLabel.Size = UDim2.new(0.9, 0, 0, 20)
-    toggleDescriptionLabel.Position = UDim2.new(0.05, 0, 0, #tabContent:GetChildren() * 40 + 40) -- ระยะห่างจาก Toggle 10 pixels
-    toggleDescriptionLabel.Text = description or "คำอธิบายของ Toggle " .. toggleText
-    toggleDescriptionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-    toggleDescriptionLabel.BackgroundTransparency = 1
-    toggleDescriptionLabel.Font = Enum.Font.Gotham
-    toggleDescriptionLabel.TextSize = 12
-    toggleDescriptionLabel.TextWrapped = true
-
-    local isToggled = defaultState or false
-    toggleButton.MouseButton1Click:Connect(function()
-        isToggled = not isToggled
-        toggleButton.Text = (isToggled and "เปิด " or "ปิด ") .. toggleText
-        callback(isToggled)
-    end)
-end
+    
 
     -- เมธอดเพิ่มปุ่มสไลด์
     function XDLuaUI:AddSlider(tabContent, sliderText, minValue, maxValue, defaultValue, callback)
@@ -268,7 +252,44 @@ end
 
         -- เพิ่มข้อความแสดงค่าปัจจุบัน
         local sliderValueLabel = Instance.new("TextLabel", sliderFrame)
-        sliderValueLabel.Size = UDim2.new(1, 0, 0, 20)
+        sliderValueLabel.Size = UDim2.new(1, 0local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 100, 0, 50)
+toggleButton.Position = UDim2.new(0.5, -50, 0.5, -25)
+toggleButton.BackgroundTransparency = 1
+toggleButton.Text = ""
+
+local switchFrame = Instance.new("Frame", toggleButton)
+switchFrame.Size = UDim2.new(1, 0, 1, 0)
+switchFrame.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+switchFrame.BorderSizePixel = 2
+
+local uicorner = Instance.new("UICorner", switchFrame)
+uicorner.CornerRadius = UDim.new(0.5, 0)  -- ทำให้เป็นวงรี
+
+local switchCircle = Instance.new("Frame", switchFrame)
+switchCircle.Size = UDim2.new(0.5, 0, 1, 0)
+switchCircle.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
+switchCircle.Position = UDim2.new(0, 0, 0, 0) -- เริ่มจากด้านซ้าย
+switchCircle.BorderSizePixel = 2
+
+local circleCorner = Instance.new("UICorner", switchCircle)
+circleCorner.CornerRadius = UDim.new(0.5, 0) -- ให้เป็นวงกลม
+
+local isOn = false  -- สถานะเปิด/ปิด
+
+toggleButton.MouseButton1Click:Connect(function()
+    isOn = not isOn
+
+    if isOn then
+        switchFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200) -- สีขณะเปิด
+        switchCircle.Position = UDim2.new(0.5, 0, 0, 0) -- เลื่อนวงกลมไปทางขวา
+    else
+        switchFrame.BackgroundColor3 = Color3.fromRGB(150, 150, 150) -- สีขณะปิด
+        switchCircle.Position = UDim2.new(0, 0, 0, 0) -- เลื่อนวงกลมไปทางซ้าย
+    end
+end)
+
+toggleButton.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("ScreenGui"), 0, 20)
         sliderValueLabel.Position = UDim2.new(0, 0, 0, 10)
         sliderValueLabel.Text = sliderText .. ": " .. defaultValue
         sliderValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
