@@ -210,6 +210,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- เมธอดเพิ่มปุ่มปกติ
     function XDLuaUI:AddButton(tabContent, buttonText, callback)
+        if not tabContent then return end -- ป้องกัน tabContent เป็น nil
         local button = Instance.new("TextButton")
         button.Parent = tabContent
         button.Size = UDim2.new(0.9, 0, 0, 30)
@@ -227,6 +228,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- เมธอดเพิ่มปุ่มเปิด/ปิด (เปลี่ยนเป็นสวิตช์)
     function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
+        if not tabContent then return end -- ป้องกัน tabContent เป็น nil
         -- สร้าง Frame หลักสำหรับ Toggle
         local toggleFrame = Instance.new("Frame")
         toggleFrame.Parent = tabContent
@@ -281,11 +283,11 @@ function XDLuaUI:CreateWindow(title)
         local function updateToggle()
             if isToggled then
                 switchFrame.BackgroundColor3 = Color3.fromRGB(100, 0, 100) -- สีเมื่อเปิด
-                switchHandle.Position = UDim2.new(0, 5, 0.5, -10) -- เลื่อนไปขวา
+                switchHandle.Position = UDim2.new(1, -25, 0.5, -10) -- เลื่อนไปขวา
                 switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- สีวงกลมเมื่อเปิด
             else
                 switchFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- สีเมื่อปิด
-                switchHandle.Position = UDim2.new(1, -25, 0.5, -10) -- เลื่อนไปซ้าย
+                switchHandle.Position = UDim2.new(0, 5, 0.5, -10) -- เลื่อนไปซ้าย
                 switchHandle.BackgroundColor3 = Color3.fromRGB(150, 150, 150) -- สีวงกลมเมื่อปิด
             end
         end
@@ -303,6 +305,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- เมธอดเพิ่มปุ่มสไลด์ (ปรับปรุงการคำนวณ)
     function XDLuaUI:AddSlider(tabContent, sliderText, minValue, maxValue, defaultValue, callback)
+        if not tabContent then return end -- ป้องกัน tabContent เป็น nil
         local sliderFrame = Instance.new("Frame")
         sliderFrame.Parent = tabContent
         sliderFrame.Size = UDim2.new(0.9, 0, 0, 50)
@@ -381,6 +384,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- เมธอดเพิ่มคำอธิบายและเครดิต
     function XDLuaUI:AddDescription(tabContent, descriptionText, creditText)
+        if not tabContent then return end -- ป้องกัน tabContent เป็น nil
         -- เพิ่มคำอธิบาย
         local descriptionLabel = Instance.new("TextLabel")
         descriptionLabel.Parent = tabContent
@@ -406,6 +410,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- เมธอดเพิ่มคำอธิบายของ Tab
     function XDLuaUI:AddTabDescription(tabContent, descriptionText)
+        if not tabContent then return end -- ป้องกัน tabContent เป็น nil
         local descriptionLabel = Instance.new("TextLabel")
         descriptionLabel.Parent = tabContent
         descriptionLabel.Size = UDim2.new(0.9, 0, 0, 40)
@@ -419,6 +424,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ YouTube
     function XDLuaUI:Youtube(tabContent, youtubeLink)
+        if not tabContent then return end -- ป้องกัน tabContent เป็น nil
         local Youtube = Instance.new("TextButton")
         Youtube.Parent = tabContent
         Youtube.Size = UDim2.new(0.9, 0, 0, 30)
@@ -433,17 +439,22 @@ function XDLuaUI:CreateWindow(title)
         youtubeCorner.Parent = Youtube
 
         Youtube.MouseButton1Click:Connect(function()
-            setclipboard(youtubeLink)
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "คัดลอกลิงค์ YouTube",
-                Text = "คัดลอกลิงค์เรียบร้อยแล้ว!",
-                Duration = 3
-            })
+            if setclipboard then
+                setclipboard(youtubeLink)
+                game:GetService("StarterGui"):SetCore("SendNotification", {
+                    Title = "คัดลอกลิงค์ YouTube",
+                    Text = "คัดลอกลิงค์เรียบร้อยแล้ว!",
+                    Duration = 3
+                })
+            else
+                warn("Executor ไม่รองรับ setclipboard!")
+            end
         end)
     end
 
     -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ดิสคอร์ด
     function XDLuaUI:Discord(tabContent)
+        if not tabContent then return end -- ป้องกัน tabContent เป็น nil
         local Discord = Instance.new("TextButton")
         Discord.Parent = tabContent
         Discord.Size = UDim2.new(0.9, 0, 0, 30)
