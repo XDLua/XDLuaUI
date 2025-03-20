@@ -15,7 +15,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- สร้างปุ่มโลโก้ (ปุ่มเปิด/ปิด UI)
     local logoButton = Instance.new("TextButton", screenGui)
-    logoButton.Size = UDim2.new(0, 50, 0, 50) -- ปรับขนาดจาก 60x60 เป็น 50x50
+    logoButton.Size = UDim2.new(0, 50, 0, 50)
     logoButton.Position = UDim2.new(0.02, 0, 0.5, -25)
     logoButton.Text = "👾"
     logoButton.TextColor3 = Color3.fromRGB(0, 255, 255)
@@ -23,7 +23,7 @@ function XDLuaUI:CreateWindow(title)
     logoButton.BackgroundTransparency = 0.2
     logoButton.BorderSizePixel = 0
     logoButton.Font = Enum.Font.GothamBold
-    logoButton.TextSize = 24 -- ปรับขนาดตัวอักษรให้เล็กลงตามขนาดปุ่ม
+    logoButton.TextSize = 24
     logoButton.Draggable = true
     logoButton.AutoButtonColor = false
 
@@ -84,24 +84,49 @@ function XDLuaUI:CreateWindow(title)
     tabCorner.CornerRadius = UDim.new(0, 8)
 
     -- สร้าง ScrollingFrame สำหรับแท็บ
-local tabScrollingFrame = Instance.new("ScrollingFrame", tabFrame)
-tabScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
-tabScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
-tabScrollingFrame.BackgroundTransparency = 1
-tabScrollingFrame.ScrollBarThickness = 4
-tabScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
-tabScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-tabScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    local tabScrollingFrame = Instance.new("ScrollingFrame", tabFrame)
+    tabScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+    tabScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
+    tabScrollingFrame.BackgroundTransparency = 1
+    tabScrollingFrame.ScrollBarThickness = 4
+    tabScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
+    tabScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    tabScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 
-local tabListLayout = Instance.new("UIListLayout", tabScrollingFrame)
-tabListLayout.Padding = UDim.new(0, 5)
-tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-tabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center -- เพิ่มเพื่อให้ปุ่มอยู่ตรงกลางแนวนอน
+    local tabListLayout = Instance.new("UIListLayout", tabScrollingFrame)
+    tabListLayout.Padding = UDim.new(0, 5)
+    tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    tabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center -- จัดปุ่มแท็บให้อยู่ตรงกลาง
 
--- เพิ่ม UIPadding เพื่อให้ปุ่มไม่ชิดด้านบน
-local tabPadding = Instance.new("UIPadding", tabScrollingFrame)
-tabPadding.PaddingTop = UDim.new(0, 10) -- เพิ่มระยะห่างด้านบน 10 พิกเซล
-    
+    -- เพิ่ม UIPadding เพื่อให้ปุ่มแท็บไม่ชิดบนสุด
+    local tabPadding = Instance.new("UIPadding", tabScrollingFrame)
+    tabPadding.PaddingTop = UDim.new(0, 10) -- เพิ่มระยะห่างด้านบน 10 พิกเซล
+
+    -- สร้างเฟรมเนื้อหา
+    local contentFrame = Instance.new("Frame", mainFrame)
+    contentFrame.Size = UDim2.new(1, -140, 1, -50)
+    contentFrame.Position = UDim2.new(0, 135, 0, 45)
+    contentFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    contentFrame.BackgroundTransparency = 0.5
+    contentFrame.BorderSizePixel = 0
+
+    local contentCorner = Instance.new("UICorner", contentFrame)
+    contentCorner.CornerRadius = UDim.new(0, 10)
+
+    -- สร้าง ScrollingFrame สำหรับเนื้อหา
+    local contentScrollingFrame = Instance.new("ScrollingFrame", contentFrame)
+    contentScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+    contentScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
+    contentScrollingFrame.BackgroundTransparency = 1
+    contentScrollingFrame.ScrollBarThickness = 4
+    contentScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
+    contentScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    contentScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+    local contentListLayout = Instance.new("UIListLayout", contentScrollingFrame)
+    contentListLayout.Padding = UDim.new(0, 10)
+    contentListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
     -- ตัวแปรเก็บแท็บและเนื้อหา
     local tabs = {}
     local selectedTab = nil
@@ -126,57 +151,57 @@ tabPadding.PaddingTop = UDim.new(0, 10) -- เพิ่มระยะห่า�
     end
 
     -- เมธอดเพิ่มแท็บ
-function XDLuaUI:AddTab(tabName)
-    local tabIndex = #tabs + 1
+    function XDLuaUI:AddTab(tabName)
+        local tabIndex = #tabs + 1
 
-    local tabButton = Instance.new("TextButton", tabScrollingFrame)
-    tabButton.Size = UDim2.new(0, 100, 0, 35) -- ปรับขนาดปุ่มให้เล็กลง (จาก 1, -10 เป็น 0, 100)
-    tabButton.AnchorPoint = Vector2.new(0.5, 0) -- ตั้งจุดยึดตรงกลาง
-    tabButton.Text = tabName
-    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    tabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    tabButton.Font = Enum.Font.GothamBold
-    tabButton.TextSize = 14
-    tabButton.AutoButtonColor = false
-    tabButton.MouseButton1Click:Connect(function()
-        switchTab(tabIndex)
-    end)
+        local tabButton = Instance.new("TextButton", tabScrollingFrame)
+        tabButton.Size = UDim2.new(0.9, 0, 0, 40) -- ปรับขนาดให้เล็กลงเพื่อให้อยู่ตรงกลาง
+        tabButton.AnchorPoint = Vector2.new(0.5, 0) -- ตั้งจุดยึดตรงกลาง
+        tabButton.Text = tabName
+        tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        tabButton.Font = Enum.Font.GothamBold
+        tabButton.TextSize = 14
+        tabButton.AutoButtonColor = false
+        tabButton.MouseButton1Click:Connect(function()
+            switchTab(tabIndex)
+        end)
 
-    local buttonGlow = Instance.new("UIStroke", tabButton)
-    buttonGlow.Name = "Stroke"
-    buttonGlow.Thickness = 2
-    buttonGlow.Color = Color3.fromRGB(255, 50, 255)
-    buttonGlow.Transparency = 1
+        local buttonGlow = Instance.new("UIStroke", tabButton)
+        buttonGlow.Name = "Stroke"
+        buttonGlow.Thickness = 2
+        buttonGlow.Color = Color3.fromRGB(255, 50, 255)
+        buttonGlow.Transparency = 1
 
-    local tabCorner = Instance.new("UICorner", tabButton)
-    tabCorner.CornerRadius = UDim.new(0, 5)
+        local tabCorner = Instance.new("UICorner", tabButton)
+        tabCorner.CornerRadius = UDim.new(0, 5)
 
-    -- สร้างเฟรมเนื้อหาแท็บ
-    local tabContent = Instance.new("Frame", contentScrollingFrame)
-    tabContent.Size = UDim2.new(1, 0, 0, 0)
-    tabContent.Name = "Tab" .. tabIndex
-    tabContent.Visible = false
-    tabContent.BackgroundTransparency = 1
-    tabContent.AutomaticSize = Enum.AutomaticSize.Y
+        -- สร้างเฟรมเนื้อหาแท็บ
+        local tabContent = Instance.new("Frame", contentScrollingFrame)
+        tabContent.Size = UDim2.new(1, 0, 0, 0)
+        tabContent.Name = "Tab" .. tabIndex
+        tabContent.Visible = false
+        tabContent.BackgroundTransparency = 1
+        tabContent.AutomaticSize = Enum.AutomaticSize.Y
 
-    -- เพิ่ม UIListLayout ใน tabContent เพื่อจัดการตำแหน่งขององค์ประกอบภายใน
-    local tabContentLayout = Instance.new("UIListLayout", tabContent)
-    tabContentLayout.Padding = UDim.new(0, 10)
-    tabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    tabContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        -- เพิ่ม UIListLayout ใน tabContent เพื่อจัดการตำแหน่งขององค์ประกอบภายใน
+        local tabContentLayout = Instance.new("UIListLayout", tabContent)
+        tabContentLayout.Padding = UDim.new(0, 10)
+        tabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        tabContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-    tabs[tabIndex] = {
-        Button = tabButton,
-        Content = tabContent
-    }
+        tabs[tabIndex] = {
+            Button = tabButton,
+            Content = tabContent
+        }
 
-    if tabIndex == 1 then
-        switchTab(1)
+        if tabIndex == 1 then
+            switchTab(1)
+        end
+
+        return tabContent
     end
 
-    return tabContent
-end
-    
     -- เมธอดแก้ไข Title
     function XDLuaUI:SetTitle(newTitle)
         titleLabel.Text = newTitle
@@ -185,8 +210,8 @@ end
     -- เมธอดเพิ่มปุ่มปกติ
     function XDLuaUI:AddButton(tabContent, buttonText, callback)
         local button = Instance.new("TextButton", tabContent)
-        button.Size = UDim2.new(0.9, 0, 0, 30) -- ปรับขนาดเล็กลงจาก 35 เป็น 30
-        button.AnchorPoint = Vector2.new(0.5, 0) -- ตั้งจุดยึดตรงกลาง
+        button.Size = UDim2.new(0.9, 0, 0, 30)
+        button.AnchorPoint = Vector2.new(0.5, 0)
         button.Text = buttonText
         button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         button.Font = Enum.Font.GothamBold
@@ -202,7 +227,7 @@ end
     -- เมธอดเพิ่มปุ่มเปิด/ปิด
     function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
         local toggleButton = Instance.new("TextButton", tabContent)
-        toggleButton.Size = UDim2.new(0.9, 0, 0, 30) -- ปรับขนาดเล็กลงจาก 35 เป็น 30
+        toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
         toggleButton.AnchorPoint = Vector2.new(0.5, 0)
         toggleButton.Text = (defaultState and "เปิด " or "ปิด ") .. toggleText
         toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
@@ -224,7 +249,7 @@ end
     -- เมธอดเพิ่มปุ่มสไลด์
     function XDLuaUI:AddSlider(tabContent, sliderText, minValue, maxValue, defaultValue, callback)
         local sliderFrame = Instance.new("Frame", tabContent)
-        sliderFrame.Size = UDim2.new(0.9, 0, 0, 50) -- ปรับขนาดเล็กลงจาก 60 เป็น 50
+        sliderFrame.Size = UDim2.new(0.9, 0, 0, 50)
         sliderFrame.AnchorPoint = Vector2.new(0.5, 0)
         sliderFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
         sliderFrame.BackgroundTransparency = 0.5
@@ -243,7 +268,7 @@ end
         sliderValueLabel.TextSize = 14
 
         local sliderBar = Instance.new("Frame", sliderFrame)
-        sliderBar.Size = UDim2.new(0.9, 0, 0, 4) -- ปรับขนาดเล็กลงจาก 5 เป็น 4
+        sliderBar.Size = UDim2.new(0.9, 0, 0, 4)
         sliderBar.Position = UDim2.new(0.05, 0, 0, 30)
         sliderBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
         sliderBar.BorderSizePixel = 0
@@ -252,7 +277,7 @@ end
         sliderBarCorner.CornerRadius = UDim.new(0, 5)
 
         local sliderHandle = Instance.new("TextButton", sliderBar)
-        sliderHandle.Size = UDim2.new(0, 12, 0, 12) -- ปรับขนาดเล็กลงจาก 15 เป็น 12
+        sliderHandle.Size = UDim2.new(0, 12, 0, 12)
         sliderHandle.Position = UDim2.new((defaultValue - minValue) / (maxValue - minValue), -6, 0, -4)
         sliderHandle.Text = ""
         sliderHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
@@ -306,7 +331,7 @@ end
 
         local creditLabel = Instance.new("TextLabel", tabContent)
         creditLabel.Size = UDim2.new(0.9, 0, 0, 30)
-        creditLabel.AnchorPoint = Vector2.new(0.5, 0)
+        descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
         creditLabel.Text = creditText
         creditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         creditLabel.BackgroundTransparency = 1
@@ -341,7 +366,7 @@ end
         descriptionLabel.TextWrapped = true
 
         local button = Instance.new("TextButton", tabContent)
-        button.Size = UDim2.new(0.9, 0, 0, 30) -- ปรับขนาดเล็กลงจาก 35 เป็น 30
+        button.Size = UDim2.new(0.9, 0, 0, 30)
         button.AnchorPoint = Vector2.new(0.5, 0)
         button.Text = buttonText
         button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
@@ -368,7 +393,7 @@ end
         descriptionLabel.TextWrapped = true
 
         local toggleButton = Instance.new("TextButton", tabContent)
-        toggleButton.Size = UDim2.new(0.9, 0, 0, 30) -- ปรับขนาดเล็กลงจาก 35 เป็น 30
+        toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
         toggleButton.AnchorPoint = Vector2.new(0.5, 0)
         toggleButton.Text = (defaultState and "เปิด " or "ปิด ") .. toggleText
         toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
@@ -390,7 +415,7 @@ end
     -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ YouTube
     function XDLuaUI:Youtube(tabContent, youtubeLink)
         local Youtube = Instance.new("TextButton", tabContent)
-        Youtube.Size = UDim2.new(0.9, 0, 0, 30) -- ปรับขนาดเล็กลงจาก 35 เป็น 30
+        Youtube.Size = UDim2.new(0.9, 0, 0, 30)
         Youtube.AnchorPoint = Vector2.new(0.5, 0)
         Youtube.Text = "📋 คัดลอกลิงค์ YouTube"
         Youtube.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
@@ -414,7 +439,7 @@ end
     -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ดิสคอร์ด
     function XDLuaUI:Discord(tabContent)
         local Discord = Instance.new("TextButton", tabContent)
-        Discord.Size = UDim2.new(0.9, 0, 0, 30) -- ปรับขนาดเล็กลงจาก 35 เป็น 30
+        Discord.Size = UDim2.new(0.9, 0, 0, 30)
         Discord.AnchorPoint = Vector2.new(0.5, 0)
         Discord.Text = "📋 คัดลอกลิงค์ดิสคอร์ด"
         Discord.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
