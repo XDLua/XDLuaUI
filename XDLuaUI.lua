@@ -15,7 +15,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- สร้างปุ่มโลโก้
     local logoButton = Instance.new("TextButton", screenGui)
-    logoButton.Size = UDim2.new(0, 60, 0, 60) -- ปรับขนาดให้ใหญ่ขึ้นเล็กน้อย
+    logoButton.Size = UDim2.new(0, 50, 0, 50)
     logoButton.Position = UDim2.new(0.02, 0, 0.5, -30)
     logoButton.Text = "👾"
     logoButton.TextColor3 = Color3.fromRGB(0, 255, 255)
@@ -32,7 +32,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- สร้างเฟรมหลัก
     local mainFrame = Instance.new("Frame", screenGui)
-    mainFrame.Size = UDim2.new(0, 450, 0, 300) -- ปรับขนาดให้ใหญ่ขึ้นเล็กน้อย
+    mainFrame.Size = UDim2.new(0, 450, 0, 300)
     mainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
     mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
     mainFrame.BackgroundTransparency = 0.3
@@ -76,7 +76,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- สร้างเฟรมแท็บ
     local tabFrame = Instance.new("Frame", mainFrame)
-    tabFrame.Size = UDim2.new(0, 120, 1, -50) -- ปรับความสูงให้เล็กลงเพื่อระยะห่าง
+    tabFrame.Size = UDim2.new(0, 120, 1, -50)
     tabFrame.Position = UDim2.new(0, 10, 0, 45)
     tabFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 
@@ -85,8 +85,8 @@ function XDLuaUI:CreateWindow(title)
 
     -- สร้าง ScrollingFrame สำหรับแท็บ
     local tabScrollingFrame = Instance.new("ScrollingFrame", tabFrame)
-    tabScrollingFrame.Size = UDim2.new(1, -10, 1, -10)
-    tabScrollingFrame.Position = UDim2.new(0, 5, 0, 5)
+    tabScrollingFrame.Size = UDim2.new(1, 0, 1, 0) -- ปรับให้เต็มขนาดของ tabFrame
+    tabScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
     tabScrollingFrame.BackgroundTransparency = 1
     tabScrollingFrame.ScrollBarThickness = 4
     tabScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
@@ -110,8 +110,8 @@ function XDLuaUI:CreateWindow(title)
 
     -- สร้าง ScrollingFrame สำหรับเนื้อหา
     local contentScrollingFrame = Instance.new("ScrollingFrame", contentFrame)
-    contentScrollingFrame.Size = UDim2.new(1, -10, 1, -10)
-    contentScrollingFrame.Position = UDim2.new(0, 5, 0, 5)
+    contentScrollingFrame.Size = UDim2.new(1, 0, 1, 0) -- ปรับให้เต็มขนาดของ contentFrame
+    contentScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
     contentScrollingFrame.BackgroundTransparency = 1
     contentScrollingFrame.ScrollBarThickness = 4
     contentScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
@@ -196,7 +196,7 @@ function XDLuaUI:CreateWindow(title)
     -- เมธอดเพิ่มปุ่มปกติ
     function XDLuaUI:AddButton(tabContent, buttonText, callback)
         local button = Instance.new("TextButton", tabContent)
-        button.Size = UDim2.new(0.95, 0, 0, 35)
+        button.Size = UDim2.new(1, -10, 0, 35) -- ปรับให้เต็มความกว้าง
         button.Text = buttonText
         button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         button.Font = Enum.Font.GothamBold
@@ -212,7 +212,7 @@ function XDLuaUI:CreateWindow(title)
     -- เมธอดเพิ่มปุ่มเปิด/ปิด
     function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
         local toggleButton = Instance.new("TextButton", tabContent)
-        toggleButton.Size = UDim2.new(0.95, 0, 0, 35)
+        toggleButton.Size = UDim2.new(1, -10, 0, 35)
         toggleButton.Text = (defaultState and "เปิด " or "ปิด ") .. toggleText
         toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         toggleButton.Font = Enum.Font.GothamBold
@@ -233,7 +233,7 @@ function XDLuaUI:CreateWindow(title)
     -- เมธอดเพิ่มปุ่มสไลด์
     function XDLuaUI:AddSlider(tabContent, sliderText, minValue, maxValue, defaultValue, callback)
         local sliderFrame = Instance.new("Frame", tabContent)
-        sliderFrame.Size = UDim2.new(0.95, 0, 0, 60)
+        sliderFrame.Size = UDim2.new(1, -10, 0, 60)
         sliderFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
         sliderFrame.BackgroundTransparency = 0.5
         sliderFrame.BorderSizePixel = 0
@@ -303,7 +303,7 @@ function XDLuaUI:CreateWindow(title)
     -- เมธอดเพิ่มคำอธิบายและเครดิต
     function XDLuaUI:AddDescription(tabContent, descriptionText, creditText)
         local descriptionLabel = Instance.new("TextLabel", tabContent)
-        descriptionLabel.Size = UDim2.new(0.95, 0, 0, 60)
+        descriptionLabel.Size = UDim2.new(1, -10, 0, 60)
         descriptionLabel.Text = descriptionText
         descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         descriptionLabel.BackgroundTransparency = 1
@@ -312,7 +312,7 @@ function XDLuaUI:CreateWindow(title)
         descriptionLabel.TextWrapped = true
 
         local creditLabel = Instance.new("TextLabel", tabContent)
-        creditLabel.Size = UDim2.new(0.95, 0, 0, 30)
+        creditLabel.Size = UDim2.new(1, -10, 0, 30)
         creditLabel.Text = creditText
         creditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         creditLabel.BackgroundTransparency = 1
@@ -324,7 +324,7 @@ function XDLuaUI:CreateWindow(title)
     -- เมธอดเพิ่มคำอธิบายของ Tab
     function XDLuaUI:AddTabDescription(tabContent, descriptionText)
         local descriptionLabel = Instance.new("TextLabel", tabContent)
-        descriptionLabel.Size = UDim2.new(0.95, 0, 0, 40)
+        descriptionLabel.Size = UDim2.new(1, -10, 0, 40)
         descriptionLabel.Text = descriptionText
         descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         descriptionLabel.BackgroundTransparency = 1
@@ -336,7 +336,7 @@ function XDLuaUI:CreateWindow(title)
     -- เมธอดเพิ่มปุ่มพร้อมคำอธิบาย
     function XDLuaUI:AddButton2(tabContent, buttonText, descriptionText, callback)
         local descriptionLabel = Instance.new("TextLabel", tabContent)
-        descriptionLabel.Size = UDim2.new(0.95, 0, 0, 20)
+        descriptionLabel.Size = UDim2.new(1, -10, 0, 20)
         descriptionLabel.Text = descriptionText
         descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         descriptionLabel.BackgroundTransparency = 1
@@ -345,7 +345,7 @@ function XDLuaUI:CreateWindow(title)
         descriptionLabel.TextWrapped = true
 
         local button = Instance.new("TextButton", tabContent)
-        button.Size = UDim2.new(0.95, 0, 0, 35)
+        button.Size = UDim2.new(1, -10, 0, 35)
         button.Text = buttonText
         button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         button.Font = Enum.Font.GothamBold
@@ -361,7 +361,7 @@ function XDLuaUI:CreateWindow(title)
     -- เมธอดเพิ่ม Toggle พร้อมคำอธิบาย
     function XDLuaUI:AddToggle2(tabContent, toggleText, descriptionText, defaultState, callback)
         local descriptionLabel = Instance.new("TextLabel", tabContent)
-        descriptionLabel.Size = UDim2.new(0.95, 0, 0, 20)
+        descriptionLabel.Size = UDim2.new(1, -10, 0, 20)
         descriptionLabel.Text = descriptionText
         descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         descriptionLabel.BackgroundTransparency = 1
@@ -370,7 +370,7 @@ function XDLuaUI:CreateWindow(title)
         descriptionLabel.TextWrapped = true
 
         local toggleButton = Instance.new("TextButton", tabContent)
-        toggleButton.Size = UDim2.new(0.95, 0, 0, 35)
+        toggleButton.Size = UDim2.new(1, -10, 0, 35)
         toggleButton.Text = (defaultState and "เปิด " or "ปิด ") .. toggleText
         toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         toggleButton.Font = Enum.Font.GothamBold
@@ -391,7 +391,7 @@ function XDLuaUI:CreateWindow(title)
     -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ YouTube
     function XDLuaUI:Youtube(tabContent, youtubeLink)
         local Youtube = Instance.new("TextButton", tabContent)
-        Youtube.Size = UDim2.new(0.95, 0, 0, 35)
+        Youtube.Size = UDim2.new(1, -10, 0, 35)
         Youtube.Text = "📋 คัดลอกลิงค์ YouTube"
         Youtube.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
         Youtube.Font = Enum.Font.GothamBold
@@ -414,7 +414,7 @@ function XDLuaUI:CreateWindow(title)
     -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ดิสคอร์ด
     function XDLuaUI:Discord(tabContent)
         local Discord = Instance.new("TextButton", tabContent)
-        Discord.Size = UDim2.new(0.95, 0, 0, 35)
+        Discord.Size = UDim2.new(1, -10, 0, 35)
         Discord.Text = "📋 คัดลอกลิงค์ดิสคอร์ด"
         Discord.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
         Discord.Font = Enum.Font.GothamBold
