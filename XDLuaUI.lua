@@ -15,7 +15,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- สร้างปุ่มโลโก้
     local logoButton = Instance.new("TextButton", screenGui)
-    logoButton.Size = UDim2.new(0, 50, 0, 50)
+    logoButton.Size = UDim2.new(0, 60, 0, 60)
     logoButton.Position = UDim2.new(0.02, 0, 0.5, -30)
     logoButton.Text = "👾"
     logoButton.TextColor3 = Color3.fromRGB(0, 255, 255)
@@ -85,7 +85,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- สร้าง ScrollingFrame สำหรับแท็บ
     local tabScrollingFrame = Instance.new("ScrollingFrame", tabFrame)
-    tabScrollingFrame.Size = UDim2.new(1, 0, 1, 0) -- ปรับให้เต็มขนาดของ tabFrame
+    tabScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
     tabScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
     tabScrollingFrame.BackgroundTransparency = 1
     tabScrollingFrame.ScrollBarThickness = 4
@@ -110,7 +110,7 @@ function XDLuaUI:CreateWindow(title)
 
     -- สร้าง ScrollingFrame สำหรับเนื้อหา
     local contentScrollingFrame = Instance.new("ScrollingFrame", contentFrame)
-    contentScrollingFrame.Size = UDim2.new(1, 0, 1, 0) -- ปรับให้เต็มขนาดของ contentFrame
+    contentScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
     contentScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
     contentScrollingFrame.BackgroundTransparency = 1
     contentScrollingFrame.ScrollBarThickness = 4
@@ -170,11 +170,18 @@ function XDLuaUI:CreateWindow(title)
         local tabCorner = Instance.new("UICorner", tabButton)
         tabCorner.CornerRadius = UDim.new(0, 5)
 
+        -- สร้างเฟรมเนื้อหาแท็บ
         local tabContent = Instance.new("Frame", contentScrollingFrame)
         tabContent.Size = UDim2.new(1, 0, 0, 0) -- ขนาดอัตโนมัติตามเนื้อหา
         tabContent.Name = "Tab" .. tabIndex
         tabContent.Visible = false
         tabContent.BackgroundTransparency = 1
+        tabContent.AutomaticSize = Enum.AutomaticSize.Y -- ให้ขนาดขยายตามเนื้อหา
+
+        -- เพิ่ม UIListLayout ใน tabContent เพื่อจัดการตำแหน่งขององค์ประกอบภายใน
+        local tabContentLayout = Instance.new("UIListLayout", tabContent)
+        tabContentLayout.Padding = UDim.new(0, 10)
+        tabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
         tabs[tabIndex] = {
             Button = tabButton,
@@ -196,7 +203,7 @@ function XDLuaUI:CreateWindow(title)
     -- เมธอดเพิ่มปุ่มปกติ
     function XDLuaUI:AddButton(tabContent, buttonText, callback)
         local button = Instance.new("TextButton", tabContent)
-        button.Size = UDim2.new(1, -10, 0, 35) -- ปรับให้เต็มความกว้าง
+        button.Size = UDim2.new(1, -10, 0, 35)
         button.Text = buttonText
         button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         button.Font = Enum.Font.GothamBold
