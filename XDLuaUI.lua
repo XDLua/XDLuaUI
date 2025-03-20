@@ -182,6 +182,7 @@ function XDLuaUI:CreateWindow(title)
         local tabContentLayout = Instance.new("UIListLayout", tabContent)
         tabContentLayout.Padding = UDim.new(0, 10)
         tabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        tabContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center -- จัดให้ปุ่มอยู่ตรงกลาง
 
         tabs[tabIndex] = {
             Button = tabButton,
@@ -204,8 +205,7 @@ function XDLuaUI:CreateWindow(title)
     function XDLuaUI:AddButton(tabContent, buttonText, callback)
         local button = Instance.new("TextButton", tabContent)
         button.Size = UDim2.new(0.9, 0, 0, 30) -- ปรับขนาดเล็กลงจาก 35 เป็น 30
-        button.AnchorPoint = Vector2.new(0.5, 0) -- ตั้งจุดยึดให้อยู่กึ่งกลาง
-        button.Position = UDim2.new(0.5, 0, 0, 0) -- จัดให้อยู่กึ่งกลาง
+        button.AnchorPoint = Vector2.new(0.5, 0) -- ตั้งจุดยึดตรงกลาง
         button.Text = buttonText
         button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         button.Font = Enum.Font.GothamBold
@@ -223,7 +223,6 @@ function XDLuaUI:CreateWindow(title)
         local toggleButton = Instance.new("TextButton", tabContent)
         toggleButton.Size = UDim2.new(0.9, 0, 0, 30) -- ปรับขนาดเล็กลงจาก 35 เป็น 30
         toggleButton.AnchorPoint = Vector2.new(0.5, 0)
-        toggleButton.Position = UDim2.new(0.5, 0, 0, 0)
         toggleButton.Text = (defaultState and "เปิด " or "ปิด ") .. toggleText
         toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         toggleButton.Font = Enum.Font.GothamBold
@@ -246,7 +245,6 @@ function XDLuaUI:CreateWindow(title)
         local sliderFrame = Instance.new("Frame", tabContent)
         sliderFrame.Size = UDim2.new(0.9, 0, 0, 50) -- ปรับขนาดเล็กลงจาก 60 เป็น 50
         sliderFrame.AnchorPoint = Vector2.new(0.5, 0)
-        sliderFrame.Position = UDim2.new(0.5, 0, 0, 0)
         sliderFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
         sliderFrame.BackgroundTransparency = 0.5
         sliderFrame.BorderSizePixel = 0
@@ -318,7 +316,6 @@ function XDLuaUI:CreateWindow(title)
         local descriptionLabel = Instance.new("TextLabel", tabContent)
         descriptionLabel.Size = UDim2.new(0.9, 0, 0, 60)
         descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
-        descriptionLabel.Position = UDim2.new(0.5, 0, 0, 0)
         descriptionLabel.Text = descriptionText
         descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         descriptionLabel.BackgroundTransparency = 1
@@ -329,7 +326,6 @@ function XDLuaUI:CreateWindow(title)
         local creditLabel = Instance.new("TextLabel", tabContent)
         creditLabel.Size = UDim2.new(0.9, 0, 0, 30)
         creditLabel.AnchorPoint = Vector2.new(0.5, 0)
-        creditLabel.Position = UDim2.new(0.5, 0, 0, 0)
         creditLabel.Text = creditText
         creditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         creditLabel.BackgroundTransparency = 1
@@ -343,7 +339,6 @@ function XDLuaUI:CreateWindow(title)
         local descriptionLabel = Instance.new("TextLabel", tabContent)
         descriptionLabel.Size = UDim2.new(0.9, 0, 0, 40)
         descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
-        descriptionLabel.Position = UDim2.new(0.5, 0, 0, 0)
         descriptionLabel.Text = descriptionText
         descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         descriptionLabel.BackgroundTransparency = 1
@@ -357,7 +352,6 @@ function XDLuaUI:CreateWindow(title)
         local descriptionLabel = Instance.new("TextLabel", tabContent)
         descriptionLabel.Size = UDim2.new(0.9, 0, 0, 20)
         descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
-        descriptionLabel.Position = UDim2.new(0.5, 0, 0, 0)
         descriptionLabel.Text = descriptionText
         descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         descriptionLabel.BackgroundTransparency = 1
@@ -368,7 +362,6 @@ function XDLuaUI:CreateWindow(title)
         local button = Instance.new("TextButton", tabContent)
         button.Size = UDim2.new(0.9, 0, 0, 30) -- ปรับขนาดเล็กลงจาก 35 เป็น 30
         button.AnchorPoint = Vector2.new(0.5, 0)
-        button.Position = UDim2.new(0.5, 0, 0, 0)
         button.Text = buttonText
         button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         button.Font = Enum.Font.GothamBold
@@ -386,7 +379,6 @@ function XDLuaUI:CreateWindow(title)
         local descriptionLabel = Instance.new("TextLabel", tabContent)
         descriptionLabel.Size = UDim2.new(0.9, 0, 0, 20)
         descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
-        descriptionLabel.Position = UDim2.new(0.5, 0, 0, 0)
         descriptionLabel.Text = descriptionText
         descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         descriptionLabel.BackgroundTransparency = 1
@@ -397,7 +389,6 @@ function XDLuaUI:CreateWindow(title)
         local toggleButton = Instance.new("TextButton", tabContent)
         toggleButton.Size = UDim2.new(0.9, 0, 0, 30) -- ปรับขนาดเล็กลงจาก 35 เป็น 30
         toggleButton.AnchorPoint = Vector2.new(0.5, 0)
-        toggleButton.Position = UDim2.new(0.5, 0, 0, 0)
         toggleButton.Text = (defaultState and "เปิด " or "ปิด ") .. toggleText
         toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         toggleButton.Font = Enum.Font.GothamBold
@@ -420,7 +411,6 @@ function XDLuaUI:CreateWindow(title)
         local Youtube = Instance.new("TextButton", tabContent)
         Youtube.Size = UDim2.new(0.9, 0, 0, 30) -- ปรับขนาดเล็กลงจาก 35 เป็น 30
         Youtube.AnchorPoint = Vector2.new(0.5, 0)
-        Youtube.Position = UDim2.new(0.5, 0, 0, 0)
         Youtube.Text = "📋 คัดลอกลิงค์ YouTube"
         Youtube.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
         Youtube.Font = Enum.Font.GothamBold
@@ -445,7 +435,6 @@ function XDLuaUI:CreateWindow(title)
         local Discord = Instance.new("TextButton", tabContent)
         Discord.Size = UDim2.new(0.9, 0, 0, 30) -- ปรับขนาดเล็กลงจาก 35 เป็น 30
         Discord.AnchorPoint = Vector2.new(0.5, 0)
-        Discord.Position = UDim2.new(0.5, 0, 0, 0)
         Discord.Text = "📋 คัดลอกลิงค์ดิสคอร์ด"
         Discord.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
         Discord.Font = Enum.Font.GothamBold
