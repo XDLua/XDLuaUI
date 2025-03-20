@@ -466,4 +466,86 @@ function XDLuaUI:CreateWindow(title)
         local switchHandle = Instance.new("Frame", switchFrame)
         switchHandle.Size = UDim2.new(0, 16, 0, 16)
         switchHandle.Position = defaultState and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
-        switchHandle.BackgroundColor3
+        switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        switchHandle.BorderSizePixel = 0
+        switchHandle.AnchorPoint = Vector2.new(0, 0.5)
+
+        local handleCorner = Instance.new("UICorner", switchHandle)
+        handleCorner.CornerRadius = UDim.new(1, 0)
+
+        -- ตัวแปรสถานะ
+        local isToggled = defaultState or false
+
+        -- ฟังก์ชันสลับสถานะ
+        local function toggle()
+            isToggled = not isToggled
+            if isToggled then
+                switchFrame.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- สีเขียวเมื่อเปิด
+                switchHandle.Position = UDim2.new(1, -18, 0.5, -8) -- เลื่อนไปขวา
+            else
+                switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- สีเทาเมื่อปิด
+                switchHandle.Position = UDim2.new(0, 2, 0.5, -8) -- เลื่อนไปซ้าย
+            end
+            callback(isToggled)
+        end
+
+        -- เพิ่มการคลิกเพื่อสลับสถานะ
+        switchFrame.MouseButton1Click:Connect(toggle)
+    end
+
+    -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ YouTube
+    function XDLuaUI:Youtube(tabContent, youtubeLink)
+        local Youtube = Instance.new("TextButton", tabContent)
+        Youtube.Size = UDim2.new(0.9, 0, 0, 30)
+        Youtube.AnchorPoint = Vector2.new(0.5, 0)
+        Youtube.Text = "📋 คัดลอกลิงค์ YouTube"
+        Youtube.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        Youtube.Font = Enum.Font.GothamBold
+        Youtube.TextSize = 14
+        Youtube.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+        local youtubeCorner = Instance.new("UICorner", Youtube)
+        youtubeCorner.CornerRadius = UDim.new(0, 8)
+
+        Youtube.MouseButton1Click:Connect(function()
+            setclipboard(youtubeLink)
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "คัดลอกลิงค์ YouTube",
+                Text = "คัดลอกลิงค์เรียบร้อยแล้ว!",
+                Duration = 3
+            })
+        end)
+    end
+
+    -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ดิสคอร์ด
+    function XDLuaUI:Discord(tabContent)
+        local Discord = Instance.new("TextButton", tabContent)
+        Discord.Size = UDim2.new(0.9, 0, 0, 30)
+        Discord.AnchorPoint = Vector2.new(0.5, 0)
+        Discord.Text = "📋 คัดลอกลิงค์ดิสคอร์ด"
+        Discord.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
+        Discord.Font = Enum.Font.GothamBold
+        Discord.TextSize = 14
+        Discord.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+        local discordCorner = Instance.new("UICorner", Discord)
+        discordCorner.CornerRadius = UDim.new(0, 8)
+
+        Discord.MouseButton1Click:Connect(function()
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "ขออภัย",
+                Text = "ตอนนี้ยังไม่มีกลุ่มดิสครับ",
+                Duration = 3
+            })
+        end)
+    end
+
+    -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อนเฟรมหลัก
+    logoButton.MouseButton1Click:Connect(function()
+        mainFrame.Visible = not mainFrame.Visible
+    end)
+
+    return XDLuaUI
+end
+
+return XDLuaUI
