@@ -84,44 +84,24 @@ function XDLuaUI:CreateWindow(title)
     tabCorner.CornerRadius = UDim.new(0, 8)
 
     -- สร้าง ScrollingFrame สำหรับแท็บ
-    local tabScrollingFrame = Instance.new("ScrollingFrame", tabFrame)
-    tabScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
-    tabScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
-    tabScrollingFrame.BackgroundTransparency = 1
-    tabScrollingFrame.ScrollBarThickness = 4
-    tabScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
-    tabScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    tabScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+local tabScrollingFrame = Instance.new("ScrollingFrame", tabFrame)
+tabScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+tabScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
+tabScrollingFrame.BackgroundTransparency = 1
+tabScrollingFrame.ScrollBarThickness = 4
+tabScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
+tabScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+tabScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 
-    local tabListLayout = Instance.new("UIListLayout", tabScrollingFrame)
-    tabListLayout.Padding = UDim.new(0, 5)
-    tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+local tabListLayout = Instance.new("UIListLayout", tabScrollingFrame)
+tabListLayout.Padding = UDim.new(0, 5)
+tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+tabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center -- เพิ่มเพื่อให้ปุ่มอยู่ตรงกลางแนวนอน
 
-    -- สร้างเฟรมเนื้อหา
-    local contentFrame = Instance.new("Frame", mainFrame)
-    contentFrame.Size = UDim2.new(1, -140, 1, -50)
-    contentFrame.Position = UDim2.new(0, 135, 0, 45)
-    contentFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    contentFrame.BackgroundTransparency = 0.5
-    contentFrame.BorderSizePixel = 0
-
-    local contentCorner = Instance.new("UICorner", contentFrame)
-    contentCorner.CornerRadius = UDim.new(0, 10)
-
-    -- สร้าง ScrollingFrame สำหรับเนื้อหา
-    local contentScrollingFrame = Instance.new("ScrollingFrame", contentFrame)
-    contentScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
-    contentScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
-    contentScrollingFrame.BackgroundTransparency = 1
-    contentScrollingFrame.ScrollBarThickness = 4
-    contentScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
-    contentScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    contentScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-
-    local contentListLayout = Instance.new("UIListLayout", contentScrollingFrame)
-    contentListLayout.Padding = UDim.new(0, 10)
-    contentListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-
+-- เพิ่ม UIPadding เพื่อให้ปุ่มไม่ชิดด้านบน
+local tabPadding = Instance.new("UIPadding", tabScrollingFrame)
+tabPadding.PaddingTop = UDim.new(0, 10) -- เพิ่มระยะห่างด้านบน 10 พิกเซล
+    
     -- ตัวแปรเก็บแท็บและเนื้อหา
     local tabs = {}
     local selectedTab = nil
@@ -146,56 +126,57 @@ function XDLuaUI:CreateWindow(title)
     end
 
     -- เมธอดเพิ่มแท็บ
-    function XDLuaUI:AddTab(tabName)
-        local tabIndex = #tabs + 1
+function XDLuaUI:AddTab(tabName)
+    local tabIndex = #tabs + 1
 
-        local tabButton = Instance.new("TextButton", tabScrollingFrame)
-        tabButton.Size = UDim2.new(1, -10, 0, 40)
-        tabButton.Text = tabName
-        tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        tabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        tabButton.Font = Enum.Font.GothamBold
-        tabButton.TextSize = 14
-        tabButton.AutoButtonColor = false
-        tabButton.MouseButton1Click:Connect(function()
-            switchTab(tabIndex)
-        end)
+    local tabButton = Instance.new("TextButton", tabScrollingFrame)
+    tabButton.Size = UDim2.new(0, 100, 0, 35) -- ปรับขนาดปุ่มให้เล็กลง (จาก 1, -10 เป็น 0, 100)
+    tabButton.AnchorPoint = Vector2.new(0.5, 0) -- ตั้งจุดยึดตรงกลาง
+    tabButton.Text = tabName
+    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    tabButton.Font = Enum.Font.GothamBold
+    tabButton.TextSize = 14
+    tabButton.AutoButtonColor = false
+    tabButton.MouseButton1Click:Connect(function()
+        switchTab(tabIndex)
+    end)
 
-        local buttonGlow = Instance.new("UIStroke", tabButton)
-        buttonGlow.Name = "Stroke"
-        buttonGlow.Thickness = 2
-        buttonGlow.Color = Color3.fromRGB(255, 50, 255)
-        buttonGlow.Transparency = 1
+    local buttonGlow = Instance.new("UIStroke", tabButton)
+    buttonGlow.Name = "Stroke"
+    buttonGlow.Thickness = 2
+    buttonGlow.Color = Color3.fromRGB(255, 50, 255)
+    buttonGlow.Transparency = 1
 
-        local tabCorner = Instance.new("UICorner", tabButton)
-        tabCorner.CornerRadius = UDim.new(0, 5)
+    local tabCorner = Instance.new("UICorner", tabButton)
+    tabCorner.CornerRadius = UDim.new(0, 5)
 
-        -- สร้างเฟรมเนื้อหาแท็บ
-        local tabContent = Instance.new("Frame", contentScrollingFrame)
-        tabContent.Size = UDim2.new(1, 0, 0, 0)
-        tabContent.Name = "Tab" .. tabIndex
-        tabContent.Visible = false
-        tabContent.BackgroundTransparency = 1
-        tabContent.AutomaticSize = Enum.AutomaticSize.Y
+    -- สร้างเฟรมเนื้อหาแท็บ
+    local tabContent = Instance.new("Frame", contentScrollingFrame)
+    tabContent.Size = UDim2.new(1, 0, 0, 0)
+    tabContent.Name = "Tab" .. tabIndex
+    tabContent.Visible = false
+    tabContent.BackgroundTransparency = 1
+    tabContent.AutomaticSize = Enum.AutomaticSize.Y
 
-        -- เพิ่ม UIListLayout ใน tabContent เพื่อจัดการตำแหน่งขององค์ประกอบภายใน
-        local tabContentLayout = Instance.new("UIListLayout", tabContent)
-        tabContentLayout.Padding = UDim.new(0, 10)
-        tabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        tabContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center -- จัดให้ปุ่มอยู่ตรงกลาง
+    -- เพิ่ม UIListLayout ใน tabContent เพื่อจัดการตำแหน่งขององค์ประกอบภายใน
+    local tabContentLayout = Instance.new("UIListLayout", tabContent)
+    tabContentLayout.Padding = UDim.new(0, 10)
+    tabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    tabContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-        tabs[tabIndex] = {
-            Button = tabButton,
-            Content = tabContent
-        }
+    tabs[tabIndex] = {
+        Button = tabButton,
+        Content = tabContent
+    }
 
-        if tabIndex == 1 then
-            switchTab(1)
-        end
-
-        return tabContent
+    if tabIndex == 1 then
+        switchTab(1)
     end
 
+    return tabContent
+end
+    
     -- เมธอดแก้ไข Title
     function XDLuaUI:SetTitle(newTitle)
         titleLabel.Text = newTitle
