@@ -335,7 +335,7 @@ function XDLuaUI:CreateWindow(title)
                 local relativeX = (inputPosition.X - sliderBarPosition.X) / sliderBarSize.X
                 local value = math.floor(minValue + (maxValue - minValue) * math.clamp(relativeX, 0, 1))
                 updateSlider(value)
-            end)
+                end
         end)
 
         updateSlider(defaultValue) -- อัปเดตค่าเริ่มต้น
