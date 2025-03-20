@@ -464,4 +464,12 @@ function XDLuaUI:CreateWindow(title)
         end)
     end
 
-    -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อนเ
+    -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อนเฟรมหลัก
+    logoButton.MouseButton1Click:Connect(function()
+        mainFrame.Visible = not mainFrame.Visible
+    end)
+
+    return XDLuaUI
+end
+
+return XDLuaUI
