@@ -18,18 +18,30 @@ local font = Enum.Font.GothamBlack
 -- FORSAKEN
 window:AddMapTab(
     "FORSAKEN",
-    "นี่คือคำอธิบายของแมพ1\n- รองรับผู้เล่น 1-4 คน\n- ความยาก: ง่าย",
-    "https://raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/Map1Script.lua"
+    "ยินดีต้อนรับสู่ สคริปต์ของผม\nสคริปต์นี้คือสคริปต์แมพ FORSAKEN", "พัฒนาโดย: IronFang\nเวอร์ชันสคริปต์: 7.1.5 ",
+    "https://raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/Forsaken.lua"
 )
 -- เพิ่มแท็บสำหรับแมพ2
-ui:AddMapTab(
-    "แมพ2",
-    "นี่คือคำอธิบายของแมพ2\n- รองรับผู้เล่น 2-6 คน\n- ความยาก: ปานกลาง",
-    "https://raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/Map2Script.lua"
+window:AddMapTab(
+    "//",
+    "ขณะนี้ยังไม่มีสคริปต์\n- โปรกรอการอัพเดต\n- สามารถแนะนำได้",
+    ""
 )
 -- เพิ่มแท็บสำหรับแมพ3
-ui:AddMapTab(
-    "แมพ3",
-    "นี่คือคำอธิบายของแมพ3\n- รองรับผู้เล่น 4-8 คน\n- ความยาก: ยาก",
-    "https://raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/Map3Script.lua"
+window:AddMapTab(
+    "//",
+    "ขณะนี้ยังไม่มีสคริปต์\n- โปรกรอการอัพเดต\n- สามารถแนะนำได้",
+    ""
+)
+--
+window:AddMapTab(
+    "//",
+    "ขณะนี้ยังไม่มีสคริปต์\n- โปรกรอการอัพเดต\n- สามารถแนะนำได้",
+    ""
+)
+--
+window:AddMapTab(
+    "//",
+    "ขณะนี้ยังไม่มีสคริปต์\n- โปรกรอการอัพเดต\n- สามารถแนะนำได้",
+    ""
 )
