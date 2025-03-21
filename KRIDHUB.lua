@@ -22,10 +22,10 @@ window:AddMapTab(
     "https://raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/Forsaken.lua"
 )
 -- 2
-window:AddExTab(//)
+window:AddExTab("//")
 -- 3
-window:AddExTab(//)
+window:AddExTab("//")
 -- 4
-window:AddExTab(//)
+window:AddExTab("//")
 -- 5
-window:AddExTab(//)
+window:AddExTab("//")
