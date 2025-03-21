@@ -362,6 +362,85 @@ contentListLayout.SortOrder = Enum.SortOrder.LayoutOrder
         return tabContent
     end
 
+    -- เมธอดเพิ่มแท็บพิเศษ (ไม่มีสคริปต์ มีปุ่มติดต่อเปล่าๆ)
+    function XDLuaUI:AddPlaceholderTab(mapName)
+        local tabIndex = #tabs + 1
+
+        -- สร้างปุ่มแท็บ
+        local tabButton = Instance.new("TextButton", tabScrollingFrame)
+        tabButton.Size = UDim2.new(0.9, 0, 0, 40)
+        tabButton.AnchorPoint = Vector2.new(0.5, 0)
+        tabButton.Text = mapName
+        tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        tabButton.Font = Enum.Font.GothamBold
+        tabButton.TextSize = 14
+        tabButton.AutoButtonColor = false
+        tabButton.MouseButton1Click:Connect(function()
+            switchTab(tabIndex)
+        end)
+
+        local buttonGlow = Instance.new("UIStroke", tabButton)
+        buttonGlow.Name = "Stroke"
+        buttonGlow.Thickness = 2
+        buttonGlow.Color = Color3.fromRGB(255, 50, 255)
+        buttonGlow.Transparency = 1
+
+        local tabCorner = Instance.new("UICorner", tabButton)
+        tabCorner.CornerRadius = UDim.new(0, 5)
+
+        -- สร้างเฟรมเนื้อหาแท็บ
+        local tabContent = Instance.new("Frame", contentScrollingFrame)
+        tabContent.Size = UDim2.new(1, 0, 0, 0)
+        tabContent.Name = "Tab" .. tabIndex
+        tabContent.Visible = false
+        tabContent.BackgroundTransparency = 1
+        tabContent.AutomaticSize = Enum.AutomaticSize.Y
+
+        -- เพิ่ม UIListLayout ใน tabContent เพื่อจัดการตำแหน่งขององค์ประกอบภายใน
+        local tabContentLayout = Instance.new("UIListLayout", tabContent)
+        tabContentLayout.Padding = UDim.new(0, 10)
+        tabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        tabContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+        -- เพิ่มคำอธิบายของแท็บ
+        local descriptionLabel = Instance.new("TextLabel", tabContent)
+        descriptionLabel.Size = UDim2.new(0.9, 0, 0, 60)
+        descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
+        descriptionLabel.Text = "ขณะนี้ยังไม่มีสคริปต์\n- โปรกรอการอัพเดต\n- สามารถแนะนำแมพได้"
+        descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        descriptionLabel.BackgroundTransparency = 1
+        descriptionLabel.Font = Enum.Font.GothamBold
+        descriptionLabel.TextSize = 14
+        descriptionLabel.TextWrapped = true
+
+        -- เพิ่มปุ่ม "ติดต่อ" (ปุ่มเปล่า)
+        local contactButton = Instance.new("TextButton", tabContent)
+        contactButton.Size = UDim2.new(0.9, 0, 0, 30)
+        contactButton.AnchorPoint = Vector2.new(0.5, 0)
+        contactButton.Text = "ติดต่อ"
+        contactButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- สีเทา (เพื่อให้ดูเหมือนปุ่มที่ไม่ทำงาน)
+        contactButton.Font = Enum.Font.GothamBold
+        contactButton.TextSize = 14
+        contactButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+        local contactButtonCorner = Instance.new("UICorner", contactButton)
+        contactButtonCorner.CornerRadius = UDim.new(0, 8)
+
+        -- ไม่เพิ่มการทำงานให้ปุ่ม "ติดต่อ" (ปุ่มเปล่า)
+
+        tabs[tabIndex] = {
+            Button = tabButton,
+            Content = tabContent
+        }
+
+        if tabIndex == 1 then
+            switchTab(1)
+        end
+
+        return tabContent
+    end
+
     -- เมธอดแก้ไข Title
     function XDLuaUI:SetTitle(newTitle)
         titleLabel.Text = newTitle
