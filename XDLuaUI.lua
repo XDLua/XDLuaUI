@@ -330,7 +330,7 @@ function XDLuaUI:CreateWindow(title)
         isToggled = not isToggled
         if isToggled then
             switchHandle.Position = UDim2.new(0, 2, 0.5, 0) -- วงกลมเลื่อนไปซ้าย (เปิด)
-            switchHandle.BackgroundColor3 = Color3.fromRGB(100, 0, 100) -- วงกลมสีม่วงเมื่อเปิด
+            switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255) -- วงกลมสีม่วงเมื่อเปิด
         else
             switchHandle.Position = UDim2.new(1, -18, 0.5, 0) -- วงกลมเลื่อนไปขวา (ปิด)
             switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- วงกลมสีขาวเมื่อปิด
@@ -539,7 +539,7 @@ function XDLuaUI:AddToggle2(tabContent, toggleText, descriptionText, defaultStat
         isToggled = not isToggled
         if isToggled then
             switchHandle.Position = UDim2.new(0, 2, 0.5, 0) -- วงกลมเลื่อนไปซ้าย (เปิด)
-            switchHandle.BackgroundColor3 = Color3.fromRGB(100, 0, 100) -- วงกลมสีม่วงเมื่อเปิด
+            switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255) -- วงกลมสีม่วงเมื่อเปิด
         else
             switchHandle.Position = UDim2.new(1, -18, 0.5, 0) -- วงกลมเลื่อนไปขวา (ปิด)
             switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- วงกลมสีขาวเมื่อปิด
