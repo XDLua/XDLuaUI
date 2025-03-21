@@ -59,20 +59,17 @@ function XDLuaUI:CreateWindow(title)
     titleLabel.TextSize = 20
     titleLabel.TextStrokeTransparency = 0.2
 
-    -- สร้างปุ่มปิด
-    local closeButton = Instance.new("TextButton", mainFrame)
-    closeButton.Size = UDim2.new(0, 30, 0, 30)
-    closeButton.Position = UDim2.new(1, -40, 0, 5)
-    closeButton.Text = "X"
-    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    closeButton.Font = Enum.Font.GothamBold
-    closeButton.TextSize = 16
-    closeButton.MouseButton1Click:Connect(function()
-        mainFrame.Visible = false
-    end)
-    local closeCorner = Instance.new("UICorner", closeButton)
-    closeCorner.CornerRadius = UDim.new(0, 8)
+    -- สร้างปุ่มฟันเฟือง (แทนปุ่ม X)
+    local settingsButton = Instance.new("TextButton", mainFrame)
+    settingsButton.Size = UDim2.new(0, 30, 0, 30)
+    settingsButton.Position = UDim2.new(1, -40, 0, 5)
+    settingsButton.Text = "⚙️"
+    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    settingsButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+    settingsButton.Font = Enum.Font.GothamBold
+    settingsButton.TextSize = 16
+    local settingsCorner = Instance.new("UICorner", settingsButton)
+    settingsCorner.CornerRadius = UDim.new(0, 8)
 
     -- สร้างเฟรมแท็บ
     local tabFrame = Instance.new("Frame", mainFrame)
@@ -127,9 +124,34 @@ function XDLuaUI:CreateWindow(title)
     contentListLayout.Padding = UDim.new(0, 10)
     contentListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
+    -- สร้างเฟรมสำหรับหน้า "ตั้งค่า"
+    local settingsFrame = Instance.new("Frame", contentScrollingFrame)
+    settingsFrame.Size = UDim2.new(1, 0, 0, 0)
+    settingsFrame.Name = "Settings"
+    settingsFrame.Visible = false
+    settingsFrame.BackgroundTransparency = 1
+    settingsFrame.AutomaticSize = Enum.AutomaticSize.Y
+
+    local settingsLayout = Instance.new("UIListLayout", settingsFrame)
+    settingsLayout.Padding = UDim.new(0, 10)
+    settingsLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    settingsLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+    -- เพิ่มคำอธิบายในหน้า "ตั้งค่า"
+    local settingsLabel = Instance.new("TextLabel", settingsFrame)
+    settingsLabel.Size = UDim2.new(0.9, 0, 0, 40)
+    settingsLabel.AnchorPoint = Vector2.new(0.5, 0)
+    settingsLabel.Text = "การตั้งค่า"
+    settingsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    settingsLabel.BackgroundTransparency = 1
+    settingsLabel.Font = Enum.Font.GothamBold
+    settingsLabel.TextSize = 14
+    settingsLabel.TextWrapped = true
+
     -- ตัวแปรเก็บแท็บและเนื้อหา
     local tabs = {}
     local selectedTab = nil
+    local settingsVisible = false
 
     -- ฟังก์ชันสลับแท็บ
     local function switchTab(tabIndex)
@@ -147,8 +169,36 @@ function XDLuaUI:CreateWindow(title)
         for _, tab in pairs(tabs) do
             tab.Content.Visible = false
         end
+        settingsFrame.Visible = false
+        settingsVisible = false
         selectedTab.Content.Visible = true
     end
+
+    -- ฟังก์ชันสลับไปหน้า "ตั้งค่า"
+    local function toggleSettings()
+        settingsVisible = not settingsVisible
+        if settingsVisible then
+            for _, tab in pairs(tabs) do
+                tab.Content.Visible = false
+            end
+            if selectedTab then
+                selectedTab.Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                if selectedTab.Button:FindFirstChild("Stroke") then
+                    selectedTab.Button:FindFirstChild("Stroke").Transparency = 1
+                end
+                selectedTab = nil
+            end
+            settingsFrame.Visible = true
+        else
+            settingsFrame.Visible = false
+            if tabs[1] then
+                switchTab(1) -- กลับไปที่แท็บแรกถ้าไม่มีแท็บที่เลือก
+            end
+        end
+    end
+
+    -- เพิ่มการทำงานให้ปุ่มฟันเฟือง
+    settingsButton.MouseButton1Click:Connect(toggleSettings)
 
     -- เมธอดเพิ่มแท็บ
     function XDLuaUI:AddTab(tabName)
@@ -224,75 +274,66 @@ function XDLuaUI:CreateWindow(title)
         button.MouseButton1Click:Connect(callback)
     end
 
-    -- เมธอดเพิ่มปุ่มเปิด/ปิด (Toggle) พร้อมสวิตช์กราฟิกหน้าชื่อปุ่มและจัดให้อยู่ตรงกลาง
+    -- เมธอดเพิ่มปุ่มเปิด/ปิด (Toggle) โดยสวิตช์ชิดซ้ายและข้อความอยู่ตรงกลาง
     function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
         local toggleButton = Instance.new("TextButton", tabContent)
         toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
         toggleButton.AnchorPoint = Vector2.new(0.5, 0)
         toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
-        toggleButton.Text = "" -- ลบข้อความออกจาก TextButton เพื่อใช้ Frame ควบคุมการจัดวาง
+        toggleButton.Text = ""
 
         local toggleCorner = Instance.new("UICorner", toggleButton)
         toggleCorner.CornerRadius = UDim.new(0, 8)
 
-        -- สร้าง Frame เพื่อจัดวางสวิตช์และข้อความให้อยู่ตรงกลาง
+        -- สร้าง Frame เพื่อจัดวางสวิตช์และข้อความ
         local contentFrame = Instance.new("Frame", toggleButton)
-        contentFrame.Size = UDim2.new(0, 0, 1, 0) -- ขนาดจะปรับตามเนื้อหาด้วย AutomaticSize
-        contentFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-        contentFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+        contentFrame.Size = UDim2.new(1, 0, 1, 0)
+        contentFrame.Position = UDim2.new(0, 0, 0, 0)
         contentFrame.BackgroundTransparency = 1
-        contentFrame.AutomaticSize = Enum.AutomaticSize.X -- ปรับขนาดตามเนื้อหาในแนวนอน
 
-        -- สร้าง UIListLayout เพื่อจัดเรียงสวิตช์และข้อความในแนวนอน
-        local layout = Instance.new("UIListLayout", contentFrame)
-        layout.FillDirection = Enum.FillDirection.Horizontal
-        layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-        layout.VerticalAlignment = Enum.VerticalAlignment.Center
-        layout.SortOrder = Enum.SortOrder.LayoutOrder
-        layout.Padding = UDim.new(0, 5) -- ระยะห่างระหว่างสวิตช์และข้อความ
-
-        -- สร้างสวิตช์กราฟิก
+        -- สร้างสวิตช์กราฟิก (ชิดซ้าย)
         local switchFrame = Instance.new("Frame", contentFrame)
-        switchFrame.Size = UDim2.new(0, 40, 0, 20) -- ขนาดสวิตช์ (กว้าง 40, สูง 20)
-        switchFrame.BackgroundColor3 = defaultState and Color3.fromRGB(100, 0, 100) or Color3.fromRGB(100, 100, 100) -- สีพื้นหลังสวิตช์
+        switchFrame.Size = UDim2.new(0, 40, 0, 20)
+        switchFrame.Position = UDim2.new(0, 5, 0.5, 0) -- ชิดซ้าย ห่างจากขอบ 5 พิกเซล
+        switchFrame.AnchorPoint = Vector2.new(0, 0.5)
+        switchFrame.BackgroundColor3 = defaultState and Color3.fromRGB(100, 0, 100) or Color3.fromRGB(100, 100, 100)
         switchFrame.BorderSizePixel = 0
-        switchFrame.LayoutOrder = 1 -- ให้สวิตช์อยู่ด้านซ้าย
 
         local switchCorner = Instance.new("UICorner", switchFrame)
-        switchCorner.CornerRadius = UDim.new(1, 0) -- มุมโค้งแบบวงรี
+        switchCorner.CornerRadius = UDim.new(1, 0)
 
         local switchHandle = Instance.new("TextButton", switchFrame)
-        switchHandle.Size = UDim2.new(0, 16, 0, 16) -- ขนาดวงกลม
-        switchHandle.Position = defaultState and UDim2.new(0, 2, 0.5, 0) or UDim2.new(1, -18, 0.5, 0) -- ตำแหน่งเริ่มต้น (ซ้าย=เปิด, ขวา=ปิด)
+        switchHandle.Size = UDim2.new(0, 16, 0, 16)
+        switchHandle.Position = defaultState and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0) -- เปิด=ขวา, ปิด=ซ้าย
         switchHandle.AnchorPoint = Vector2.new(0, 0.5)
         switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         switchHandle.BorderSizePixel = 0
         switchHandle.Text = ""
 
         local handleCorner = Instance.new("UICorner", switchHandle)
-        handleCorner.CornerRadius = UDim.new(1, 0) -- วงกลม
+        handleCorner.CornerRadius = UDim.new(1, 0)
 
-        -- สร้าง TextLabel สำหรับข้อความ
+        -- สร้าง TextLabel สำหรับข้อความ (อยู่ตรงกลาง)
         local textLabel = Instance.new("TextLabel", contentFrame)
-        textLabel.Size = UDim2.new(0, 0, 0, 20) -- ขนาดจะปรับตามข้อความด้วย AutomaticSize
+        textLabel.Size = UDim2.new(0, 0, 0, 20)
+        textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+        textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
         textLabel.BackgroundTransparency = 1
         textLabel.Text = toggleText
         textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         textLabel.Font = Enum.Font.GothamBold
         textLabel.TextSize = 14
-        textLabel.AutomaticSize = Enum.AutomaticSize.X -- ปรับขนาดตามข้อความ
-        textLabel.LayoutOrder = 2 -- ให้ข้อความอยู่ด้านขวาของสวิตช์
+        textLabel.AutomaticSize = Enum.AutomaticSize.X
 
         local isToggled = defaultState or false
         toggleButton.MouseButton1Click:Connect(function()
             isToggled = not isToggled
-            -- อัปเดตตำแหน่งและสีของสวิตช์
             if isToggled then
-                switchHandle.Position = UDim2.new(0, 2, 0.5, 0) -- วงกลมเลื่อนไปซ้าย
-                switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- สีเทาเมื่อปิด
+                switchHandle.Position = UDim2.new(1, -18, 0.5, 0) -- วงกลมเลื่อนไปขวา (เปิด)
+                switchFrame.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
             else
-                switchHandle.Position = UDim2.new(1, -18, 0.5, 0) -- วงกลมเลื่อนไปขวา
-                switchFrame.BackgroundColor3 = Color3.fromRGB(100, 0, 100) -- สีม่วงเมื่อเปิด
+                switchHandle.Position = UDim2.new(0, 2, 0.5, 0) -- วงกลมเลื่อนไปซ้าย (ปิด)
+                switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
             end
             callback(isToggled)
         end)
@@ -331,9 +372,9 @@ function XDLuaUI:CreateWindow(title)
         local sliderHandle = Instance.new("TextButton", sliderBar)
         sliderHandle.Size = UDim2.new(0, 12, 0, 12)
         sliderHandle.Position = UDim2.new((defaultValue - minValue) / (maxValue - minValue), -6, 0, -4)
-        switchHandle.Text = ""
-        switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
-        switchHandle.BorderSizePixel = 0
+        sliderHandle.Text = ""
+        sliderHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
+        sliderHandle.BorderSizePixel = 0
 
         local sliderHandleCorner = Instance.new("UICorner", sliderHandle)
         sliderHandleCorner.CornerRadius = UDim.new(0, 10)
@@ -427,131 +468,4 @@ function XDLuaUI:CreateWindow(title)
         button.TextColor3 = Color3.fromRGB(255, 255, 255)
 
         local buttonCorner = Instance.new("UICorner", button)
-        buttonCorner.CornerRadius = UDim.new(0, 8)
-
-        button.MouseButton1Click:Connect(callback)
-    end
-
-    -- เมธอดเพิ่ม Toggle พร้อมคำอธิบายและสวิตช์กราฟิกหน้าชื่อปุ่มและจัดให้อยู่ตรงกลาง
-    function XDLuaUI:AddToggle2(tabContent, toggleText, descriptionText, defaultState, callback)
-        local descriptionLabel = Instance.new("TextLabel", tabContent)
-        descriptionLabel.Size = UDim2.new(0.9, 0, 0, 20)
-        descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
-        descriptionLabel.Text = descriptionText
-        descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        descriptionLabel.BackgroundTransparency = 1
-        descriptionLabel.Font = Enum.Font.GothamBold
-        descriptionLabel.TextSize = 12
-        descriptionLabel.TextWrapped = true
-
-        local toggleButton = Instance.new("TextButton", tabContent)
-        toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
-        toggleButton.AnchorPoint = Vector2.new(0.5, 0)
-        toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
-        toggleButton.Text = ""
-
-        local toggleCorner = Instance.new("UICorner", toggleButton)
-        toggleCorner.CornerRadius = UDim.new(0, 8)
-
-        -- สร้างสวิตช์กราฟิก
-        local switchFrame = Instance.new("Frame", contentFrame)
-        switchFrame.Size = UDim2.new(0, 40, 0, 20)
-        switchFrame.BackgroundColor3 = defaultState and Color3.fromRGB(100, 0, 100) or Color3.fromRGB(100, 100, 100)
-        switchFrame.BorderSizePixel = 0
-        switchFrame.LayoutOrder = 1
-
-        local switchCorner = Instance.new("UICorner", switchFrame)
-        switchCorner.CornerRadius = UDim.new(1, 0)
-
-        local switchHandle = Instance.new("TextButton", switchFrame)
-        switchHandle.Size = UDim2.new(0, 16, 0, 16)
-        switchHandle.Position = defaultState and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)
-        switchHandle.AnchorPoint = Vector2.new(0, 0.5)
-        switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        switchHandle.BorderSizePixel = 0
-        switchHandle.Text = ""
-
-        local handleCorner = Instance.new("UICorner", switchHandle)
-        handleCorner.CornerRadius = UDim.new(1, 0)
-
-        -- สร้าง TextLabel สำหรับข้อความ
-        local textLabel = Instance.new("TextLabel", contentFrame)
-        textLabel.Size = UDim2.new(0, 0, 0, 20)
-        textLabel.BackgroundTransparency = 1
-        textLabel.Text = toggleText
-        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        textLabel.Font = Enum.Font.GothamBold
-        textLabel.TextSize = 14
-        textLabel.AutomaticSize = Enum.AutomaticSize.X
-        textLabel.LayoutOrder = 2
-
-        local isToggled = defaultState or false
-        toggleButton.MouseButton1Click:Connect(function()
-            isToggled = not isToggled
-            if isToggled then
-                switchHandle.Position = UDim2.new(1, -18, 0.5, 0)
-                switchFrame.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
-            else
-                switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
-                switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-            end
-            callback(isToggled)
-        end)
-    end
-
-    -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ YouTube
-    function XDLuaUI:Youtube(tabContent, youtubeLink)
-        local Youtube = Instance.new("TextButton", tabContent)
-        Youtube.Size = UDim2.new(0.9, 0, 0, 30)
-        Youtube.AnchorPoint = Vector2.new(0.5, 0)
-        Youtube.Text = "📋 คัดลอกลิงค์ YouTube"
-        Youtube.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-        Youtube.Font = Enum.Font.GothamBold
-        Youtube.TextSize = 14
-        Youtube.TextColor3 = Color3.fromRGB(255, 255, 255)
-
-        local youtubeCorner = Instance.new("UICorner", Youtube)
-        youtubeCorner.CornerRadius = UDim.new(0, 8)
-
-        Youtube.MouseButton1Click:Connect(function()
-            setclipboard(youtubeLink)
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "คัดลอกลิงค์ YouTube",
-                Text = "คัดลอกลิงค์เรียบร้อยแล้ว!",
-                Duration = 3
-            })
-        end)
-    end
-
-    -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ดิสคอร์ด
-    function XDLuaUI:Discord(tabContent)
-        local Discord = Instance.new("TextButton", tabContent)
-        Discord.Size = UDim2.new(0.9, 0, 0, 30)
-        Discord.AnchorPoint = Vector2.new(0.5, 0)
-        Discord.Text = "📋 คัดลอกลิงค์ดิสคอร์ด"
-        Discord.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
-        Discord.Font = Enum.Font.GothamBold
-        Discord.TextSize = 14
-        Discord.TextColor3 = Color3.fromRGB(255, 255, 255)
-
-        local discordCorner = Instance.new("UICorner", Discord)
-        discordCorner.CornerRadius = UDim.new(0, 8)
-
-        Discord.MouseButton1Click:Connect(function()
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "ขออภัย",
-                Text = "ตอนนี้ยังไม่มีกลุ่มดิสครับ",
-                Duration = 3
-            })
-        end)
-    end
-
-    -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อนเฟรมหลัก
-    logoButton.MouseButton1Click:Connect(function()
-        mainFrame.Visible = not mainFrame.Visible
-    end)
-
-    return XDLuaUI
-end
-
-return XDLuaUI
+        buttonCorner.CornerRadius = UDi
