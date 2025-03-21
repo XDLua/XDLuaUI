@@ -81,48 +81,52 @@ function XDLuaUI:CreateWindow(title)
     tabCorner.CornerRadius = UDim.new(0, 8)
 
     -- สร้าง ScrollingFrame สำหรับแท็บ
-    local tabScrollingFrame = Instance.new("ScrollingFrame", tabFrame)
-    tabScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
-    tabScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
-    tabScrollingFrame.BackgroundTransparency = 1
-    tabScrollingFrame.ScrollBarThickness = 4
-    tabScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
-    tabScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    tabScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+local tabScrollingFrame = Instance.new("ScrollingFrame", tabFrame)
+tabScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+tabScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
+tabScrollingFrame.BackgroundTransparency = 1
+tabScrollingFrame.ScrollBarThickness = 4
+tabScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
+tabScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+tabScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+tabScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.Y -- เลื่อนเฉพาะแนวตั้ง
+tabScrollingFrame.ElasticBehavior = Enum.ElasticBehavior.Never -- ปิดการเลื่อนเกินขอบ
 
-    local tabListLayout = Instance.new("UIListLayout", tabScrollingFrame)
-    tabListLayout.Padding = UDim.new(0, 5)
-    tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    tabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+local tabListLayout = Instance.new("UIListLayout", tabScrollingFrame)
+tabListLayout.Padding = UDim.new(0, 5)
+tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+tabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-    -- เพิ่ม UIPadding เพื่อให้ปุ่มแท็บไม่ชิดบนสุด
-    local tabPadding = Instance.new("UIPadding", tabScrollingFrame)
-    tabPadding.PaddingTop = UDim.new(0, 10)
+-- เพิ่ม UIPadding เพื่อให้ปุ่มแท็บไม่ชิดบนสุด
+local tabPadding = Instance.new("UIPadding", tabScrollingFrame)
+tabPadding.PaddingTop = UDim.new(0, 10)
 
-    -- สร้างเฟรมเนื้อหา
-    local contentFrame = Instance.new("Frame", mainFrame)
-    contentFrame.Size = UDim2.new(1, -140, 1, -50)
-    contentFrame.Position = UDim2.new(0, 135, 0, 45)
-    contentFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    contentFrame.BackgroundTransparency = 0.5
-    contentFrame.BorderSizePixel = 0
+-- สร้างเฟรมเนื้อหา
+local contentFrame = Instance.new("Frame", mainFrame)
+contentFrame.Size = UDim2.new(1, -140, 1, -50)
+contentFrame.Position = UDim2.new(0, 135, 0, 45)
+contentFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+contentFrame.BackgroundTransparency = 0.5
+contentFrame.BorderSizePixel = 0
 
-    local contentCorner = Instance.new("UICorner", contentFrame)
-    contentCorner.CornerRadius = UDim.new(0, 10)
+local contentCorner = Instance.new("UICorner", contentFrame)
+contentCorner.CornerRadius = UDim.new(0, 10)
 
-    -- สร้าง ScrollingFrame สำหรับเนื้อหา
-    local contentScrollingFrame = Instance.new("ScrollingFrame", contentFrame)
-    contentScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
-    contentScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
-    contentScrollingFrame.BackgroundTransparency = 1
-    contentScrollingFrame.ScrollBarThickness = 4
-    contentScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
-    contentScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    contentScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+-- สร้าง ScrollingFrame สำหรับเนื้อหา
+local contentScrollingFrame = Instance.new("ScrollingFrame", contentFrame)
+contentScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+contentScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
+contentScrollingFrame.BackgroundTransparency = 1
+contentScrollingFrame.ScrollBarThickness = 4
+contentScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 255)
+contentScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+contentScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+contentScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.Y -- เลื่อนเฉพาะแนวตั้ง
+contentScrollingFrame.ElasticBehavior = Enum.ElasticBehavior.Never -- ปิดการเลื่อนเกินขอบ
 
-    local contentListLayout = Instance.new("UIListLayout", contentScrollingFrame)
-    contentListLayout.Padding = UDim.new(0, 10)
-    contentListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+local contentListLayout = Instance.new("UIListLayout", contentScrollingFrame)
+contentListLayout.Padding = UDim.new(0, 10)
+contentListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
     -- สร้างเฟรมสำหรับหน้า "ตั้งค่า"
     local settingsFrame = Instance.new("Frame", contentScrollingFrame)
