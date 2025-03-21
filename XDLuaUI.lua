@@ -263,7 +263,7 @@ function XDLuaUI:CreateWindow(title)
 
         local switchHandle = Instance.new("TextButton", switchFrame)
         switchHandle.Size = UDim2.new(0, 16, 0, 16) -- ขนาดวงกลม
-        switchHandle.Position = defaultState and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0) -- ตำแหน่งเริ่มต้น (ซ้าย=ปิด, ขวา=เปิด)
+        switchHandle.Position = defaultState and UDim2.new(0, 2, 0.5, 0) or UDim2.new(1, -18, 0.5, 0) -- ตำแหน่งเริ่มต้น (ซ้าย=เปิด, ขวา=ปิด)
         switchHandle.AnchorPoint = Vector2.new(0, 0.5)
         switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         switchHandle.BorderSizePixel = 0
@@ -288,11 +288,11 @@ function XDLuaUI:CreateWindow(title)
             isToggled = not isToggled
             -- อัปเดตตำแหน่งและสีของสวิตช์
             if isToggled then
-                switchHandle.Position = UDim2.new(1, -18, 0.5, 0) -- วงกลมเลื่อนไปขวา
-                switchFrame.BackgroundColor3 = Color3.fromRGB(100, 0, 100) -- สีม่วงเมื่อเปิด
-            else
                 switchHandle.Position = UDim2.new(0, 2, 0.5, 0) -- วงกลมเลื่อนไปซ้าย
                 switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- สีเทาเมื่อปิด
+            else
+                switchHandle.Position = UDim2.new(1, -18, 0.5, 0) -- วงกลมเลื่อนไปขวา
+                switchFrame.BackgroundColor3 = Color3.fromRGB(100, 0, 100) -- สีม่วงเมื่อเปิด
             end
             callback(isToggled)
         end)
