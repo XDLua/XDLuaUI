@@ -275,7 +275,7 @@ function XDLuaUI:CreateWindow(title)
     end
 
     -- เมธอดเพิ่มปุ่มเปิด/ปิด (Toggle) โดยสวิตช์ชิดซ้ายและข้อความอยู่ตรงกลาง
-function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
+    function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
     local toggleButton = Instance.new("TextButton", tabContent)
     toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
     toggleButton.AnchorPoint = Vector2.new(0.5, 0)
