@@ -363,7 +363,7 @@ contentListLayout.SortOrder = Enum.SortOrder.LayoutOrder
     end
 
     -- เมธอดเพิ่มแท็บพิเศษ (ไม่มีสคริปต์ มีปุ่มติดต่อเปล่าๆ)
-    function XDLuaUI:AddPlaceholderTab(mapName)
+    function XDLuaUI:AddExTab(mapName)
         local tabIndex = #tabs + 1
 
         -- สร้างปุ่มแท็บ
