@@ -21,27 +21,11 @@ window:AddMapTab(
     "ยินดีต้อนรับสู่ สคริปต์ของผม\nสคริปต์นี้คือสคริปต์แมพ FORSAKEN", "พัฒนาโดย: IronFang\nเวอร์ชันสคริปต์: 7.1.5 ",
     "https://raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/Forsaken.lua"
 )
--- เพิ่มแท็บสำหรับแมพ2
-window:AddMapTab(
-    "//",
-    "ขณะนี้ยังไม่มีสคริปต์\n- โปรกรอการอัพเดต\n- สามารถแนะนำได้",
-    ""
-)
--- เพิ่มแท็บสำหรับแมพ3
-window:AddMapTab(
-    "//",
-    "ขณะนี้ยังไม่มีสคริปต์\n- โปรกรอการอัพเดต\n- สามารถแนะนำได้",
-    ""
-)
---
-window:AddMapTab(
-    "//",
-    "ขณะนี้ยังไม่มีสคริปต์\n- โปรกรอการอัพเดต\n- สามารถแนะนำได้",
-    ""
-)
---
-window:AddMapTab(
-    "//",
-    "ขณะนี้ยังไม่มีสคริปต์\n- โปรกรอการอัพเดต\n- สามารถแนะนำได้",
-    ""
-)
+-- 2
+window:AddExTab(//)
+-- 3
+window:AddExTab(//)
+-- 4
+window:AddExTab(//)
+-- 5
+window:AddExTab(//)
