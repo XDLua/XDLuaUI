@@ -59,7 +59,7 @@ function XDLuaUI:CreateWindow(title)
     titleLabel.TextSize = 20
     titleLabel.TextStrokeTransparency = 0.2
 
-    -- สร้างปุ่มฟันเฟือง (แทนปุ่ม X)
+    -- สร้างปุ่มฟันเฟือง
     local settingsButton = Instance.new("TextButton", mainFrame)
     settingsButton.Size = UDim2.new(0, 30, 0, 30)
     settingsButton.Position = UDim2.new(1, -40, 0, 5)
@@ -275,68 +275,68 @@ function XDLuaUI:CreateWindow(title)
     end
 
     -- เมธอดเพิ่มปุ่มเปิด/ปิด (Toggle) โดยสวิตช์ชิดซ้ายและข้อความอยู่ตรงกลาง
-    function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
-        local toggleButton = Instance.new("TextButton", tabContent)
-        toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
-        toggleButton.AnchorPoint = Vector2.new(0.5, 0)
-        toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
-        toggleButton.Text = ""
+function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
+    local toggleButton = Instance.new("TextButton", tabContent)
+    toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
+    toggleButton.AnchorPoint = Vector2.new(0.5, 0)
+    toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+    toggleButton.Text = ""
 
-        local toggleCorner = Instance.new("UICorner", toggleButton)
-        toggleCorner.CornerRadius = UDim.new(0, 8)
+    local toggleCorner = Instance.new("UICorner", toggleButton)
+    toggleCorner.CornerRadius = UDim.new(0, 8)
 
-        -- สร้าง Frame เพื่อจัดวางสวิตช์และข้อความ
-        local contentFrame = Instance.new("Frame", toggleButton)
-        contentFrame.Size = UDim2.new(1, 0, 1, 0)
-        contentFrame.Position = UDim2.new(0, 0, 0, 0)
-        contentFrame.BackgroundTransparency = 1
+    -- สร้าง Frame เพื่อจัดวางสวิตช์และข้อความ
+    local contentFrame = Instance.new("Frame", toggleButton)
+    contentFrame.Size = UDim2.new(1, 0, 1, 0)
+    contentFrame.Position = UDim2.new(0, 0, 0, 0)
+    contentFrame.BackgroundTransparency = 1
 
-        -- สร้างสวิตช์กราฟิก (ชิดซ้าย)
-        local switchFrame = Instance.new("Frame", contentFrame)
-        switchFrame.Size = UDim2.new(0, 40, 0, 20)
-        switchFrame.Position = UDim2.new(0, 5, 0.5, 0) -- ชิดซ้าย ห่างจากขอบ 5 พิกเซล
-        switchFrame.AnchorPoint = Vector2.new(0, 0.5)
-        switchFrame.BackgroundColor3 = defaultState and Color3.fromRGB(100, 0, 100) or Color3.fromRGB(100, 100, 100)
-        switchFrame.BorderSizePixel = 0
+    -- สร้างสวิตช์กราฟิก (ชิดซ้าย)
+    local switchFrame = Instance.new("Frame", contentFrame)
+    switchFrame.Size = UDim2.new(0, 40, 0, 20)
+    switchFrame.Position = UDim2.new(0, 5, 0.5, 0) -- ชิดซ้าย ห่างจากขอบ 5 พิกเซล
+    switchFrame.AnchorPoint = Vector2.new(0, 0.5)
+    switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- พื้นหลังสีเทาเสมอ
+    switchFrame.BorderSizePixel = 0
 
-        local switchCorner = Instance.new("UICorner", switchFrame)
-        switchCorner.CornerRadius = UDim.new(1, 0)
+    local switchCorner = Instance.new("UICorner", switchFrame)
+    switchCorner.CornerRadius = UDim.new(1, 0)
 
-        local switchHandle = Instance.new("TextButton", switchFrame)
-        switchHandle.Size = UDim2.new(0, 16, 0, 16)
-        switchHandle.Position = defaultState and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0) -- เปิด=ขวา, ปิด=ซ้าย
-        switchHandle.AnchorPoint = Vector2.new(0, 0.5)
-        switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        switchHandle.BorderSizePixel = 0
-        switchHandle.Text = ""
+    local switchHandle = Instance.new("TextButton", switchFrame)
+    switchHandle.Size = UDim2.new(0, 16, 0, 16)
+    switchHandle.Position = UDim2.new(1, -18, 0.5, 0) -- เริ่มต้นที่ขวา (ปิด)
+    switchHandle.AnchorPoint = Vector2.new(0, 0.5)
+    switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- วงกลมสีขาวเมื่อปิด
+    switchHandle.BorderSizePixel = 0
+    switchHandle.Text = ""
 
-        local handleCorner = Instance.new("UICorner", switchHandle)
-        handleCorner.CornerRadius = UDim.new(1, 0)
+    local handleCorner = Instance.new("UICorner", switchHandle)
+    handleCorner.CornerRadius = UDim.new(1, 0)
 
-        -- สร้าง TextLabel สำหรับข้อความ (อยู่ตรงกลาง)
-        local textLabel = Instance.new("TextLabel", contentFrame)
-        textLabel.Size = UDim2.new(0, 0, 0, 20)
-        textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-        textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-        textLabel.BackgroundTransparency = 1
-        textLabel.Text = toggleText
-        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        textLabel.Font = Enum.Font.GothamBold
-        textLabel.TextSize = 14
-        textLabel.AutomaticSize = Enum.AutomaticSize.X
+    -- สร้าง TextLabel สำหรับข้อความ (อยู่ตรงกลาง)
+    local textLabel = Instance.new("TextLabel", contentFrame)
+    textLabel.Size = UDim2.new(0, 0, 0, 20)
+    textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+    textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = toggleText
+    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    textLabel.Font = Enum.Font.GothamBold
+    textLabel.TextSize = 14
+    textLabel.AutomaticSize = Enum.AutomaticSize.X
 
-        local isToggled = defaultState or false
-        toggleButton.MouseButton1Click:Connect(function()
-            isToggled = not isToggled
-            if isToggled then
-                switchHandle.Position = UDim2.new(1, -18, 0.5, 0) -- วงกลมเลื่อนไปขวา (เปิด)
-                switchFrame.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
-            else
-                switchHandle.Position = UDim2.new(0, 2, 0.5, 0) -- วงกลมเลื่อนไปซ้าย (ปิด)
-                switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-            end
-            callback(isToggled)
-        end)
+    local isToggled = false -- เริ่มต้นเป็น "ปิด" เสมอ
+    toggleButton.MouseButton1Click:Connect(function()
+        isToggled = not isToggled
+        if isToggled then
+            switchHandle.Position = UDim2.new(0, 2, 0.5, 0) -- วงกลมเลื่อนไปซ้าย (เปิด)
+            switchHandle.BackgroundColor3 = Color3.fromRGB(100, 0, 100) -- วงกลมสีม่วงเมื่อเปิด
+        else
+            switchHandle.Position = UDim2.new(1, -18, 0.5, 0) -- วงกลมเลื่อนไปขวา (ปิด)
+            switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- วงกลมสีขาวเมื่อปิด
+        end
+        callback(isToggled)
+    end)
     end
 
     -- เมธอดเพิ่มปุ่มสไลด์
