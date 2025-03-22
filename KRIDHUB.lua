@@ -14,7 +14,7 @@ window:Discord(homeTab)
 window:AddMapTab(
     "FORSAKEN",
     "ยินดีต้อนรับสู่ สคริปต์ของผม\nสคริปต์นี้คือสคริปต์แมพ FORSAKEN", "พัฒนาโดย: IronFang\nเวอร์ชันสคริปต์: 7.1.5 ",
-    "https://raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/Forsaken.lua"
+    "raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/Forsaken.lua"
 )
 -- 2
 window:AddExTab("//")
