@@ -257,110 +257,163 @@ contentListLayout.SortOrder = Enum.SortOrder.LayoutOrder
     end
 
     -- เมธอดเพิ่มแท็บสำหรับแมพ (มีปุ่มรันสคริปต์)
-    function XDLuaUI:AddMapTab(mapName, mapDescription, scriptUrl)
-        local tabIndex = #tabs + 1
+function XDLuaUI:AddMapTab(mapName, mapDescription, scriptUrl)
+    local tabIndex = #tabs + 1
 
-        -- สร้างปุ่มแท็บ
-        local tabButton = Instance.new("TextButton", tabScrollingFrame)
-        tabButton.Size = UDim2.new(0.9, 0, 0, 40)
-        tabButton.AnchorPoint = Vector2.new(0.5, 0)
-        tabButton.Text = mapName
-        tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        tabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        tabButton.Font = Enum.Font.GothamBold
-        tabButton.TextSize = 14
-        tabButton.AutoButtonColor = false
-        tabButton.MouseButton1Click:Connect(function()
-            switchTab(tabIndex)
-        end)
+    -- สร้างปุ่มแท็บ
+    local tabButton = Instance.new("TextButton", tabScrollingFrame)
+    tabButton.Size = UDim2.new(0.9, 0, 0, 40)
+    tabButton.AnchorPoint = Vector2.new(0.5, 0)
+    tabButton.Text = mapName
+    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    tabButton.Font = Enum.Font.GothamBold
+    tabButton.TextSize = 14
+    tabButton.AutoButtonColor = false
+    tabButton.MouseButton1Click:Connect(function()
+        switchTab(tabIndex)
+    end)
 
-        local buttonGlow = Instance.new("UIStroke", tabButton)
-        buttonGlow.Name = "Stroke"
-        buttonGlow.Thickness = 2
-        buttonGlow.Color = Color3.fromRGB(255, 50, 255)
-        buttonGlow.Transparency = 1
+    local buttonGlow = Instance.new("UIStroke", tabButton)
+    buttonGlow.Name = "Stroke"
+    buttonGlow.Thickness = 2
+    buttonGlow.Color = Color3.fromRGB(255, 50, 255)
+    buttonGlow.Transparency = 1
 
-        local tabCorner = Instance.new("UICorner", tabButton)
-        tabCorner.CornerRadius = UDim.new(0, 5)
+    local tabCorner = Instance.new("UICorner", tabButton)
+    tabCorner.CornerRadius = UDim.new(0, 5)
 
-        -- สร้างเฟรมเนื้อหาแท็บ
-        local tabContent = Instance.new("Frame", contentScrollingFrame)
-        tabContent.Size = UDim2.new(1, 0, 0, 0)
-        tabContent.Name = "Tab" .. tabIndex
-        tabContent.Visible = false
-        tabContent.BackgroundTransparency = 1
-        tabContent.AutomaticSize = Enum.AutomaticSize.Y
+    -- สร้างเฟรมเนื้อหาแท็บ
+    local tabContent = Instance.new("Frame", contentScrollingFrame)
+    tabContent.Size = UDim2.new(1, 0, 0, 0)
+    tabContent.Name = "Tab" .. tabIndex
+    tabContent.Visible = false
+    tabContent.BackgroundTransparency = 1
+    tabContent.AutomaticSize = Enum.AutomaticSize.Y
 
-        -- เพิ่ม UIListLayout ใน tabContent เพื่อจัดการตำแหน่งขององค์ประกอบภายใน
-        local tabContentLayout = Instance.new("UIListLayout", tabContent)
-        tabContentLayout.Padding = UDim.new(0, 10)
-        tabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        tabContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    -- เพิ่ม UIListLayout ใน tabContent เพื่อจัดการตำแหน่งขององค์ประกอบภายใน
+    local tabContentLayout = Instance.new("UIListLayout", tabContent)
+    tabContentLayout.Padding = UDim.new(0, 10)
+    tabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    tabContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-        -- เพิ่มคำอธิบายของแมพ
-        local descriptionLabel = Instance.new("TextLabel", tabContent)
-        descriptionLabel.Size = UDim2.new(0.9, 0, 0, 60)
-        descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
-        descriptionLabel.Text = mapDescription
-        descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        descriptionLabel.BackgroundTransparency = 1
-        descriptionLabel.Font = Enum.Font.GothamBold
-        descriptionLabel.TextSize = 14
-        descriptionLabel.TextWrapped = true
+    -- เพิ่มคำอธิบายของแมพ
+    local descriptionLabel = Instance.new("TextLabel", tabContent)
+    descriptionLabel.Size = UDim2.new(0.9, 0, 0, 60)
+    descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
+    descriptionLabel.Text = mapDescription
+    descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    descriptionLabel.BackgroundTransparency = 1
+    descriptionLabel.Font = Enum.Font.GothamBold
+    descriptionLabel.TextSize = 14
+    descriptionLabel.TextWrapped = true
 
-        -- เพิ่มปุ่ม "รันสคริปต์"
-        local runButton = Instance.new("TextButton", tabContent)
-        runButton.Size = UDim2.new(0.9, 0, 0, 30)
-        runButton.AnchorPoint = Vector2.new(0.5, 0)
-        runButton.Text = "รันสคริปต์"
-        runButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0) -- สีเขียว
-        runButton.Font = Enum.Font.GothamBold
-        runButton.TextSize = 14
-        runButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    -- เพิ่มปุ่ม "รันสคริปต์"
+    local runButton = Instance.new("TextButton", tabContent)
+    runButton.Size = UDim2.new(0.9, 0, 0, 30)
+    runButton.AnchorPoint = Vector2.new(0.5, 0)
+    runButton.Text = "รันสคริปต์"
+    runButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0) -- สีเขียว
+    runButton.Font = Enum.Font.GothamBold
+    runButton.TextSize = 14
+    runButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-        local runButtonCorner = Instance.new("UICorner", runButton)
-        runButtonCorner.CornerRadius = UDim.new(0, 8)
+    local runButtonCorner = Instance.new("UICorner", runButton)
+    runButtonCorner.CornerRadius = UDim.new(0, 8)
 
-        -- เพิ่มการทำงานให้ปุ่ม "รันสคริปต์"
-        runButton.MouseButton1Click:Connect(function()
-            local success, result = pcall(function()
-                local scriptCode = game:HttpGet(scriptUrl)
-                local scriptFunction = loadstring(scriptCode)
-                if scriptFunction then
-                    scriptFunction()
-                    game:GetService("StarterGui"):SetCore("SendNotification", {
-                        Title = "รันสคริปต์สำเร็จ",
-                        Text = "สคริปต์สำหรับ " .. mapName .. " ทำงานแล้ว!",
-                        Duration = 3
-                    })
-                else
-                    game:GetService("StarterGui"):SetCore("SendNotification", {
-                        Title = "ข้อผิดพลาด",
-                        Text = "ไม่สามารถโหลดสคริปต์ได้",
-                        Duration = 3
-                    })
-                end
-            end)
-            if not success then
-                game:GetService("StarterGui"):SetCore("SendNotification", {
-                    Title = "ข้อผิดพลาด",
-                    Text = "เกิดข้อผิดพลาด: " .. tostring(result),
-                    Duration = 3
-                })
-            end
-        end)
-
-        tabs[tabIndex] = {
-            Button = tabButton,
-            Content = tabContent
-        }
-
-        if tabIndex == 1 then
-            switchTab(1)
+    -- เพิ่มการทำงานให้ปุ่ม "รันสคริปต์"
+    runButton.MouseButton1Click:Connect(function()
+        -- ตรวจสอบว่า URL ว่างหรือไม่
+        if not scriptUrl or scriptUrl == "" then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "ข้อผิดพลาด",
+                Text = "URL ของสคริปต์ไม่ถูกต้องหรือว่างเปล่า",
+                Duration = 5
+            })
+            return
         end
 
-        return tabContent
+        -- ตรวจสอบว่า URL ใช้โปรโตคอล HTTP/HTTPS หรือไม่
+        if not scriptUrl:lower():match("^https?://") then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "ข้อผิดพลาด",
+                Text = "URL ต้องใช้โปรโตคอล HTTP หรือ HTTPS เท่านั้น",
+                Duration = 5
+            })
+            return
+        end
+
+        -- ใช้ pcall เพื่อจัดการข้อผิดพลาด
+        local success, result = pcall(function()
+            -- ตรวจสอบว่า game:HttpGet ทำงานได้หรือไม่
+            local scriptCode = game:HttpGet(scriptUrl, true)
+            if not scriptCode or scriptCode == "" then
+                error("ไม่สามารถดึงโค้ดจาก URL ได้: " .. scriptUrl)
+            end
+
+            -- ตรวจสอบว่า loadstring ทำงานได้หรือไม่
+            local scriptFunction = loadstring(scriptCode)
+            if not scriptFunction then
+                error("โค้ดในสคริปต์ไม่ถูกต้องหรือไม่สามารถโหลดได้")
+                        end
+                        
+            scriptFunction()
+        end)
+                -- แจ้งผลลัพธ์
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "รันสคริปต์สำเร็จ",
+                Text = "สคริปต์สำหรับ " .. mapName .. " ทำงานแล้ว!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "ข้อผิดพลาด",
+                Text = "เกิดข้อผิดพลาด: " .. tostring(result),
+                Duration = 5
+            })
+        end
+    end)
+
+    tabs[tabIndex] = {
+        Button = tabButton,
+        Content = tabContent
+    }
+
+    if tabIndex == 1 then
+        switchTab(1)
     end
+
+    return tabContent
+    end
+
+        -- แจ้งผลลัพธ์
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "รันสคริปต์สำเร็จ",
+                Text = "สคริปต์สำหรับ " .. mapName .. " ทำงานแล้ว!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "ข้อผิดพลาด",
+                Text = "เกิดข้อผิดพลาด: " .. tostring(result),
+                Duration = 5
+            })
+        end
+    end)
+
+    tabs[tabIndex] = {
+        Button = tabButton,
+        Content = tabContent
+    }
+
+    if tabIndex == 1 then
+        switchTab(1)
+    end
+
+    return tabContent
+end
 
     -- เมธอดเพิ่มแท็บพิเศษ (ไม่มีสคริปต์ มีปุ่มติดต่อเปล่าๆ)
     function XDLuaUI:AddExTab(mapName)
