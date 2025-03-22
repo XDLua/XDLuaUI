@@ -355,37 +355,11 @@ function XDLuaUI:AddMapTab(mapName, mapDescription, scriptUrl)
             local scriptFunction = loadstring(scriptCode)
             if not scriptFunction then
                 error("โค้ดในสคริปต์ไม่ถูกต้องหรือไม่สามารถโหลดได้")
-                        end
-                        
+            end
+
+            -- รันสคริปต์
             scriptFunction()
         end)
-                -- แจ้งผลลัพธ์
-        if success then
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "รันสคริปต์สำเร็จ",
-                Text = "สคริปต์สำหรับ " .. mapName .. " ทำงานแล้ว!",
-                Duration = 3
-            })
-        else
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "ข้อผิดพลาด",
-                Text = "เกิดข้อผิดพลาด: " .. tostring(result),
-                Duration = 5
-            })
-        end
-    end)
-
-    tabs[tabIndex] = {
-        Button = tabButton,
-        Content = tabContent
-    }
-
-    if tabIndex == 1 then
-        switchTab(1)
-    end
-
-    return tabContent
-    end
 
         -- แจ้งผลลัพธ์
         if success then
