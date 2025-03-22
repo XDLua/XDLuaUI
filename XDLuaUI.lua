@@ -339,7 +339,7 @@ function XDLuaUI:CreateWindow(title)
         end)
     end
 
-    -- เมธอดเพิ่มแท็บ Executor
+    -- เมธอดเพิ่มแท็บ Executor (แก้ไขแล้ว)
     function XDLuaUI:AddExecutorTab()
         local tabContent = XDLuaUI:AddTab("Executor")
 
@@ -364,6 +364,7 @@ function XDLuaUI:CreateWindow(title)
         scriptUrlBox.Font = Enum.Font.GothamBold
         scriptUrlBox.TextSize = 14
         scriptUrlBox.ClearTextOnFocus = true
+        scriptUrlBox.TextWrapped = true
 
         local scriptUrlBoxCorner = Instance.new("UICorner", scriptUrlBox)
         scriptUrlBoxCorner.CornerRadius = UDim.new(0, 8)
@@ -382,21 +383,38 @@ function XDLuaUI:CreateWindow(title)
         executeButtonCorner.CornerRadius = UDim.new(0, 8)
 
         executeButton.MouseButton1Click:Connect(function()
-            local scriptUrl = scriptUrlBox.Text
+            local scriptUrl = scriptUrlBox.Text:match("^%s*(.-)%s*$") -- ตัดช่องว่างหน้า-หลัง
             if scriptUrl == "" or scriptUrl == "วางลิงค์สคริปต์ที่นี่" then
                 game:GetService("StarterGui"):SetCore("SendNotification", {
                     Title = "ข้อผิดพลาด",
-                    Text = "กรุณาวางลิงค์สคริปต์!",
+                    Text = "กรุณาวางลิงค์สคริปต์ที่ถูกต้อง!",
+                    Duration = 3
+                })
+                return
+            end
+
+            -- ตรวจสอบว่า URL เป็นลิงค์ที่ถูกต้อง (เริ่มต้นด้วย http หรือ https)
+            if not scriptUrl:match("^https?://") then
+                game:GetService("StarterGui"):SetCore("SendNotification", {
+                    Title = "ข้อผิดพลาด",
+                    Text = "ลิงค์ไม่ถูกต้อง! ต้องเริ่มต้นด้วย http:// หรือ https://",
                     Duration = 3
                 })
                 return
             end
 
             local success, err = pcall(function()
-                local scriptContent = game:HttpGet(scriptUrl)
+                local scriptContent = game:HttpGet(scriptUrl, true) -- เพิ่ม true เพื่อให้รอการโหลด
+                if not scriptContent or scriptContent == "" then
+                    error("ไม่สามารถดึงเนื้อหาสคริปต์ได้")
+                end
                 local scriptFunc = loadstring(scriptContent)
+                if not scriptFunc then
+                    error("ไม่สามารถโหลดสคริปต์ได้")
+                end
                 scriptFunc()
             end)
+
             if success then
                 game:GetService("StarterGui"):SetCore("SendNotification", {
                     Title = "รันสคริปต์",
@@ -407,9 +425,31 @@ function XDLuaUI:CreateWindow(title)
                 game:GetService("StarterGui"):SetCore("SendNotification", {
                     Title = "ข้อผิดพลาด",
                     Text = "รันสคริปต์ล้มเหลว: " .. tostring(err),
-                    Duration = 3
+                    Duration = 5
                 })
             end
+        end)
+
+        -- เพิ่มปุ่มล้างช่อง TextBox (เพื่อความสะดวก)
+        local clearButton = Instance.new("TextButton", tabContent)
+        clearButton.Size = UDim2.new(0.9, 0, 0, 30)
+        clearButton.AnchorPoint = Vector2.new(0.5, 0)
+        clearButton.Text = "ล้างช่อง"
+        clearButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        clearButton.Font = Enum.Font.GothamBold
+        clearButton.TextSize = 14
+        clearButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+        local clearButtonCorner = Instance.new("UICorner", clearButton)
+        clearButtonCorner.CornerRadius = UDim.new(0, 8)
+
+        clearButton.MouseButton1Click:Connect(function()
+            scriptUrlBox.Text = "วางลิงค์สคริปต์ที่นี่"
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "ล้างช่อง",
+                Text = "ล้างช่องเรียบร้อยแล้ว!",
+                Duration = 3
+            })
         end)
     end
 
@@ -449,110 +489,4 @@ function XDLuaUI:CreateWindow(title)
         -- สร้าง Frame เพื่อจัดวางสวิตช์และข้อความ
         local contentFrame = Instance.new("Frame", toggleButton)
         contentFrame.Size = UDim2.new(1, 0, 1, 0)
-        contentFrame.Position = UDim2.new(0, 0, 0, 0)
-        contentFrame.BackgroundTransparency = 1
-
-        -- สร้างสวิตช์กราฟิก (ชิดซ้าย)
-        local switchFrame = Instance.new("Frame", contentFrame)
-        switchFrame.Size = UDim2.new(0, 40, 0, 20)
-        switchFrame.Position = UDim2.new(0, 5, 0.5, 0)
-        switchFrame.AnchorPoint = Vector2.new(0, 0.5)
-        switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        switchFrame.BorderSizePixel = 0
-
-        local switchCorner = Instance.new("UICorner", switchFrame)
-        switchCorner.CornerRadius = UDim.new(1, 0)
-
-        local switchHandle = Instance.new("TextButton", switchFrame)
-        switchHandle.Size = UDim2.new(0, 16, 0, 16)
-        switchHandle.Position = UDim2.new(1, -18, 0.5, 0)
-        switchHandle.AnchorPoint = Vector2.new(0, 0.5)
-        switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        switchHandle.BorderSizePixel = 0
-        switchHandle.Text = ""
-
-        local handleCorner = Instance.new("UICorner", switchHandle)
-        handleCorner.CornerRadius = UDim.new(1, 0)
-
-        -- สร้าง TextLabel สำหรับข้อความ (อยู่ตรงกลาง)
-        local textLabel = Instance.new("TextLabel", contentFrame)
-        textLabel.Size = UDim2.new(0, 0, 0, 20)
-        textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-        textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-        textLabel.BackgroundTransparency = 1
-        textLabel.Text = toggleText
-        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        textLabel.Font = Enum.Font.GothamBold
-        textLabel.TextSize = 14
-        textLabel.AutomaticSize = Enum.AutomaticSize.X
-
-       local isToggled = false
-        toggleButton.MouseButton1Click:Connect(function()
-            isToggled = not isToggled
-            if isToggled then
-                switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
-                switchHandle.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
-            else
-                switchHandle.Position = UDim2.new(1, -18, 0.5, 0)
-                switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            end
-            callback(isToggled)
-        end)
-    end
-
-    -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ YouTube
-    function XDLuaUI:Youtube(tabContent, youtubeLink)
-        local Youtube = Instance.new("TextButton", tabContent)
-        Youtube.Size = UDim2.new(0.9, 0, 0, 30)
-        Youtube.AnchorPoint = Vector2.new(0.5, 0)
-        Youtube.Text = "📋 คัดลอกลิงค์ YouTube"
-        Youtube.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-        Youtube.Font = Enum.Font.GothamBold
-        Youtube.TextSize = 14
-        Youtube.TextColor3 = Color3.fromRGB(255, 255, 255)
-
-        local youtubeCorner = Instance.new("UICorner", Youtube)
-        youtubeCorner.CornerRadius = UDim.new(0, 8)
-
-        Youtube.MouseButton1Click:Connect(function()
-            setclipboard(youtubeLink)
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "คัดลอกลิงค์ YouTube",
-                Text = "คัดลอกลิงค์เรียบร้อยแล้ว!",
-                Duration = 3
-            })
-        end)
-    end
-
-    -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ดิสคอร์ด
-    function XDLuaUI:Discord(tabContent)
-        local Discord = Instance.new("TextButton", tabContent)
-        Discord.Size = UDim2.new(0.9, 0, 0, 30)
-        Discord.AnchorPoint = Vector2.new(0.5, 0)
-        Discord.Text = "📋 คัดลอกลิงค์ดิสคอร์ด"
-        Discord.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
-        Discord.Font = Enum.Font.GothamBold
-        Discord.TextSize = 14
-        Discord.TextColor3 = Color3.fromRGB(255, 255, 255)
-
-        local discordCorner = Instance.new("UICorner", Discord)
-        discordCorner.CornerRadius = UDim.new(0, 8)
-
-        Discord.MouseButton1Click:Connect(function()
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "ขออภัย",
-                Text = "ตอนนี้ยังไม่มีกลุ่มดิสครับ",
-                Duration = 3
-            })
-        end)
-    end
-
-    -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อนเฟรมหลัก
-    logoButton.MouseButton1Click:Connect(function()
-        mainFrame.Visible = not mainFrame.Visible
-    end)
-
-    return XDLuaUI
-end
-
-return XDLuaUI
+  
