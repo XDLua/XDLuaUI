@@ -287,7 +287,7 @@ function XDLuaUI:CreateWindow(title)
         runButton.Size = UDim2.new(0.9, 0, 0, 30)
         runButton.AnchorPoint = Vector2.new(0.5, 0)
         runButton.Text = "รันสคริปต์"
-        runButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        runButton.BackgroundColor3 = Color3.fromRGB(0, 204, 0)
         runButton.Font = Enum.Font.GothamBold
         runButton.TextSize = 14
         runButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -320,7 +320,7 @@ function XDLuaUI:CreateWindow(title)
         local copyButton = Instance.new("TextButton", tabContent)
         copyButton.Size = UDim2.new(0.9, 0, 0, 30)
         copyButton.AnchorPoint = Vector2.new(0.5, 0)
-        copyButton.Text = "คัดลอกลิงค์สคริปต์"
+        copyButton.Text = "คัดลอกสคริปต์"
         copyButton.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
         copyButton.Font = Enum.Font.GothamBold
         copyButton.TextSize = 14
@@ -374,7 +374,7 @@ function XDLuaUI:CreateWindow(title)
         executeButton.Size = UDim2.new(0.9, 0, 0, 30)
         executeButton.AnchorPoint = Vector2.new(0.5, 0)
         executeButton.Text = "รันสคริปต์"
-        executeButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        executeButton.BackgroundColor3 = Color3.fromRGB(0, 204, 0)
         executeButton.Font = Enum.Font.GothamBold
         executeButton.TextSize = 14
         executeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -531,7 +531,7 @@ function XDLuaUI:CreateWindow(title)
             isToggled = not isToggled
             if isToggled then
                 switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
-                switchHandle.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+                switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
             else
                 switchHandle.Position = UDim2.new(1, -18, 0.5, 0)
                 switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -740,7 +740,7 @@ function XDLuaUI:CreateWindow(title)
             isToggled = not isToggled
             if isToggled then
                 switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
-                switchHandle.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+                switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
             else
                 switchHandle.Position = UDim2.new(1, -18, 0.5, 0)
                 switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
