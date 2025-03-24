@@ -12,7 +12,7 @@ window:Youtube(homeTab, "https://www.youtube.com/@IronFang2008")
 window:Discord(homeTab)
 window:AddExecutorTab()
 -- FORSAKEN
-window:AddScriptTab("FORSAKEN", "สคริปต์นี้คือสคริปต์แมพ FORSAKEN", "พัฒนาโดย: KRIDHUB\nเวอร์ชันสคริปต์: 3.5.5", "https://raw.githubusercontent.com/XDLua/Scripts/refs/heads/main/Forsaken.lua")
+window:AddScriptTab("FORSAKEN", "สคริปต์นี้คือสคริปต์แมพ FORSAKEN", "พัฒนาโดย: KRIDHUB\nเวอร์ชันสคริปต์: 3.5.5", "https://raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/Forsaken.lua")
 window:AddScriptTab("ADMIN", "สคริปต์ Infinite Yield", "สคริปต์ยอดนิยมสำหรับใช้งานคำสั่งแอดมิน", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
 local Tab1 = window:AddTab("🚫")
 window:AddTabDescription(homeTab, "ไม่พบสคริปต์")
