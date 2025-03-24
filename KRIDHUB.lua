@@ -11,9 +11,10 @@ window:AddDescription(homeTab, "ยินดีต้อนรับสู่ KR
 window:Youtube(homeTab, "https://www.youtube.com/@IronFang2008")
 window:Discord(homeTab)
 window:AddExecutorTab()
+window:AddScriptTab("ADMIN", "สคริปต์ Infinite Yield", "สคริปต์ยอดนิยมสำหรับใช้งานคำสั่งแอดมิน", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
+window:AddScriptTab("DEX", "สคริปต์ Dex Expolor", "สคริปต์ยอดนิยมสำหรับใช้ดูโครงสร้างแมพ", "https://raw.githubusercontent.com/MITUMAxDev/Tools/refs/heads/main/Dex-Explorer.lua")
 -- FORSAKEN
 window:AddScriptTab("FORSAKEN", "สคริปต์นี้คือสคริปต์แมพ FORSAKEN", "พัฒนาโดย: KRIDHUB\nเวอร์ชันสคริปต์: 3.5.5", "https://raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/Forsaken.lua")
-window:AddScriptTab("ADMIN", "สคริปต์ Infinite Yield", "สคริปต์ยอดนิยมสำหรับใช้งานคำสั่งแอดมิน", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
 local Tab1 = window:AddTab("🚫")
 window:AddTabDescription(homeTab, "ไม่พบสคริปต์")
 window:AddDescription(Tab1, "ขณะนี้ยังไม่มีสคริปต์", "โปรดรอการอัพเดตเพิ่มเติม.....")
@@ -23,3 +24,5 @@ window:AddDescription(Tab2, "ขณะนี้ยังไม่มีสคร
 local Tab3 = window:AddTab("🚫")
 window:AddTabDescription(homeTab, "ไม่พบสคริปต์")
 window:AddDescription(Tab3, "ขณะนี้ยังไม่มีสคริปต์", "โปรดรอการอัพเดตเพิ่มเติม.....")
+
+https://raw.githubusercontent.com/MITUMAxDev/Tools/refs/heads/main/Dex-Explorer.lua
