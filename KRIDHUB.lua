@@ -13,7 +13,7 @@ window:Discord(homeTab)
 window:AddExecutorTab()
 window:AddScriptTab("ADMIN", "สคริปต์ Infinite Yield", "สคริปต์ยอดนิยมสำหรับใช้งานคำสั่งแอดมิน", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
 window:AddScriptTab("DEX", "สคริปต์ Dex Expolor", "สคริปต์ยอดนิยมสำหรับใช้ดูโครงสร้างแมพ", "https://raw.githubusercontent.com/MITUMAxDev/Tools/refs/heads/main/Dex-Explorer.lua")
--- FORSAKEN
+window:AddScriptTab("AIMBOT", "สคริปต์ AIMBOT", "", "https://raw.githubusercontent.com/XDLua/KRIDHUB/refs/heads/main/KRIDHUB.lua")
 window:AddScriptTab("FORSAKEN", "สคริปต์นี้คือสคริปต์แมพ FORSAKEN", "พัฒนาโดย: KRIDHUB\nเวอร์ชันสคริปต์: 3.5.5", "https://raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/Forsaken.lua")
 local Tab1 = window:AddTab("🚫")
 window:AddTabDescription(homeTab, "ไม่พบสคริปต์")
