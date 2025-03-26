@@ -204,56 +204,95 @@ function XDLuaUI:CreateWindow(title)
     -- เพิ่มการทำงานให้ปุ่มฟันเฟือง
     settingsButton.MouseButton1Click:Connect(toggleSettings)
 
-    -- เมธอดเพิ่มแท็บ
-    function XDLuaUI:AddTab(tabName)
-        local tabIndex = #tabs + 1
+    -- เมธอดเพิ่มแท็บ (ปรับแต่งใช้ front/back)
+function XDLuaUI:AddTab(tabName, emoji, emojiPosition)
+    local tabIndex = #tabs + 1
 
-        local tabButton = Instance.new("TextButton", tabScrollingFrame)
-        tabButton.Size = UDim2.new(0.9, 0, 0, 40)
-        tabButton.AnchorPoint = Vector2.new(0.5, 0)
-        tabButton.Text = tabName
-        tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        tabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        tabButton.Font = Enum.Font.GothamBold
-        tabButton.TextSize = 14
-        tabButton.AutoButtonColor = false
-        tabButton.MouseButton1Click:Connect(function()
-            switchTab(tabIndex)
-        end)
-
-        local buttonGlow = Instance.new("UIStroke", tabButton)
-        buttonGlow.Name = "Stroke"
-        buttonGlow.Thickness = 2
-        buttonGlow.Color = Color3.fromRGB(255, 50, 255)
-        buttonGlow.Transparency = 1
-
-        local tabCorner = Instance.new("UICorner", tabButton)
-        tabCorner.CornerRadius = UDim.new(0, 5)
-
-        -- สร้างเฟรมเนื้อหาแท็บ
-        local tabContent = Instance.new("Frame", contentScrollingFrame)
-        tabContent.Size = UDim2.new(1, 0, 0, 0)
-        tabContent.Name = "Tab" .. tabIndex
-        tabContent.Visible = false
-        tabContent.BackgroundTransparency = 1
-        tabContent.AutomaticSize = Enum.AutomaticSize.Y
-
-        -- เพิ่ม UIListLayout ใน tabContent เพื่อจัดการตำแหน่งขององค์ประกอบภายใน
-        local tabContentLayout = Instance.new("UIListLayout", tabContent)
-        tabContentLayout.Padding = UDim.new(0, 10)
-        tabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        tabContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-        tabs[tabIndex] = {
-            Button = tabButton,
-            Content = tabContent
-        }
-
-        if tabIndex == 1 then
-            switchTab(1)
+    local tabButton = Instance.new("TextButton", tabScrollingFrame)
+    tabButton.Size = UDim2.new(0.9, 0, 0, 40)
+    tabButton.AnchorPoint = Vector2.new(0.5, 0)
+    
+    -- จัดการอิโมจิในชื่อแท็บ
+    local emoji = emoji or "" -- ถ้าไม่ระบุอิโมจิ ให้ว่าง
+    local emojiPosition = emojiPosition or "front" -- ค่าเริ่มต้นเป็น "front"
+    if emoji ~= "" then
+        if emojiPosition == "back" then
+            tabButton.Text = tabName .. " " .. emoji
+        else
+            tabButton.Text = emoji .. " " .. tabName
         end
+    else
+        tabButton.Text = tabName
+    end
 
-        return tabContent
+    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    tabButton.Font = Enum.Font.GothamBold
+    tabButton.TextSize = 14
+    tabButton.AutoButtonColor = false
+    tabButton.MouseButton1Click:Connect(function()
+        switchTab(tabIndex)
+    end)
+
+    local buttonGlow = Instance.new("UIStroke", tabButton)
+    buttonGlow.Name = "Stroke"
+    buttonGlow.Thickness = 2
+    buttonGlow.Color = Color3.fromRGB(255, 50, 255)
+    buttonGlow.Transparency = 1
+
+    local tabCorner = Instance.new("UICorner", tabButton)
+    tabCorner.CornerRadius = UDim.new(0, 5)
+
+    -- สร้างเฟรมเนื้อหาแท็บ
+    local tabContent = Instance.new("Frame", contentScrollingFrame)
+    tabContent.Size = UDim2.new(1, 0, 0, 0)
+    tabContent.Name = "Tab" .. tabIndex
+    tabContent.Visible = false
+    tabContent.BackgroundTransparency = 1
+    tabContent.AutomaticSize = Enum.AutomaticSize.Y
+
+    -- เพิ่ม UIListLayout ใน tabContent เพื่อจัดการตำแหน่งขององค์ประกอบภายใน
+    local tabContentLayout = Instance.new("UIListLayout", tabContent)
+    tabContentLayout.Padding = UDim.new(0, 10)
+    tabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    tabContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+    tabs[tabIndex] = {
+        Button = tabButton,
+        Content = tabContent
+    }
+
+    if tabIndex == 1 then
+        switchTab(1)
+    end
+
+    return tabContent
+end
+
+-- เมธอดเพิ่มคำอธิบายของ Tab (ปรับแต่งให้ใช้ front/back แทน before/after)
+function XDLuaUI:AddTabDescription(tabContent, descriptionText, emoji, emojiPosition)
+    local descriptionLabel = Instance.new("TextLabel", tabContent)
+    descriptionLabel.Size = UDim2.new(0.9, 0, 0, 40)
+    descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
+
+    -- จัดการอิโมจิในคำอธิบายแท็บ
+    local emoji = emoji or "" -- ถ้าไม่ระบุอิโมจิ ให้เป็นสตริงว่าง
+    local emojiPosition = emojiPosition or "front" -- ค่าเริ่มต้นเป็น "front"
+    if emoji ~= "" then
+        if emojiPosition == "back" then
+            descriptionLabel.Text = descriptionText .. " " .. emoji
+        else
+            descriptionLabel.Text = emoji .. " " .. descriptionText
+        end
+    else
+        descriptionLabel.Text = descriptionText
+    end
+
+    descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    descriptionLabel.BackgroundTransparency = 1
+    descriptionLabel.Font = Enum.Font.GothamBold
+    descriptionLabel.TextSize = 14
+    descriptionLabel.TextWrapped = true
     end
 
     -- เมธอดเพิ่มแท็บสคริปต์
@@ -632,19 +671,6 @@ function XDLuaUI:CreateWindow(title)
         creditLabel.Font = Enum.Font.GothamBold
         creditLabel.TextSize = 12
         creditLabel.TextWrapped = true
-    end
-
-    -- เมธอดเพิ่มคำอธิบายของ Tab
-    function XDLuaUI:AddTabDescription(tabContent, descriptionText)
-        local descriptionLabel = Instance.new("TextLabel", tabContent)
-        descriptionLabel.Size = UDim2.new(0.9, 0, 0, 40)
-        descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
-        descriptionLabel.Text = descriptionText
-        descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        descriptionLabel.BackgroundTransparency = 1
-        descriptionLabel.Font = Enum.Font.GothamBold
-        descriptionLabel.TextSize = 14
-        descriptionLabel.TextWrapped = true
     end
 
     -- เมธอดเพิ่มปุ่มพร้อมคำอธิบาย
