@@ -1,5 +1,5 @@
 -- โหลด UI Library
-local XDLuaUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/XDLuaUI2.lua"))()
+local XDLuaUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/XDLua/XDLuaUI/refs/heads/main/XDLuaUI.lua"))()
 
 -- สร้างหน้าต่าง
 local window = XDLuaUI:CreateWindow("🔹 KRIDHUB 🔹")
