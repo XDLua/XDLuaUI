@@ -1,8 +1,8 @@
 -- UI Library
 local XDLuaUI = {}
 
--- สร้างหน้าต่างหลัก
-function XDLuaUI:CreateWindow(title)
+    -- สร้างหน้าต่างหลัก (ปรับแต่งให้รองรับอิโมจิใน Title)
+function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     -- ลบ GUI เดิมหากมีอยู่
     if game.CoreGui:FindFirstChild("XDLuaGUI") then
         game.CoreGui:FindFirstChild("XDLuaGUI"):Destroy()
@@ -52,7 +52,23 @@ function XDLuaUI:CreateWindow(title)
     -- เพิ่มข้อความหัวเรื่อง
     local titleLabel = Instance.new("TextLabel", mainFrame)
     titleLabel.Size = UDim2.new(1, 0, 0, 40)
-    titleLabel.Text = title or "🔹 XDLua UI 🔹"
+    
+    -- จัดการอิโมจิใน Title
+    local emojiFront = emojiFront or "" -- ถ้าไม่ระบุอิโมจิหน้า ให้ว่าง
+    local emojiBack = emojiBack or "" -- ถ้าไม่ระบุอิโมจิหลัง ให้ว่าง
+    local spacing = spacing or 2 -- ค่าเริ่มต้น 2 ช่อง
+    local spacingStr = string.rep(" ", spacing) -- สร้างช่องว่างตามจำนวนที่ระบุ
+    
+    if emojiFront ~= "" and emojiBack ~= "" then
+        titleLabel.Text = emojiFront .. spacingStr .. (title or "XDLua UI") .. spacingStr .. emojiBack
+    elseif emojiFront ~= "" then
+        titleLabel.Text = emojiFront .. spacingStr .. (title or "XDLua UI")
+    elseif emojiBack ~= "" then
+        titleLabel.Text = (title or "XDLua UI") .. spacingStr .. emojiBack
+    else
+        titleLabel.Text = title or "XDLua UI"
+    end
+
     titleLabel.TextColor3 = Color3.fromRGB(255, 50, 255)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Font = Enum.Font.GothamBlack
@@ -151,6 +167,27 @@ function XDLuaUI:CreateWindow(title)
     settingsLabel.Font = Enum.Font.GothamBold
     settingsLabel.TextSize = 14
     settingsLabel.TextWrapped = true
+    
+end
+
+-- เมธอดแก้ไข Title (ปรับแต่งให้รองรับอิโมจิ)
+function XDLuaUI:SetTitle(newTitle, emojiFront, emojiBack, spacing)
+    -- จัดการอิโมจิใน Title
+    local emojiFront = emojiFront or "" -- ถ้าไม่ระบุอิโมจิหน้า ให้ว่าง
+    local emojiBack = emojiBack or "" -- ถ้าไม่ระบุอิโมจิหลัง ให้ว่าง
+    local spacing = spacing or 2 -- ค่าเริ่มต้น 2 ช่อง
+    local spacingStr = string.rep(" ", spacing) -- สร้างช่องว่างตามจำนวนที่ระบุ
+    
+    if emojiFront ~= "" and emojiBack ~= "" then
+        titleLabel.Text = emojiFront .. spacingStr .. newTitle .. spacingStr .. emojiBack
+    elseif emojiFront ~= "" then
+        titleLabel.Text = emojiFront .. spacingStr .. newTitle
+    elseif emojiBack ~= "" then
+        titleLabel.Text = newTitle .. spacingStr .. emojiBack
+    else
+        titleLabel.Text = newTitle
+    end
+end
 
     -- ตัวแปรเก็บแท็บและเนื้อหา
     local tabs = {}
