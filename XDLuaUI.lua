@@ -499,4 +499,376 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         contentFrame.Position = UDim2.new(0, 0, 0, 0)
         contentFrame.BackgroundTransparency = 1
 
-        local switchFrame = Instance.new("Frame", contentFr
+        local switchFrame = Instance.new("Frame", contentFrame)
+        switchFrame.Size = UDim2.new(0, 40, 0, 20)
+        switchFrame.Position = UDim2.new(0, 5, 0.5, 0)
+        switchFrame.AnchorPoint = Vector2.new(0, 0.5)
+        switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        switchFrame.BorderSizePixel = 0
+        switchFrame.BackgroundTransparency = 1
+
+        local switchCorner = Instance.new("UICorner", switchFrame)
+        switchCorner.CornerRadius = UDim.new(1, 0)
+
+        local switchHandle = Instance.new("TextButton", switchFrame)
+        switchHandle.Size = UDim2.new(0, 16, 0, 16)
+        switchHandle.Position = UDim2.new(1, -18, 0.5, 0)
+        switchHandle.AnchorPoint = Vector2.new(0, 0.5)
+        switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        switchHandle.BorderSizePixel = 0
+        switchHandle.Text = ""
+        switchHandle.BackgroundTransparency = 1
+
+        local handleCorner = Instance.new("UICorner", switchHandle)
+        handleCorner.CornerRadius = UDim.new(1, 0)
+
+        local textLabel = Instance.new("TextLabel", contentFrame)
+        textLabel.Size = UDim2.new(0, 0, 0, 20)
+        textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+        textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+        textLabel.BackgroundTransparency = 1
+        textLabel.Text = toggleText
+        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textLabel.Font = Enum.Font.GothamBold
+        textLabel.TextSize = 14
+        textLabel.AutomaticSize = Enum.AutomaticSize.X
+        textLabel.TextTransparency = 1
+
+        local isToggled = defaultState or false
+        if isToggled then
+            switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
+            switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
+        end
+
+        toggleButton.MouseButton1Click:Connect(function()
+            isToggled = not isToggled
+            if isToggled then
+                createTween(switchHandle, {Position = UDim2.new(0, 2, 0.5, 0)}, 0.2):Play()
+                switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
+            else
+                createTween(switchHandle, {Position = UDim2.new(1, -18, 0.5, 0)}, 0.2):Play()
+                switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            end
+            callback(isToggled)
+        end)
+    end
+
+    -- เมธอดเพิ่มปุ่มสไลด์
+    function XDLuaUI:AddSlider(tabContent, sliderText, minValue, maxValue, defaultValue, callback)
+        local sliderFrame = Instance.new("Frame", tabContent)
+        sliderFrame.Size = UDim2.new(0.9, 0, 0, 50)
+        sliderFrame.AnchorPoint = Vector2.new(0.5, 0)
+        sliderFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        sliderFrame.BackgroundTransparency = 1
+        sliderFrame.BorderSizePixel = 0
+
+        local sliderCorner = Instance.new("UICorner", sliderFrame)
+        sliderCorner.CornerRadius = UDim.new(0, 8)
+
+        local sliderValueLabel = Instance.new("TextLabel", sliderFrame)
+        sliderValueLabel.Size = UDim2.new(1, 0, 0, 20)
+        sliderValueLabel.Position = UDim2.new(0, 0, 0, 5)
+        sliderValueLabel.Text = sliderText .. ": " .. defaultValue
+        sliderValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        sliderValueLabel.BackgroundTransparency = 1
+        sliderValueLabel.Font = Enum.Font.GothamBold
+        sliderValueLabel.TextSize = 14
+        sliderValueLabel.TextTransparency = 1
+
+        local sliderBar = Instance.new("Frame", sliderFrame)
+        sliderBar.Size = UDim2.new(0.9, 0, 0, 4)
+        sliderBar.Position = UDim2.new(0.05, 0, 0, 30)
+        sliderBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        sliderBar.BorderSizePixel = 0
+        sliderBar.BackgroundTransparency = 1
+
+        local sliderBarCorner = Instance.new("UICorner", sliderBar)
+        sliderBarCorner.CornerRadius = UDim.new(0, 5)
+
+        local sliderHandle = Instance.new("TextButton", sliderBar)
+        sliderHandle.Size = UDim2.new(0, 12, 0, 12)
+        sliderHandle.Position = UDim2.new((defaultValue - minValue) / (maxValue - minValue), -6, 0, -4)
+        sliderHandle.Text = ""
+        sliderHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
+        sliderHandle.BorderSizePixel = 0
+        sliderHandle.BackgroundTransparency = 1
+
+        local sliderHandleCorner = Instance.new("UICorner", sliderHandle)
+        sliderHandleCorner.CornerRadius = UDim.new(0, 10)
+
+        local function updateSlider(value)
+            local clampedValue = math.clamp(value, minValue, maxValue)
+            sliderValueLabel.Text = sliderText .. ": " .. clampedValue
+            local percent = (clampedValue - minValue) / (maxValue - minValue)
+            createTween(sliderHandle, {Position = UDim2.new(percent, -6, 0, -4)}, 0.2):Play()
+            callback(clampedValue)
+        end
+
+        local isDragging = false
+        sliderHandle.MouseButton1Down:Connect(function()
+            isDragging = true
+        end)
+
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                isDragging = false
+            end
+        end)
+
+        UserInputService.InputChanged:Connect(function(input)
+            if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                local inputPosition = input.UserInputType == Enum.UserInputType.Touch and input.Position or UserInputService:GetMouseLocation()
+                local sliderBarPosition = sliderBar.AbsolutePosition
+                local sliderBarSize = sliderBar.AbsoluteSize
+                local relativeX = (inputPosition.X - sliderBarPosition.X) / sliderBarSize.X
+                local value = math.floor(minValue + (maxValue - minValue) * math.clamp(relativeX, 0, 1))
+                updateSlider(value)
+            end
+        end)
+    end
+
+    -- เมธอดเพิ่มคำอธิบายและเครดิต
+    function XDLuaUI:AddDescription(tabContent, descriptionText, creditText)
+        local descriptionLabel = Instance.new("TextLabel", tabContent)
+        descriptionLabel.Size = UDim2.new(0.9, 0, 0, 60)
+        descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
+        descriptionLabel.Text = descriptionText
+        descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        descriptionLabel.BackgroundTransparency = 1
+        descriptionLabel.Font = Enum.Font.GothamBold
+        descriptionLabel.TextSize = 14
+        descriptionLabel.TextWrapped = true
+        descriptionLabel.TextTransparency = 1
+
+        local creditLabel = Instance.new("TextLabel", tabContent)
+        creditLabel.Size = UDim2.new(0.9, 0, 0, 30)
+        creditLabel.AnchorPoint = Vector2.new(0.5, 0)
+        creditLabel.Text = creditText
+        creditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        creditLabel.BackgroundTransparency = 1
+        creditLabel.Font = Enum.Font.GothamBold
+        creditLabel.TextSize = 12
+        creditLabel.TextWrapped = true
+        creditLabel.TextTransparency = 1
+    end
+
+    -- เมธอดเพิ่มคำอธิบายของ Tab
+    function XDLuaUI:AddTabDescription(tabContent, descriptionText, emoji, emojiPosition)
+        local descriptionLabel = Instance.new("TextLabel", tabContent)
+        descriptionLabel.Size = UDim2.new(0.9, 0, 0, 40)
+        descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
+
+        local emoji = emoji or ""
+        local emojiPosition = emojiPosition or "front"
+        if emoji ~= "" then
+            if emojiPosition == "back" then
+                descriptionLabel.Text = descriptionText .. " " .. emoji
+            else
+                descriptionLabel.Text = emoji .. " " .. descriptionText
+            end
+        else
+            descriptionLabel.Text = descriptionText
+        end
+
+        descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        descriptionLabel.BackgroundTransparency = 1
+        descriptionLabel.Font = Enum.Font.GothamBold
+        descriptionLabel.TextSize = 14
+        descriptionLabel.TextWrapped = true
+        descriptionLabel.TextTransparency = 1
+    end
+
+    -- เมธอดเพิ่มปุ่มพร้อมคำอธิบาย
+    function XDLuaUI:AddButton2(tabContent, buttonText, descriptionText, callback)
+        local descriptionLabel = Instance.new("TextLabel", tabContent)
+        descriptionLabel.Size = UDim2.new(0.9, 0, 0, 20)
+        descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
+        descriptionLabel.Text = descriptionText
+        descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        descriptionLabel.BackgroundTransparency = 1
+        descriptionLabel.Font = Enum.Font.GothamBold
+        descriptionLabel.TextSize = 12
+        descriptionLabel.TextWrapped = true
+        descriptionLabel.TextTransparency = 1
+
+        local button = Instance.new("TextButton", tabContent)
+        button.Size = UDim2.new(0.9, 0, 0, 30)
+        button.AnchorPoint = Vector2.new(0.5, 0)
+        button.Text = buttonText
+        button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+        button.Font = Enum.Font.GothamBold
+        button.TextSize = 14
+        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        button.BackgroundTransparency = 1
+        button.TextTransparency = 1
+
+        local buttonCorner = Instance.new("UICorner", button)
+        buttonCorner.CornerRadius = UDim.new(0, 8)
+
+        button.MouseButton1Click:Connect(callback)
+    end
+
+    -- เมธอดเพิ่ม Toggle พร้อมคำอธิบาย
+    function XDLuaUI:AddToggle2(tabContent, toggleText, descriptionText, defaultState, callback)
+        local descriptionLabel = Instance.new("TextLabel", tabContent)
+        descriptionLabel.Size = UDim2.new(0.9, 0, 0, 20)
+        descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
+        descriptionLabel.Text = descriptionText
+        descriptionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        descriptionLabel.BackgroundTransparency = 1
+        descriptionLabel.Font = Enum.Font.GothamBold
+        descriptionLabel.TextSize = 12
+        descriptionLabel.TextWrapped = true
+        descriptionLabel.TextTransparency = 1
+
+        local toggleButton = Instance.new("TextButton", tabContent)
+        toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
+        toggleButton.AnchorPoint = Vector2.new(0.5, 0)
+        toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+        toggleButton.Text = ""
+        toggleButton.BackgroundTransparency = 1
+
+        local toggleCorner = Instance.new("UICorner", toggleButton)
+        toggleCorner.CornerRadius = UDim.new(0, 8)
+
+        local contentFrame = Instance.new("Frame", toggleButton)
+        contentFrame.Size = UDim2.new(1, 0, 1, 0)
+        contentFrame.Position = UDim2.new(0, 0, 0, 0)
+        contentFrame.BackgroundTransparency = 1
+
+        local switchFrame = Instance.new("Frame", contentFrame)
+        switchFrame.Size = UDim2.new(0, 40, 0, 20)
+        switchFrame.Position = UDim2.new(0, 5, 0.5, 0)
+        switchFrame.AnchorPoint = Vector2.new(0, 0.5)
+        switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        switchFrame.BorderSizePixel = 0
+        switchFrame.BackgroundTransparency = 1
+
+        local switchCorner = Instance.new("UICorner", switchFrame)
+        switchCorner.CornerRadius = UDim.new(1, 0)
+
+        local switchHandle = Instance.new("TextButton", switchFrame)
+        switchHandle.Size = UDim2.new(0, 16, 0, 16)
+        switchHandle.Position = UDim2.new(1, -18, 0.5, 0)
+        switchHandle.AnchorPoint = Vector2.new(0, 0.5)
+        switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        switchHandle.BorderSizePixel = 0
+        switchHandle.Text = ""
+        switchHandle.BackgroundTransparency = 1
+
+        local handleCorner = Instance.new("UICorner", switchHandle)
+        handleCorner.CornerRadius = UDim.new(1, 0)
+
+        local textLabel = Instance.new("TextLabel", contentFrame)
+        textLabel.Size = UDim2.new(0, 0, 0, 20)
+        textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+        textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+        textLabel.BackgroundTransparency = 1
+        textLabel.Text = toggleText
+        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textLabel.Font = Enum.Font.GothamBold
+        textLabel.TextSize = 14
+        textLabel.AutomaticSize = Enum.AutomaticSize.X
+        textLabel.TextTransparency = 1
+
+        local isToggled = defaultState or false
+        if isToggled then
+            switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
+            switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
+        end
+
+        toggleButton.MouseButton1Click:Connect(function()
+            isToggled = not isToggled
+            if isToggled then
+                createTween(switchHandle, {Position = UDim2.new(0, 2, 0.5, 0)}, 0.2):Play()
+                switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
+            else
+                createTween(switchHandle, {Position = UDim2.new(1, -18, 0.5, 0)}, 0.2):Play()
+                switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            end
+            callback(isToggled)
+        end)
+    end
+
+    -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ YouTube
+    function XDLuaUI:Youtube(tabContent, youtubeLink)
+        local Youtube = Instance.new("TextButton", tabContent)
+        Youtube.Size = UDim2.new(0.9, 0, 0, 30)
+        Youtube.AnchorPoint = Vector2.new(0.5, 0)
+        Youtube.Text = "📋 คัดลอกลิงค์ YouTube"
+        Youtube.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        Youtube.Font = Enum.Font.GothamBold
+        Youtube.TextSize = 14
+        Youtube.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Youtube.BackgroundTransparency = 1
+        Youtube.TextTransparency = 1
+
+        local youtubeCorner = Instance.new("UICorner", Youtube)
+        youtubeCorner.CornerRadius = UDim.new(0, 8)
+
+        Youtube.MouseButton1Click:Connect(function()
+            setclipboard(youtubeLink)
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "คัดลอกลิงค์ YouTube",
+                Text = "คัดลอกลิงค์เรียบร้อยแล้ว!",
+                Duration = 3
+            })
+        end)
+    end
+
+    -- เมธอดเพิ่มปุ่มคัดลอกลิงค์ดิสคอร์ด
+    function XDLuaUI:Discord(tabContent)
+        local Discord = Instance.new("TextButton", tabContent)
+        Discord.Size = UDim2.new(0.9, 0, 0, 30)
+        Discord.AnchorPoint = Vector2.new(0.5, 0)
+        Discord.Text = "📋 คัดลอกลิงค์ดิสคอร์ด"
+        Discord.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
+        Discord.Font = Enum.Font.GothamBold
+        Discord.TextSize = 14
+        Discord.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Discord.BackgroundTransparency = 1
+        Discord.TextTransparency = 1
+
+        local discordCorner = Instance.new("UICorner", Discord)
+        discordCorner.CornerRadius = UDim.new(0, 8)
+
+        Discord.MouseButton1Click:Connect(function()
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "ขออภัย",
+                Text = "ตอนนี้ยังไม่มีกลุ่มดิสครับ",
+                Duration = 3
+            })
+        end)
+    end
+
+    -- อะนิเมชันเปิด/ปิด UI
+    local function toggleUI()
+        if mainFrame.Visible then
+            createTween(mainFrame, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
+            for _, child in pairs(mainFrame:GetDescendants()) do
+                if child:IsA("GuiObject") then
+                    createTween(child, {BackgroundTransparency = 1, TextTransparency = 1}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
+                end
+            end
+            wait(0.5)
+            mainFrame.Visible = false
+        else
+            mainFrame.Visible = true
+            mainFrame.Size = UDim2.new(0, 0, 0, 0)
+            createTween(mainFrame, {Size = UDim2.new(0, 450, 0, 300), BackgroundTransparency = 0.3}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out):Play()
+            createTween(glowMain, {Transparency = 0.1}, 0.5):Play()
+            for _, child in pairs(mainFrame:GetDescendants()) do
+                if child:IsA("GuiObject") then
+                    createTween(child, {BackgroundTransparency = child.BackgroundTransparency == 1 and 1 or 0, TextTransparency = 0}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out):Play()
+                end
+            end
+        end
+    end
+
+    -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อนเฟรมหลัก
+    logoButton.MouseButton1Click:Connect(toggleUI)
+
+    return XDLuaUI
+end
+
+return XDLuaUI
