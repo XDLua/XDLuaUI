@@ -73,17 +73,21 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     loadingText.TextStrokeTransparency = 0.2
 
     -- อะนิเมชั่นแถบโหลด
-    local barTweenInfo1 = TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut) -- ใช้เวลา 2 วินาทีเพื่อไปถึง 80%
+    local barTweenInfo1 = TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out) -- ใช้เวลา 1.5 วินาทีเพื่อไปถึง 80%
 local barTween1 = tweenService:Create(loadingBar, barTweenInfo1, {Position = UDim2.new(0.8, 0, 0, 0)}) -- ไปถึง 80%
 barTween1:Play()
--- รอให้แถบโหลดถึง 80% ก่อน
-barTween1.Completed:Wait()
+
+-- รอให้ครบเวลา 3 วินาที (ปรับได้ตามต้องการ)
 wait(3)
--- อะนิเมชั่นแถบโหลด: จาก 80% ไป 100%
-local barTweenInfo2 = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut) -- ใช้เวลา 0.5 วินาทีเพื่อไปถึง 100%
+
+-- อะนิเมชั่นสุดท้าย (เพิ่มจาก 80% ไป 100% ใน 0.5 วินาที)
+local barTweenInfo2 = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In)
 local barTween2 = tweenService:Create(loadingBar, barTweenInfo2, {Position = UDim2.new(1, 0, 0, 0)}) -- ไปถึง 100%
 barTween2:Play()
 
+-- รอให้แถบโหลดถึง 100% ก่อนดำเนินการต่อ
+barTween2.Completed:Wait()
+    
     -- อะนิเมชั่นข้อความกระพริบ
     local textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
     local textTween = TweenService:Create(loadingText, textTweenInfo, {TextTransparency = 0.8})
