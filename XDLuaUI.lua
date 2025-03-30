@@ -89,9 +89,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local barTween2 = tweenService:Create(loadingBar, barTweenInfo2, {Size = UDim2.new(1, 0, 1, 0)}) -- ไปถึง 100%
     barTween2:Play()
 
-    -- รอให้แถบโหลดถึง 100% ก่อนดำเนินการต่อ
-    barTween2.Completed:Wait()
-
     -- อะนิเมชั่นข้อความกระพริบ
     local textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
     local textTween = TweenService:Create(loadingText, textTweenInfo, {TextTransparency = 0.8})
@@ -749,13 +746,13 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     end)
 
     -- แสดงหน้าโหลดแล้วซ่อนเมื่อโหลดเสร็จ
-    spawn(function()
-        barTween2.Completed:Wait() -- รอให้แถบโหลดถึง 100%
+    barTween2.Completed:Connect(function()
         loadingFrame:Destroy() -- ลบหน้าโหลด
+        textTween:Cancel() -- หยุดอะนิเมชั่นข้อความกระพริบ
         logoButton.Visible = true -- แสดงปุ่มโลโก้
         mainFrame.Visible = true -- แสดง UI หลัก
     end)
-
+    
     return XDLuaUI
 end
 
