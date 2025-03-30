@@ -32,7 +32,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     loadingGlow.Color = Color3.fromRGB(255, 50, 255)
     loadingGlow.Transparency = 0.2
 
-    -- เพิ่มชื่อ "BY C•J"
+    -- เพิ่มชื่อ "BY C • J"
     local titleLabel = Instance.new("TextLabel", loadingFrame)
     titleLabel.Size = UDim2.new(1, 0, 0, 40)
     titleLabel.Position = UDim2.new(0, 0, 0, 10)
@@ -44,24 +44,22 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     titleLabel.TextStrokeTransparency = 0.2
 
     -- เพิ่มแถบโหลด
-local loadingBarFrame = Instance.new("Frame", loadingFrame)
-loadingBarFrame.Size = UDim2.new(0.8, 0, 0, 8)
-loadingBarFrame.Position = UDim2.new(0.1, 0, 0, 40)
-loadingBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-loadingBarFrame.BorderSizePixel = 0
+    local loadingBarFrame = Instance.new("Frame", loadingFrame)
+    loadingBarFrame.Size = UDim2.new(0.8, 0, 0, 10)
+    loadingBarFrame.Position = UDim2.new(0.1, 0, 0, 60)
+    loadingBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    loadingBarFrame.BorderSizePixel = 0
 
-local barCorner = Instance.new("UICorner", loadingBarFrame)
-barCorner.CornerRadius = UDim.new(0, 4)
+    local barCorner = Instance.new("UICorner", loadingBarFrame)
+    barCorner.CornerRadius = UDim.new(0, 5)
 
--- ปรับขนาดและตำแหน่งเริ่มต้นของ loadingBar
-local loadingBar = Instance.new("Frame", loadingBarFrame)
-loadingBar.Size = UDim2.new(0, 0, 1, 0) -- เริ่มต้นที่ความกว้าง 0 (0%)
-loadingBar.Position = UDim2.new(0, 0, 0, 0)
-loadingBar.BackgroundColor3 = Color3.fromRGB(255, 50, 255) -- สีของ XDLuaUI (ปรับใน XDLuaScriptUI เป็น Color3.fromRGB(100, 255, 200))
-loadingBar.BorderSizePixel = 0
+    local loadingBar = Instance.new("Frame", loadingBarFrame)
+    loadingBar.Size = UDim2.new(0, 0, 1, 0)
+    loadingBar.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
+    loadingBar.BorderSizePixel = 0
 
-local barInnerCorner = Instance.new("UICorner", loadingBar)
-barInnerCorner.CornerRadius = UDim.new(0, 4)
+    local barInnerCorner = Instance.new("UICorner", loadingBar)
+    barInnerCorner.CornerRadius = UDim.new(0, 5)
 
     -- เพิ่มข้อความ "กำลังโหลด..."
     local loadingText = Instance.new("TextLabel", loadingFrame)
@@ -74,27 +72,30 @@ barInnerCorner.CornerRadius = UDim.new(0, 4)
     loadingText.TextSize = 16
     loadingText.TextStrokeTransparency = 0.2
 
+    -- อะนิเมชั่นแถบโหลด
+    local tweenService = game:GetService("TweenService")
+    local barTweenInfo1 = TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out) -- ใช้เวลา 1.5 วินาทีเพื่อไปถึง 80%
+    local barTween1 = tweenService:Create(loadingBar, barTweenInfo1, {Size = UDim2.new(0.8, 0, 1, 0)}) -- ไปถึง 80%
+    barTween1:Play()
+
+    -- รอให้แถบโหลดถึง 80%
+    barTween1.Completed:Wait()
+
+    -- รอเวลาที่กำหนด (เช่น 1.5 วินาที) ก่อนไปถึง 100%
+    wait(1.5)
+
+    -- อะนิเมชั่นสุดท้าย (เพิ่มจาก 80% ไป 100% ใน 0.5 วินาที)
+    local barTweenInfo2 = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In)
+    local barTween2 = tweenService:Create(loadingBar, barTweenInfo2, {Size = UDim2.new(1, 0, 1, 0)}) -- ไปถึง 100%
+    barTween2:Play()
+
+    -- รอให้แถบโหลดถึง 100% ก่อนดำเนินการต่อ
+    barTween2.Completed:Wait()
+
     -- อะนิเมชั่นข้อความกระพริบ
     local textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
     local textTween = TweenService:Create(loadingText, textTweenInfo, {TextTransparency = 0.8})
     textTween:Play()
-
-    -- อะนิเมชั่นแถบโหลด (เพิ่มไปถึง 80%)
-local tweenService = game:GetService("TweenService")
-local barTweenInfo1 = TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out) -- ใช้เวลา 1.5 วินาทีเพื่อไปถึง 80%
-local barTween1 = tweenService:Create(loadingBar, barTweenInfo1, {Size = UDim2.new(0.8, 0, 1, 0)}) -- ปรับขนาดเป็น 80% ของ loadingBarFrame
-barTween1:Play()
-
--- รอให้ครบเวลา 3 วินาที
-wait(3)
-
--- อะนิเมชั่นสุดท้าย (เพิ่มจาก 80% ไป 100% ใน 0.5 วินาที)
-local barTweenInfo2 = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In)
-local barTween2 = tweenService:Create(loadingBar, barTweenInfo2, {Size = UDim2.new(1, 0, 1, 0)}) -- ปรับขนาดเป็น 100%
-barTween2:Play()
-
--- รอให้แถบโหลดถึง 100% ก่อนดำเนินการต่อ
-barTween2.Completed:Wait()
 
     -- สร้างปุ่มโลโก้ (ปุ่มเปิด/ปิด UI)
     local logoButton = Instance.new("TextButton", screenGui)
@@ -134,9 +135,9 @@ barTween2.Completed:Wait()
     mainCorner.CornerRadius = UDim.new(0, 12)
 
     -- เพิ่มข้อความหัวเรื่อง
-    local titleLabel = Instance.new("TextLabel", mainFrame)
-    titleLabel.Size = UDim2.new(1, 0, 0, 40)
-    
+    local titleLabelMain = Instance.new("TextLabel", mainFrame)
+    titleLabelMain.Size = UDim2.new(1, 0, 0, 40)
+
     -- จัดการอิโมจิใน Title
     local emojiFront = emojiFront or "" -- ถ้าไม่ระบุอิโมจิหน้า ให้เป็นสตริงว่าง
     local emojiBack = emojiBack or "" -- ถ้าไม่ระบุอิโมจิหลัง ให้เป็นสตริงว่าง
@@ -146,20 +147,20 @@ barTween2.Completed:Wait()
     -- สร้างข้อความ Title โดยเพิ่มอิโมจิหน้าและหลัง
     local titleText = title or "XDLua UI"
     if emojiFront ~= "" and emojiBack ~= "" then
-        titleLabel.Text = emojiFront .. spacingStr .. titleText .. spacingStr .. emojiBack
+        titleLabelMain.Text = emojiFront .. spacingStr .. titleText .. spacingStr .. emojiBack
     elseif emojiFront ~= "" then
-        titleLabel.Text = emojiFront .. spacingStr .. titleText
+        titleLabelMain.Text = emojiFront .. spacingStr .. titleText
     elseif emojiBack ~= "" then
-        titleLabel.Text = titleText .. spacingStr .. emojiBack
+        titleLabelMain.Text = titleText .. spacingStr .. emojiBack
     else
-        titleLabel.Text = titleText
+        titleLabelMain.Text = titleText
     end
 
-    titleLabel.TextColor3 = Color3.fromRGB(255, 50, 255)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.Font = Enum.Font.GothamBlack
-    titleLabel.TextSize = 20
-    titleLabel.TextStrokeTransparency = 0.2
+    titleLabelMain.TextColor3 = Color3.fromRGB(255, 50, 255)
+    titleLabelMain.BackgroundTransparency = 1
+    titleLabelMain.Font = Enum.Font.GothamBlack
+    titleLabelMain.TextSize = 20
+    titleLabelMain.TextStrokeTransparency = 0.2
 
     -- สร้างปุ่มฟันเฟือง (แทนปุ่ม X)
     local settingsButton = Instance.new("TextButton", mainFrame)
@@ -373,21 +374,19 @@ barTween2.Completed:Wait()
 
     -- เมธอดแก้ไข Title
     function XDLuaUI:SetTitle(newTitle, emojiFront, emojiBack, spacing)
-        -- จัดการอิโมจิใน Title
-        local emojiFront = emojiFront or "" -- ถ้าไม่ระบุอิโมจิหน้า ให้เป็นสตริงว่าง
-        local emojiBack = emojiBack or "" -- ถ้าไม่ระบุอิโมจิหลัง ให้เป็นสตริงว่าง
-        local spacing = spacing or 2 -- ค่าเริ่มต้นของช่องว่างเป็น 2 ช่อง
-        local spacingStr = string.rep(" ", spacing) -- สร้างช่องว่างตามจำนวนที่ระบุ
+        local emojiFront = emojiFront or ""
+        local emojiBack = emojiBack or ""
+        local spacing = spacing or 2
+        local spacingStr = string.rep(" ", spacing)
         
-        -- สร้างข้อความ Title โดยเพิ่มอิโมจิหน้าและหลัง
         if emojiFront ~= "" and emojiBack ~= "" then
-            titleLabel.Text = emojiFront .. spacingStr .. newTitle .. spacingStr .. emojiBack
+            titleLabelMain.Text = emojiFront .. spacingStr .. newTitle .. spacingStr .. emojiBack
         elseif emojiFront ~= "" then
-            titleLabel.Text = emojiFront .. spacingStr .. newTitle
+            titleLabelMain.Text = emojiFront .. spacingStr .. newTitle
         elseif emojiBack ~= "" then
-            titleLabel.Text = newTitle .. spacingStr .. emojiBack
+            titleLabelMain.Text = newTitle .. spacingStr .. emojiBack
         else
-            titleLabel.Text = newTitle
+            titleLabelMain.Text = newTitle
         end
     end
 
@@ -408,7 +407,7 @@ barTween2.Completed:Wait()
         button.MouseButton1Click:Connect(callback)
     end
 
-    -- เมธอดเพิ่มปุ่มเปิด/ปิด (Toggle) โดยสวิตช์ชิดซ้ายและข้อความอยู่ตรงกลาง
+    -- เมธอดเพิ่มปุ่มเปิด/ปิด (Toggle)
     function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
         local toggleButton = Instance.new("TextButton", tabContent)
         toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
@@ -419,13 +418,11 @@ barTween2.Completed:Wait()
         local toggleCorner = Instance.new("UICorner", toggleButton)
         toggleCorner.CornerRadius = UDim.new(0, 8)
 
-        -- สร้าง Frame เพื่อจัดวางสวิตช์และข้อความ
         local contentFrame = Instance.new("Frame", toggleButton)
         contentFrame.Size = UDim2.new(1, 0, 1, 0)
         contentFrame.Position = UDim2.new(0, 0, 0, 0)
         contentFrame.BackgroundTransparency = 1
 
-        -- สร้างสวิตช์กราฟิก (ชิดซ้าย)
         local switchFrame = Instance.new("Frame", contentFrame)
         switchFrame.Size = UDim2.new(0, 40, 0, 20)
         switchFrame.Position = UDim2.new(0, 5, 0.5, 0)
@@ -447,7 +444,6 @@ barTween2.Completed:Wait()
         local handleCorner = Instance.new("UICorner", switchHandle)
         handleCorner.CornerRadius = UDim.new(1, 0)
 
-        -- สร้าง TextLabel สำหรับข้อความ (อยู่ตรงกลาง)
         local textLabel = Instance.new("TextLabel", contentFrame)
         textLabel.Size = UDim2.new(0, 0, 0, 20)
         textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -459,7 +455,12 @@ barTween2.Completed:Wait()
         textLabel.TextSize = 14
         textLabel.AutomaticSize = Enum.AutomaticSize.X
 
-        local isToggled = false
+        local isToggled = defaultState or false
+        if isToggled then
+            switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
+            switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
+        end
+
         toggleButton.MouseButton1Click:Connect(function()
             isToggled = not isToggled
             if isToggled then
@@ -573,9 +574,8 @@ barTween2.Completed:Wait()
         descriptionLabel.Size = UDim2.new(0.9, 0, 0, 40)
         descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
 
-        -- จัดการอิโมจิในคำอธิบายแท็บ
-        local emoji = emoji or "" -- ถ้าไม่ระบุอิโมจิ ให้เป็นสตริงว่าง
-        local emojiPosition = emojiPosition or "front" -- ค่าเริ่มต้นเป็น "front"
+        local emoji = emoji or ""
+        local emojiPosition = emojiPosition or "front"
         if emoji ~= "" then
             if emojiPosition == "back" then
                 descriptionLabel.Text = descriptionText .. " " .. emoji
@@ -607,8 +607,7 @@ barTween2.Completed:Wait()
 
         local button = Instance.new("TextButton", tabContent)
         button.Size = UDim2.new(0.9, 0, 0, 30)
-        button.AnchorPoint = Vector2.new(0.5, 0)
-        button.Text = buttonText
+        buttonTextColor3 = Color3.fromRGB(255, 255, 255)
         button.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         button.Font = Enum.Font.GothamBold
         button.TextSize = 14
@@ -620,7 +619,7 @@ barTween2.Completed:Wait()
         button.MouseButton1Click:Connect(callback)
     end
 
-    -- เมธอดเพิ่ม Toggle พร้อมคำอธิบาย โดยสวิตช์ชิดซ้ายและข้อความอยู่ตรงกลาง
+    -- เมธอดเพิ่ม Toggle พร้อมคำอธิบาย
     function XDLuaUI:AddToggle2(tabContent, toggleText, descriptionText, defaultState, callback)
         local descriptionLabel = Instance.new("TextLabel", tabContent)
         descriptionLabel.Size = UDim2.new(0.9, 0, 0, 20)
@@ -641,13 +640,11 @@ barTween2.Completed:Wait()
         local toggleCorner = Instance.new("UICorner", toggleButton)
         toggleCorner.CornerRadius = UDim.new(0, 8)
 
-        -- สร้าง Frame เพื่อจัดวางสวิตช์และข้อความ
         local contentFrame = Instance.new("Frame", toggleButton)
         contentFrame.Size = UDim2.new(1, 0, 1, 0)
         contentFrame.Position = UDim2.new(0, 0, 0, 0)
         contentFrame.BackgroundTransparency = 1
 
-        -- สร้างสวิตช์กราฟิก (ชิดซ้าย)
         local switchFrame = Instance.new("Frame", contentFrame)
         switchFrame.Size = UDim2.new(0, 40, 0, 20)
         switchFrame.Position = UDim2.new(0, 5, 0.5, 0)
@@ -669,7 +666,6 @@ barTween2.Completed:Wait()
         local handleCorner = Instance.new("UICorner", switchHandle)
         handleCorner.CornerRadius = UDim.new(1, 0)
 
-        -- สร้าง TextLabel สำหรับข้อความ (อยู่ตรงกลาง)
         local textLabel = Instance.new("TextLabel", contentFrame)
         textLabel.Size = UDim2.new(0, 0, 0, 20)
         textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -681,7 +677,12 @@ barTween2.Completed:Wait()
         textLabel.TextSize = 14
         textLabel.AutomaticSize = Enum.AutomaticSize.X
 
-        local isToggled = false
+        local isToggled = defaultState or false
+        if isToggled then
+            switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
+            switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
+        end
+
         toggleButton.MouseButton1Click:Connect(function()
             isToggled = not isToggled
             if isToggled then
@@ -747,11 +748,12 @@ barTween2.Completed:Wait()
         mainFrame.Visible = not mainFrame.Visible
     end)
 
-    -- แสดงหน้าโหลด 3 วินาทีแล้วซ่อน
+    -- แสดงหน้าโหลดแล้วซ่อนเมื่อโหลดเสร็จ
     spawn(function()
-        wait(3) -- รอ 3 วินาที (ปรับได้)
+        barTween2.Completed:Wait() -- รอให้แถบโหลดถึง 100%
         loadingFrame:Destroy() -- ลบหน้าโหลด
         logoButton.Visible = true -- แสดงปุ่มโลโก้
+        mainFrame.Visible = true -- แสดง UI หลัก
     end)
 
     return XDLuaUI
