@@ -36,7 +36,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local titleLabel = Instance.new("TextLabel", loadingFrame)
     titleLabel.Size = UDim2.new(1, 0, 0, 40)
     titleLabel.Position = UDim2.new(0, 0, 0, 10)
-    titleLabel.Text = "BY C•J"
+    titleLabel.Text = "BY C • J"
     titleLabel.TextColor3 = Color3.fromRGB(255, 50, 255)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Font = Enum.Font.GothamBlack
@@ -63,7 +63,18 @@ loadingBar.BorderSizePixel = 0
 local barInnerCorner = Instance.new("UICorner", loadingBar)
 barInnerCorner.CornerRadius = UDim.new(0, 4)
 
--- อะนิเมชั่นแถบโหลด (เพิ่มไปถึง 80%)
+    -- เพิ่มข้อความ "กำลังโหลด..."
+    local loadingText = Instance.new("TextLabel", loadingFrame)
+    loadingText.Size = UDim2.new(1, 0, 0, 30)
+    loadingText.Position = UDim2.new(0, 0, 0, 90)
+    loadingText.Text = "กำลังโหลด..."
+    loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    loadingText.BackgroundTransparency = 1
+    loadingText.Font = Enum.Font.GothamBold
+    loadingText.TextSize = 16
+    loadingText.TextStrokeTransparency = 0.2
+
+    -- อะนิเมชั่นแถบโหลด (เพิ่มไปถึง 80%)
 local tweenService = game:GetService("TweenService")
 local barTweenInfo1 = TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out) -- ใช้เวลา 1.5 วินาทีเพื่อไปถึง 80%
 local barTween1 = tweenService:Create(loadingBar, barTweenInfo1, {Size = UDim2.new(0.8, 0, 1, 0)}) -- ปรับขนาดเป็น 80% ของ loadingBarFrame
@@ -79,17 +90,6 @@ barTween2:Play()
 
 -- รอให้แถบโหลดถึง 100% ก่อนดำเนินการต่อ
 barTween2.Completed:Wait()
-
-    -- เพิ่มข้อความ "กำลังโหลด..."
-    local loadingText = Instance.new("TextLabel", loadingFrame)
-    loadingText.Size = UDim2.new(1, 0, 0, 30)
-    loadingText.Position = UDim2.new(0, 0, 0, 90)
-    loadingText.Text = "กำลังโหลด..."
-    loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
-    loadingText.BackgroundTransparency = 1
-    loadingText.Font = Enum.Font.GothamBold
-    loadingText.TextSize = 16
-    loadingText.TextStrokeTransparency = 0.2
 
     -- อะนิเมชั่นข้อความกระพริบ
     local textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
