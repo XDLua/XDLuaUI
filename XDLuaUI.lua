@@ -1,33 +1,8 @@
--- XDLuaUI.lua
+-- XDLuaUI (UI หลัก)
 local XDLuaUI = {}
 
 -- บริการที่ใช้
 local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-
--- ฟังก์ชันสร้าง Tween
-local function createTween(instance, properties, duration, easingStyle, easingDirection)
-    local tweenInfo = TweenInfo.new(
-        duration,
-        easingStyle or Enum.EasingStyle.Quad,
-        easingDirection or Enum.EasingDirection.Out
-    )
-    -- ตรวจสอบและกรองคุณสมบัติที่ใช้ได้
-    local validProperties = {}
-    for prop, value in pairs(properties) do
-        if prop == "TextTransparency" then
-            if instance:IsA("TextLabel") or instance:IsA("TextButton") or instance:IsA("TextBox") then
-                validProperties[prop] = value
-            end
-        elseif prop == "BackgroundTransparency" then
-            validProperties[prop] = value
-        else
-            validProperties[prop] = value
-        end
-    end
-    local tween = TweenService:Create(instance, tweenInfo, validProperties)
-    return tween
-end
 
 -- สร้างหน้าต่างหลัก
 function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
@@ -41,101 +16,71 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local screenGui = Instance.new("ScreenGui", CoreGui)
     screenGui.Name = "XDLuaGUI"
 
-    -- สร้างหน้าจอโหลด (ปรับขนาดให้เล็กลง)
+    -- สร้างหน้าโหลด
     local loadingFrame = Instance.new("Frame", screenGui)
-    loadingFrame.Size = UDim2.new(0, 300, 0, 200) -- ลดขนาดจากเต็มจอเป็น 300x200
-    loadingFrame.Position = UDim2.new(0.5, -150, 0.5, -100) -- อยู่ตรงกลางจอ
-    loadingFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-    loadingFrame.BackgroundTransparency = 0
+    loadingFrame.Size = UDim2.new(0, 300, 0, 150)
+    loadingFrame.Position = UDim2.new(0.5, -150, 0.5, -75)
+    loadingFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    loadingFrame.BackgroundTransparency = 0.1
+    loadingFrame.BorderSizePixel = 0
 
-    -- เพิ่ม Gradient ให้พื้นหลัง
-    local gradient = Instance.new("UIGradient", loadingFrame)
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(10, 10, 10)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 0, 50))
-    })
-    gradient.Rotation = 45
+    local loadingCorner = Instance.new("UICorner", loadingFrame)
+    loadingCorner.CornerRadius = UDim.new(0, 12)
 
-    -- เพิ่มชื่อสคริปต์ด้านบน (ปรับขนาดและตำแหน่ง)
-    local scriptNameLabel = Instance.new("TextLabel", loadingFrame)
-    scriptNameLabel.Size = UDim2.new(0, 200, 0, 40)
-    scriptNameLabel.Position = UDim2.new(0.5, 0, 0.2, 0)
-    scriptNameLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-    scriptNameLabel.Text = "FORSAKEN UI"
-    scriptNameLabel.TextColor3 = Color3.fromRGB(255, 50, 255)
-    scriptNameLabel.BackgroundTransparency = 1
-    scriptNameLabel.Font = Enum.Font.GothamBlack
-    scriptNameLabel.TextSize = 24
-    scriptNameLabel.TextStrokeTransparency = 0.5
+    local loadingGlow = Instance.new("UIStroke", loadingFrame)
+    loadingGlow.Thickness = 2
+    loadingGlow.Color = Color3.fromRGB(255, 50, 255)
+    loadingGlow.Transparency = 0.2
 
-    -- เพิ่มข้อความ "กำลังโหลด..." (ปรับขนาดและตำแหน่ง)
-    local loadingLabel = Instance.new("TextLabel", loadingFrame)
-    loadingLabel.Size = UDim2.new(0, 150, 0, 30)
-    loadingLabel.Position = UDim2.new(0.5, 0, 0.4, 0)
-    loadingLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-    loadingLabel.Text = "กำลังโหลด..."
-    loadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    loadingLabel.BackgroundTransparency = 1
-    loadingLabel.Font = Enum.Font.GothamBold
-    loadingLabel.TextSize = 18
+    -- เพิ่มชื่อ "BY C•J"
+    local titleLabel = Instance.new("TextLabel", loadingFrame)
+    titleLabel.Size = UDim2.new(1, 0, 0, 40)
+    titleLabel.Position = UDim2.new(0, 0, 0, 10)
+    titleLabel.Text = "BY C•J"
+    titleLabel.TextColor3 = Color3.fromRGB(255, 50, 255)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Font = Enum.Font.GothamBlack
+    titleLabel.TextSize = 24
+    titleLabel.TextStrokeTransparency = 0.2
 
-    -- อะนิเมชันกระพริบให้ข้อความ "กำลังโหลด..."
-    spawn(function()
-        while loadingFrame.Parent do
-            createTween(loadingLabel, {TextTransparency = 1}, 0.5):Play()
-            wait(0.5)
-            createTween(loadingLabel, {TextTransparency = 0}, 0.5):Play()
-            wait(0.5)
-        end
-    end)
-
-    -- สร้างแถบโหลด (ปรับขนาดและตำแหน่ง)
+    -- เพิ่มแถบโหลด
     local loadingBarFrame = Instance.new("Frame", loadingFrame)
-    loadingBarFrame.Size = UDim2.new(0, 200, 0, 15)
-    loadingBarFrame.Position = UDim2.new(0.5, 0, 0.6, 0)
-    loadingBarFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    loadingBarFrame.Size = UDim2.new(0.8, 0, 0, 10)
+    loadingBarFrame.Position = UDim2.new(0.1, 0, 0, 60)
     loadingBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     loadingBarFrame.BorderSizePixel = 0
 
-    local loadingBarCorner = Instance.new("UICorner", loadingBarFrame)
-    loadingBarCorner.CornerRadius = UDim.new(0, 10)
+    local barCorner = Instance.new("UICorner", loadingBarFrame)
+    barCorner.CornerRadius = UDim.new(0, 5)
 
     local loadingBar = Instance.new("Frame", loadingBarFrame)
     loadingBar.Size = UDim2.new(0, 0, 1, 0)
     loadingBar.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
     loadingBar.BorderSizePixel = 0
 
-    local loadingBarCornerInner = Instance.new("UICorner", loadingBar)
-    loadingBarCornerInner.CornerRadius = UDim.new(0, 10)
+    local barInnerCorner = Instance.new("UICorner", loadingBar)
+    barInnerCorner.CornerRadius = UDim.new(0, 5)
 
-    -- เพิ่มเงาให้แถบโหลด
-    local barGlow = Instance.new("UIStroke", loadingBar)
-    barGlow.Thickness = 2
-    barGlow.Color = Color3.fromRGB(255, 255, 255)
-    barGlow.Transparency = 0.5
+    -- เพิ่มข้อความ "กำลังโหลด..."
+    local loadingText = Instance.new("TextLabel", loadingFrame)
+    loadingText.Size = UDim2.new(1, 0, 0, 30)
+    loadingText.Position = UDim2.new(0, 0, 0, 90)
+    loadingText.Text = "กำลังโหลด..."
+    loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    loadingText.BackgroundTransparency = 1
+    loadingText.Font = Enum.Font.GothamBold
+    loadingText.TextSize = 16
+    loadingText.TextStrokeTransparency = 0.2
 
-    -- เริ่มอะนิเมชันโหลด
-    local loadingTween = createTween(loadingBar, {Size = UDim2.new(1, 0, 1, 0)}, 2)
-    loadingTween:Play()
+    -- อะนิเมชั่นแถบโหลด
+    local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true)
+    local barTween = TweenService:Create(loadingBar, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)})
+    barTween:Play()
 
-    -- รอให้โหลดเสร็จ
-    loadingTween.Completed:Wait()
-
-    -- อะนิเมชัน Fade Out หน้าจอโหลด
-    local fadeOutTween = createTween(loadingFrame, {BackgroundTransparency = 1}, 0.5)
-    for _, child in pairs(loadingFrame:GetDescendants()) do
-        if child:IsA("GuiObject") then
-            createTween(child, {BackgroundTransparency = 1}, 0.5):Play()
-            if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
-                createTween(child, {TextTransparency = 1}, 0.5):Play()
-            end
-        end
-    end
-    fadeOutTween:Play()
-    fadeOutTween.Completed:Wait()
-
-    -- ลบหน้าโหลด
-    loadingFrame:Destroy()
+    -- อะนิเมชั่นข้อความกระพริบ
+    local textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
+    local textTween = TweenService:Create(loadingText, textTweenInfo, {TextTransparency = 0.8})
+    textTween:Play()
 
     -- สร้างปุ่มโลโก้ (ปุ่มเปิด/ปิด UI)
     local logoButton = Instance.new("TextButton", screenGui)
@@ -150,6 +95,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     logoButton.TextSize = 24
     logoButton.Draggable = true
     logoButton.AutoButtonColor = false
+    logoButton.Visible = false -- ซ่อนปุ่มโลโก้จนกว่าหน้าโหลดจะหายไป
 
     local uiCorner = Instance.new("UICorner", logoButton)
     uiCorner.CornerRadius = UDim.new(0, 12)
@@ -159,7 +105,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     mainFrame.Size = UDim2.new(0, 450, 0, 300)
     mainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
     mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-    mainFrame.BackgroundTransparency = 0.3 -- คืนค่าให้สวยเหมือนเดิม
+    mainFrame.BackgroundTransparency = 0.3
     mainFrame.BorderSizePixel = 0
     mainFrame.Visible = false
     mainFrame.Active = true
@@ -168,7 +114,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local glowMain = Instance.new("UIStroke", mainFrame)
     glowMain.Thickness = 4
     glowMain.Color = Color3.fromRGB(255, 50, 255)
-    glowMain.Transparency = 0.1 -- คืนค่าให้สวยเหมือนเดิม
+    glowMain.Transparency = 0.1
 
     local mainCorner = Instance.new("UICorner", mainFrame)
     mainCorner.CornerRadius = UDim.new(0, 12)
@@ -178,11 +124,12 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     titleLabel.Size = UDim2.new(1, 0, 0, 40)
     
     -- จัดการอิโมจิใน Title
-    local emojiFront = emojiFront or ""
-    local emojiBack = emojiBack or ""
-    local spacing = spacing or 2
-    local spacingStr = string.rep(" ", spacing)
+    local emojiFront = emojiFront or "" -- ถ้าไม่ระบุอิโมจิหน้า ให้เป็นสตริงว่าง
+    local emojiBack = emojiBack or "" -- ถ้าไม่ระบุอิโมจิหลัง ให้เป็นสตริงว่าง
+    local spacing = spacing or 2 -- ค่าเริ่มต้นของช่องว่างเป็น 2 ช่อง
+    local spacingStr = string.rep(" ", spacing) -- สร้างช่องว่างตามจำนวนที่ระบุ
     
+    -- สร้างข้อความ Title โดยเพิ่มอิโมจิหน้าและหลัง
     local titleText = title or "XDLua UI"
     if emojiFront ~= "" and emojiBack ~= "" then
         titleLabel.Text = emojiFront .. spacingStr .. titleText .. spacingStr .. emojiBack
@@ -199,7 +146,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     titleLabel.Font = Enum.Font.GothamBlack
     titleLabel.TextSize = 20
     titleLabel.TextStrokeTransparency = 0.2
-    titleLabel.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
     -- สร้างปุ่มฟันเฟือง (แทนปุ่ม X)
     local settingsButton = Instance.new("TextButton", mainFrame)
@@ -210,8 +156,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     settingsButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
     settingsButton.Font = Enum.Font.GothamBold
     settingsButton.TextSize = 16
-    settingsButton.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
-    settingsButton.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
     local settingsCorner = Instance.new("UICorner", settingsButton)
     settingsCorner.CornerRadius = UDim.new(0, 8)
 
@@ -220,7 +164,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     tabFrame.Size = UDim2.new(0, 120, 1, -50)
     tabFrame.Position = UDim2.new(0, 10, 0, 45)
     tabFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    tabFrame.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
     local tabCorner = Instance.new("UICorner", tabFrame)
     tabCorner.CornerRadius = UDim.new(0, 8)
@@ -242,6 +185,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
     tabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
+    -- เพิ่ม UIPadding เพื่อให้ปุ่มแท็บไม่ชิดบนสุด
     local tabPadding = Instance.new("UIPadding", tabScrollingFrame)
     tabPadding.PaddingTop = UDim.new(0, 10)
 
@@ -250,7 +194,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     contentFrame.Size = UDim2.new(1, -140, 1, -50)
     contentFrame.Position = UDim2.new(0, 135, 0, 45)
     contentFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    contentFrame.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
+    contentFrame.BackgroundTransparency = 0.5
     contentFrame.BorderSizePixel = 0
 
     local contentCorner = Instance.new("UICorner", contentFrame)
@@ -277,7 +221,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     settingsFrame.Size = UDim2.new(1, 0, 0, 0)
     settingsFrame.Name = "Settings"
     settingsFrame.Visible = false
-    settingsFrame.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
+    settingsFrame.BackgroundTransparency = 1
     settingsFrame.AutomaticSize = Enum.AutomaticSize.Y
 
     local settingsLayout = Instance.new("UIListLayout", settingsFrame)
@@ -285,6 +229,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     settingsLayout.SortOrder = Enum.SortOrder.LayoutOrder
     settingsLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
+    -- เพิ่มคำอธิบายในหน้า "ตั้งค่า"
     local settingsLabel = Instance.new("TextLabel", settingsFrame)
     settingsLabel.Size = UDim2.new(0.9, 0, 0, 40)
     settingsLabel.AnchorPoint = Vector2.new(0.5, 0)
@@ -294,7 +239,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     settingsLabel.Font = Enum.Font.GothamBold
     settingsLabel.TextSize = 14
     settingsLabel.TextWrapped = true
-    settingsLabel.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
     -- ตัวแปรเก็บแท็บและเนื้อหา
     local tabs = {}
@@ -315,29 +259,11 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
             selectedTab.Button:FindFirstChild("Stroke").Transparency = 0.2
         end
         for _, tab in pairs(tabs) do
-            createTween(tab.Content, {BackgroundTransparency = 1}, 0.3):Play()
-            for _, child in pairs(tab.Content:GetDescendants()) do
-                if child:IsA("GuiObject") then
-                    createTween(child, {BackgroundTransparency = 1}, 0.3):Play()
-                    if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
-                        createTween(child, {TextTransparency = 1}, 0.3):Play()
-                    end
-                end
-            end
             tab.Content.Visible = false
         end
         settingsFrame.Visible = false
         settingsVisible = false
         selectedTab.Content.Visible = true
-        createTween(selectedTab.Content, {BackgroundTransparency = 0}, 0.3):Play()
-        for _, child in pairs(selectedTab.Content:GetDescendants()) do
-            if child:IsA("GuiObject") then
-                createTween(child, {BackgroundTransparency = child.BackgroundTransparency == 1 and 1 or 0}, 0.3):Play()
-                if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
-                    createTween(child, {TextTransparency = 0}, 0.3):Play()
-                end
-            end
-        end
     end
 
     -- ฟังก์ชันสลับไปหน้า "ตั้งค่า"
@@ -345,15 +271,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         settingsVisible = not settingsVisible
         if settingsVisible then
             for _, tab in pairs(tabs) do
-                createTween(tab.Content, {BackgroundTransparency = 1}, 0.3):Play()
-                for _, child in pairs(tab.Content:GetDescendants()) do
-                    if child:IsA("GuiObject") then
-                        createTween(child, {BackgroundTransparency = 1}, 0.3):Play()
-                        if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
-                            createTween(child, {TextTransparency = 1}, 0.3):Play()
-                        end
-                    end
-                end
                 tab.Content.Visible = false
             end
             if selectedTab then
@@ -364,28 +281,10 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
                 selectedTab = nil
             end
             settingsFrame.Visible = true
-            createTween(settingsFrame, {BackgroundTransparency = 0}, 0.3):Play()
-            for _, child in pairs(settingsFrame:GetDescendants()) do
-                if child:IsA("GuiObject") then
-                    createTween(child, {BackgroundTransparency = child.BackgroundTransparency == 1 and 1 or 0}, 0.3):Play()
-                    if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
-                        createTween(child, {TextTransparency = 0}, 0.3):Play()
-                    end
-                end
-            end
         else
-            createTween(settingsFrame, {BackgroundTransparency = 1}, 0.3):Play()
-            for _, child in pairs(settingsFrame:GetDescendants()) do
-                if child:IsA("GuiObject") then
-                    createTween(child, {BackgroundTransparency = 1}, 0.3):Play()
-                    if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
-                        createTween(child, {TextTransparency = 1}, 0.3):Play()
-                    end
-                end
-            end
             settingsFrame.Visible = false
             if tabs[1] then
-                switchTab(1)
+                switchTab(1) -- กลับไปที่แท็บแรกถ้าไม่มีแท็บที่เลือก
             end
         end
     end
@@ -401,8 +300,9 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         tabButton.Size = UDim2.new(0.9, 0, 0, 40)
         tabButton.AnchorPoint = Vector2.new(0.5, 0)
         
-        local emoji = emoji or ""
-        local emojiPosition = emojiPosition or "front"
+        -- จัดการอิโมจิในชื่อแท็บ
+        local emoji = emoji or "" -- ถ้าไม่ระบุอิโมจิ ให้เป็นสตริงว่าง
+        local emojiPosition = emojiPosition or "front" -- ค่าเริ่มต้นเป็น "front"
         if emoji ~= "" then
             if emojiPosition == "back" then
                 tabButton.Text = tabName .. " " .. emoji
@@ -418,8 +318,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         tabButton.Font = Enum.Font.GothamBold
         tabButton.TextSize = 14
         tabButton.AutoButtonColor = false
-        tabButton.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
-        tabButton.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
         tabButton.MouseButton1Click:Connect(function()
             switchTab(tabIndex)
         end)
@@ -433,13 +331,15 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         local tabCorner = Instance.new("UICorner", tabButton)
         tabCorner.CornerRadius = UDim.new(0, 5)
 
+        -- สร้างเฟรมเนื้อหาแท็บ
         local tabContent = Instance.new("Frame", contentScrollingFrame)
         tabContent.Size = UDim2.new(1, 0, 0, 0)
         tabContent.Name = "Tab" .. tabIndex
         tabContent.Visible = false
-        tabContent.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
+        tabContent.BackgroundTransparency = 1
         tabContent.AutomaticSize = Enum.AutomaticSize.Y
 
+        -- เพิ่ม UIListLayout ใน tabContent เพื่อจัดการตำแหน่งขององค์ประกอบภายใน
         local tabContentLayout = Instance.new("UIListLayout", tabContent)
         tabContentLayout.Padding = UDim.new(0, 10)
         tabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -459,11 +359,13 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
 
     -- เมธอดแก้ไข Title
     function XDLuaUI:SetTitle(newTitle, emojiFront, emojiBack, spacing)
-        local emojiFront = emojiFront or ""
-        local emojiBack = emojiBack or ""
-        local spacing = spacing or 2
-        local spacingStr = string.rep(" ", spacing)
+        -- จัดการอิโมจิใน Title
+        local emojiFront = emojiFront or "" -- ถ้าไม่ระบุอิโมจิหน้า ให้เป็นสตริงว่าง
+        local emojiBack = emojiBack or "" -- ถ้าไม่ระบุอิโมจิหลัง ให้เป็นสตริงว่าง
+        local spacing = spacing or 2 -- ค่าเริ่มต้นของช่องว่างเป็น 2 ช่อง
+        local spacingStr = string.rep(" ", spacing) -- สร้างช่องว่างตามจำนวนที่ระบุ
         
+        -- สร้างข้อความ Title โดยเพิ่มอิโมจิหน้าและหลัง
         if emojiFront ~= "" and emojiBack ~= "" then
             titleLabel.Text = emojiFront .. spacingStr .. newTitle .. spacingStr .. emojiBack
         elseif emojiFront ~= "" then
@@ -485,8 +387,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         button.Font = Enum.Font.GothamBold
         button.TextSize = 14
         button.TextColor3 = Color3.fromRGB(255, 255, 255)
-        button.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
-        button.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local buttonCorner = Instance.new("UICorner", button)
         buttonCorner.CornerRadius = UDim.new(0, 8)
@@ -494,30 +394,30 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         button.MouseButton1Click:Connect(callback)
     end
 
-    -- เมธอดเพิ่มปุ่มเปิด/ปิด (Toggle)
+    -- เมธอดเพิ่มปุ่มเปิด/ปิด (Toggle) โดยสวิตช์ชิดซ้ายและข้อความอยู่ตรงกลาง
     function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
         local toggleButton = Instance.new("TextButton", tabContent)
         toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
         toggleButton.AnchorPoint = Vector2.new(0.5, 0)
         toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         toggleButton.Text = ""
-        toggleButton.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local toggleCorner = Instance.new("UICorner", toggleButton)
         toggleCorner.CornerRadius = UDim.new(0, 8)
 
+        -- สร้าง Frame เพื่อจัดวางสวิตช์และข้อความ
         local contentFrame = Instance.new("Frame", toggleButton)
         contentFrame.Size = UDim2.new(1, 0, 1, 0)
         contentFrame.Position = UDim2.new(0, 0, 0, 0)
         contentFrame.BackgroundTransparency = 1
 
+        -- สร้างสวิตช์กราฟิก (ชิดซ้าย)
         local switchFrame = Instance.new("Frame", contentFrame)
         switchFrame.Size = UDim2.new(0, 40, 0, 20)
         switchFrame.Position = UDim2.new(0, 5, 0.5, 0)
         switchFrame.AnchorPoint = Vector2.new(0, 0.5)
         switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
         switchFrame.BorderSizePixel = 0
-        switchFrame.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local switchCorner = Instance.new("UICorner", switchFrame)
         switchCorner.CornerRadius = UDim.new(1, 0)
@@ -529,11 +429,11 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         switchHandle.BorderSizePixel = 0
         switchHandle.Text = ""
-        switchHandle.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local handleCorner = Instance.new("UICorner", switchHandle)
         handleCorner.CornerRadius = UDim.new(1, 0)
 
+        -- สร้าง TextLabel สำหรับข้อความ (อยู่ตรงกลาง)
         local textLabel = Instance.new("TextLabel", contentFrame)
         textLabel.Size = UDim2.new(0, 0, 0, 20)
         textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -544,21 +444,15 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         textLabel.Font = Enum.Font.GothamBold
         textLabel.TextSize = 14
         textLabel.AutomaticSize = Enum.AutomaticSize.X
-        textLabel.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
-        local isToggled = defaultState or false
-        if isToggled then
-            switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
-            switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
-        end
-
+        local isToggled = false
         toggleButton.MouseButton1Click:Connect(function()
             isToggled = not isToggled
             if isToggled then
-                createTween(switchHandle, {Position = UDim2.new(0, 2, 0.5, 0)}, 0.2):Play()
+                switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
                 switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
             else
-                createTween(switchHandle, {Position = UDim2.new(1, -18, 0.5, 0)}, 0.2):Play()
+                switchHandle.Position = UDim2.new(1, -18, 0.5, 0)
                 switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             end
             callback(isToggled)
@@ -571,7 +465,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         sliderFrame.Size = UDim2.new(0.9, 0, 0, 50)
         sliderFrame.AnchorPoint = Vector2.new(0.5, 0)
         sliderFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        sliderFrame.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
+        sliderFrame.BackgroundTransparency = 0.5
         sliderFrame.BorderSizePixel = 0
 
         local sliderCorner = Instance.new("UICorner", sliderFrame)
@@ -585,14 +479,12 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         sliderValueLabel.BackgroundTransparency = 1
         sliderValueLabel.Font = Enum.Font.GothamBold
         sliderValueLabel.TextSize = 14
-        sliderValueLabel.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local sliderBar = Instance.new("Frame", sliderFrame)
         sliderBar.Size = UDim2.new(0.9, 0, 0, 4)
         sliderBar.Position = UDim2.new(0.05, 0, 0, 30)
         sliderBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
         sliderBar.BorderSizePixel = 0
-        sliderBar.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local sliderBarCorner = Instance.new("UICorner", sliderBar)
         sliderBarCorner.CornerRadius = UDim.new(0, 5)
@@ -603,7 +495,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         sliderHandle.Text = ""
         sliderHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
         sliderHandle.BorderSizePixel = 0
-        sliderHandle.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local sliderHandleCorner = Instance.new("UICorner", sliderHandle)
         sliderHandleCorner.CornerRadius = UDim.new(0, 10)
@@ -612,7 +503,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
             local clampedValue = math.clamp(value, minValue, maxValue)
             sliderValueLabel.Text = sliderText .. ": " .. clampedValue
             local percent = (clampedValue - minValue) / (maxValue - minValue)
-            createTween(sliderHandle, {Position = UDim2.new(percent, -6, 0, -4)}, 0.2):Play()
+            sliderHandle.Position = UDim2.new(percent, -6, 0, -4)
             callback(clampedValue)
         end
 
@@ -621,15 +512,15 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
             isDragging = true
         end)
 
-        UserInputService.InputEnded:Connect(function(input)
+        game:GetService("UserInputService").InputEnded:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 isDragging = false
             end
         end)
 
-        UserInputService.InputChanged:Connect(function(input)
+        game:GetService("UserInputService").InputChanged:Connect(function(input)
             if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-                local inputPosition = input.UserInputType == Enum.UserInputType.Touch and input.Position or UserInputService:GetMouseLocation()
+                local inputPosition = input.UserInputType == Enum.UserInputType.Touch and input.Position or game:GetService("UserInputService"):GetMouseLocation()
                 local sliderBarPosition = sliderBar.AbsolutePosition
                 local sliderBarSize = sliderBar.AbsoluteSize
                 local relativeX = (inputPosition.X - sliderBarPosition.X) / sliderBarSize.X
@@ -650,7 +541,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         descriptionLabel.Font = Enum.Font.GothamBold
         descriptionLabel.TextSize = 14
         descriptionLabel.TextWrapped = true
-        descriptionLabel.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local creditLabel = Instance.new("TextLabel", tabContent)
         creditLabel.Size = UDim2.new(0.9, 0, 0, 30)
@@ -661,7 +551,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         creditLabel.Font = Enum.Font.GothamBold
         creditLabel.TextSize = 12
         creditLabel.TextWrapped = true
-        creditLabel.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
     end
 
     -- เมธอดเพิ่มคำอธิบายของ Tab
@@ -670,8 +559,9 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         descriptionLabel.Size = UDim2.new(0.9, 0, 0, 40)
         descriptionLabel.AnchorPoint = Vector2.new(0.5, 0)
 
-        local emoji = emoji or ""
-        local emojiPosition = emojiPosition or "front"
+        -- จัดการอิโมจิในคำอธิบายแท็บ
+        local emoji = emoji or "" -- ถ้าไม่ระบุอิโมจิ ให้เป็นสตริงว่าง
+        local emojiPosition = emojiPosition or "front" -- ค่าเริ่มต้นเป็น "front"
         if emoji ~= "" then
             if emojiPosition == "back" then
                 descriptionLabel.Text = descriptionText .. " " .. emoji
@@ -687,7 +577,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         descriptionLabel.Font = Enum.Font.GothamBold
         descriptionLabel.TextSize = 14
         descriptionLabel.TextWrapped = true
-        descriptionLabel.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
     end
 
     -- เมธอดเพิ่มปุ่มพร้อมคำอธิบาย
@@ -701,7 +590,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         descriptionLabel.Font = Enum.Font.GothamBold
         descriptionLabel.TextSize = 12
         descriptionLabel.TextWrapped = true
-        descriptionLabel.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local button = Instance.new("TextButton", tabContent)
         button.Size = UDim2.new(0.9, 0, 0, 30)
@@ -711,8 +599,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         button.Font = Enum.Font.GothamBold
         button.TextSize = 14
         button.TextColor3 = Color3.fromRGB(255, 255, 255)
-        button.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
-        button.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local buttonCorner = Instance.new("UICorner", button)
         buttonCorner.CornerRadius = UDim.new(0, 8)
@@ -720,7 +606,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         button.MouseButton1Click:Connect(callback)
     end
 
-    -- เมธอดเพิ่ม Toggle พร้อมคำอธิบาย
+    -- เมธอดเพิ่ม Toggle พร้อมคำอธิบาย โดยสวิตช์ชิดซ้ายและข้อความอยู่ตรงกลาง
     function XDLuaUI:AddToggle2(tabContent, toggleText, descriptionText, defaultState, callback)
         local descriptionLabel = Instance.new("TextLabel", tabContent)
         descriptionLabel.Size = UDim2.new(0.9, 0, 0, 20)
@@ -731,30 +617,29 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         descriptionLabel.Font = Enum.Font.GothamBold
         descriptionLabel.TextSize = 12
         descriptionLabel.TextWrapped = true
-        descriptionLabel.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local toggleButton = Instance.new("TextButton", tabContent)
         toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
         toggleButton.AnchorPoint = Vector2.new(0.5, 0)
         toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
         toggleButton.Text = ""
-        toggleButton.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local toggleCorner = Instance.new("UICorner", toggleButton)
         toggleCorner.CornerRadius = UDim.new(0, 8)
 
+        -- สร้าง Frame เพื่อจัดวางสวิตช์และข้อความ
         local contentFrame = Instance.new("Frame", toggleButton)
         contentFrame.Size = UDim2.new(1, 0, 1, 0)
         contentFrame.Position = UDim2.new(0, 0, 0, 0)
         contentFrame.BackgroundTransparency = 1
 
+        -- สร้างสวิตช์กราฟิก (ชิดซ้าย)
         local switchFrame = Instance.new("Frame", contentFrame)
         switchFrame.Size = UDim2.new(0, 40, 0, 20)
         switchFrame.Position = UDim2.new(0, 5, 0.5, 0)
         switchFrame.AnchorPoint = Vector2.new(0, 0.5)
         switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
         switchFrame.BorderSizePixel = 0
-        switchFrame.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local switchCorner = Instance.new("UICorner", switchFrame)
         switchCorner.CornerRadius = UDim.new(1, 0)
@@ -766,11 +651,11 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         switchHandle.BorderSizePixel = 0
         switchHandle.Text = ""
-        switchHandle.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local handleCorner = Instance.new("UICorner", switchHandle)
         handleCorner.CornerRadius = UDim.new(1, 0)
 
+        -- สร้าง TextLabel สำหรับข้อความ (อยู่ตรงกลาง)
         local textLabel = Instance.new("TextLabel", contentFrame)
         textLabel.Size = UDim2.new(0, 0, 0, 20)
         textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -781,21 +666,15 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         textLabel.Font = Enum.Font.GothamBold
         textLabel.TextSize = 14
         textLabel.AutomaticSize = Enum.AutomaticSize.X
-        textLabel.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
-        local isToggled = defaultState or false
-        if isToggled then
-            switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
-            switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
-        end
-
+        local isToggled = false
         toggleButton.MouseButton1Click:Connect(function()
             isToggled = not isToggled
             if isToggled then
-                createTween(switchHandle, {Position = UDim2.new(0, 2, 0.5, 0)}, 0.2):Play()
+                switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
                 switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
             else
-                createTween(switchHandle, {Position = UDim2.new(1, -18, 0.5, 0)}, 0.2):Play()
+                switchHandle.Position = UDim2.new(1, -18, 0.5, 0)
                 switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             end
             callback(isToggled)
@@ -812,8 +691,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         Youtube.Font = Enum.Font.GothamBold
         Youtube.TextSize = 14
         Youtube.TextColor3 = Color3.fromRGB(255, 255, 255)
-        Youtube.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
-        Youtube.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local youtubeCorner = Instance.new("UICorner", Youtube)
         youtubeCorner.CornerRadius = UDim.new(0, 8)
@@ -838,8 +715,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         Discord.Font = Enum.Font.GothamBold
         Discord.TextSize = 14
         Discord.TextColor3 = Color3.fromRGB(255, 255, 255)
-        Discord.BackgroundTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
-        Discord.TextTransparency = 0 -- คืนค่าให้สวยเหมือนเดิม
 
         local discordCorner = Instance.new("UICorner", Discord)
         discordCorner.CornerRadius = UDim.new(0, 8)
@@ -853,38 +728,17 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end)
     end
 
-    -- อะนิเมชันเปิด/ปิด UI
-    local function toggleUI()
-        if mainFrame.Visible then
-            createTween(mainFrame, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
-            for _, child in pairs(mainFrame:GetDescendants()) do
-                if child:IsA("GuiObject") then
-                    createTween(child, {BackgroundTransparency = 1}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
-                    if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
-                        createTween(child, {TextTransparency = 1}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
-                    end
-                end
-            end
-            wait(0.5)
-            mainFrame.Visible = false
-        else
-            mainFrame.Visible = true
-            mainFrame.Size = UDim2.new(0, 0, 0, 0)
-            createTween(mainFrame, {Size = UDim2.new(0, 450, 0, 300), BackgroundTransparency = 0.3}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out):Play()
-            createTween(glowMain, {Transparency = 0.1}, 0.5):Play()
-            for _, child in pairs(mainFrame:GetDescendants()) do
-                if child:IsA("GuiObject") then
-                    createTween(child, {BackgroundTransparency = child.BackgroundTransparency == 1 and 1 or 0}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out):Play()
-                    if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
-                        createTween(child, {TextTransparency = 0}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out):Play()
-                    end
-                end
-            end
-        end
-    end
-
     -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อนเฟรมหลัก
-    logoButton.MouseButton1Click:Connect(toggleUI)
+    logoButton.MouseButton1Click:Connect(function()
+        mainFrame.Visible = not mainFrame.Visible
+    end)
+
+    -- แสดงหน้าโหลด 3 วินาทีแล้วซ่อน
+    spawn(function()
+        wait(3) -- รอ 3 วินาที (ปรับได้)
+        loadingFrame:Destroy() -- ลบหน้าโหลด
+        logoButton.Visible = true -- แสดงปุ่มโลโก้
+    end)
 
     return XDLuaUI
 end
