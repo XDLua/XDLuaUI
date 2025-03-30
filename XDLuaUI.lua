@@ -46,7 +46,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     -- เพิ่มแถบโหลด
 local loadingBarFrame = Instance.new("Frame", loadingFrame)
 loadingBarFrame.Size = UDim2.new(0.8, 0, 0, 8)
-loadingBarFrame.Position = UDim2.new(0, 0, 0, 40)
+loadingBarFrame.Position = UDim2.new(0.1, 0, 0, 40)
 loadingBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 loadingBarFrame.BorderSizePixel = 0
 
@@ -74,6 +74,11 @@ barInnerCorner.CornerRadius = UDim.new(0, 4)
     loadingText.TextSize = 16
     loadingText.TextStrokeTransparency = 0.2
 
+    -- อะนิเมชั่นข้อความกระพริบ
+    local textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
+    local textTween = TweenService:Create(loadingText, textTweenInfo, {TextTransparency = 0.8})
+    textTween:Play()
+
     -- อะนิเมชั่นแถบโหลด (เพิ่มไปถึง 80%)
 local tweenService = game:GetService("TweenService")
 local barTweenInfo1 = TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out) -- ใช้เวลา 1.5 วินาทีเพื่อไปถึง 80%
@@ -90,11 +95,6 @@ barTween2:Play()
 
 -- รอให้แถบโหลดถึง 100% ก่อนดำเนินการต่อ
 barTween2.Completed:Wait()
-
-    -- อะนิเมชั่นข้อความกระพริบ
-    local textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
-    local textTween = TweenService:Create(loadingText, textTweenInfo, {TextTransparency = 0.8})
-    textTween:Play()
 
     -- สร้างปุ่มโลโก้ (ปุ่มเปิด/ปิด UI)
     local logoButton = Instance.new("TextButton", screenGui)
