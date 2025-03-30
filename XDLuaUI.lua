@@ -1,18 +1,33 @@
--- XDLuaUI.lua
 local XDLuaUI = {}
 
 -- บริการที่ใช้
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
--- ฟังก์ชันสร้าง Tween
+-- ฟังก์ชันสร้าง Tween (ปรับปรุงให้ตรวจสอบคุณสมบัติ)
 local function createTween(instance, properties, duration, easingStyle, easingDirection)
     local tweenInfo = TweenInfo.new(
         duration,
         easingStyle or Enum.EasingStyle.Quad,
         easingDirection or Enum.EasingDirection.Out
     )
-    local tween = TweenService:Create(instance, tweenInfo, properties)
+    -- ตรวจสอบและกรองคุณสมบัติที่ใช้ได้
+    local validProperties = {}
+    for prop, value in pairs(properties) do
+        if prop == "TextTransparency" then
+            -- ใช้ TextTransparency เฉพาะกับออบเจกต์ที่มีคุณสมบัตินี้
+            if instance:IsA("TextLabel") or instance:IsA("TextButton") or instance:IsA("TextBox") then
+                validProperties[prop] = value
+            end
+        elseif prop == "BackgroundTransparency" then
+            -- BackgroundTransparency ใช้ได้กับทุก GuiObject
+            validProperties[prop] = value
+        else
+            -- คุณสมบัติอื่นๆ (เช่น Size, Position) ให้ผ่านไปเลย
+            validProperties[prop] = value
+        end
+    end
+    local tween = TweenService:Create(instance, tweenInfo, validProperties)
     return tween
 end
 
@@ -127,11 +142,15 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     loadingTween.Completed:Wait()
     loadingTextConnection:Disconnect()
 
-    -- อะนิเมชัน Fade Out หน้าจอโหลด
+    -- อะนิเมชัน Fade Out หน้าจอโหลด (แก้ไขส่วนนี้)
     local fadeOutTween = createTween(loadingFrame, {BackgroundTransparency = 1}, 0.5)
     for _, child in pairs(loadingFrame:GetDescendants()) do
         if child:IsA("GuiObject") then
-            createTween(child, {BackgroundTransparency = 1, TextTransparency = 1}, 0.5):Play()
+            -- แยกการจัดการ BackgroundTransparency และ TextTransparency
+            createTween(child, {BackgroundTransparency = 1}, 0.5):Play()
+            if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                createTween(child, {TextTransparency = 1}, 0.5):Play()
+            end
         end
     end
     fadeOutTween:Play()
@@ -321,7 +340,10 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
             createTween(tab.Content, {BackgroundTransparency = 1}, 0.3):Play()
             for _, child in pairs(tab.Content:GetDescendants()) do
                 if child:IsA("GuiObject") then
-                    createTween(child, {BackgroundTransparency = 1, TextTransparency = 1}, 0.3):Play()
+                    createTween(child, {BackgroundTransparency = 1}, 0.3):Play()
+                    if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                        createTween(child, {TextTransparency = 1}, 0.3):Play()
+                    end
                 end
             end
             tab.Content.Visible = false
@@ -332,7 +354,10 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         createTween(selectedTab.Content, {BackgroundTransparency = 0.5}, 0.3):Play()
         for _, child in pairs(selectedTab.Content:GetDescendants()) do
             if child:IsA("GuiObject") then
-                createTween(child, {BackgroundTransparency = child.BackgroundTransparency == 1 and 1 or 0, TextTransparency = 0}, 0.3):Play()
+                createTween(child, {BackgroundTransparency = child.BackgroundTransparency == 1 and 1 or 0}, 0.3):Play()
+                if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                    createTween(child, {TextTransparency = 0}, 0.3):Play()
+                end
             end
         end
     end
@@ -345,7 +370,10 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
                 createTween(tab.Content, {BackgroundTransparency = 1}, 0.3):Play()
                 for _, child in pairs(tab.Content:GetDescendants()) do
                     if child:IsA("GuiObject") then
-                        createTween(child, {BackgroundTransparency = 1, TextTransparency = 1}, 0.3):Play()
+                        createTween(child, {BackgroundTransparency = 1}, 0.3):Play()
+                        if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                            createTween(child, {TextTransparency = 1}, 0.3):Play()
+                        end
                     end
                 end
                 tab.Content.Visible = false
@@ -361,14 +389,20 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
             createTween(settingsFrame, {BackgroundTransparency = 0.5}, 0.3):Play()
             for _, child in pairs(settingsFrame:GetDescendants()) do
                 if child:IsA("GuiObject") then
-                    createTween(child, {BackgroundTransparency = child.BackgroundTransparency == 1 and 1 or 0, TextTransparency = 0}, 0.3):Play()
+                    createTween(child, {BackgroundTransparency = child.BackgroundTransparency == 1 and 1 or 0}, 0.3):Play()
+                    if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                        createTween(child, {TextTransparency = 0}, 0.3):Play()
+                    end
                 end
             end
         else
             createTween(settingsFrame, {BackgroundTransparency = 1}, 0.3):Play()
             for _, child in pairs(settingsFrame:GetDescendants()) do
                 if child:IsA("GuiObject") then
-                    createTween(child, {BackgroundTransparency = 1, TextTransparency = 1}, 0.3):Play()
+                    createTween(child, {BackgroundTransparency = 1}, 0.3):Play()
+                    if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                        createTween(child, {TextTransparency = 1}, 0.3):Play()
+                    end
                 end
             end
             settingsFrame.Visible = false
@@ -847,7 +881,10 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
             createTween(mainFrame, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
             for _, child in pairs(mainFrame:GetDescendants()) do
                 if child:IsA("GuiObject") then
-                    createTween(child, {BackgroundTransparency = 1, TextTransparency = 1}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
+                    createTween(child, {BackgroundTransparency = 1}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
+                    if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                        createTween(child, {TextTransparency = 1}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
+                    end
                 end
             end
             wait(0.5)
@@ -859,7 +896,10 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
             createTween(glowMain, {Transparency = 0.1}, 0.5):Play()
             for _, child in pairs(mainFrame:GetDescendants()) do
                 if child:IsA("GuiObject") then
-                    createTween(child, {BackgroundTransparency = child.BackgroundTransparency == 1 and 1 or 0, TextTransparency = 0}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out):Play()
+                    createTween(child, {BackgroundTransparency = child.BackgroundTransparency == 1 and 1 or 0}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out):Play()
+                    if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                        createTween(child, {TextTransparency = 0}, 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out):Play()
+                    end
                 end
             end
         end
