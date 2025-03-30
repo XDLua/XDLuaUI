@@ -46,7 +46,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     -- เพิ่มแถบโหลด
 local loadingBarFrame = Instance.new("Frame", loadingFrame)
 loadingBarFrame.Size = UDim2.new(0.8, 0, 0, 8)
-loadingBarFrame.Position = UDim2.new(0.1, 0, 0, 40)
+loadingBarFrame.Position = UDim2.new(0, 0, 0, 40)
 loadingBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 loadingBarFrame.BorderSizePixel = 0
 
