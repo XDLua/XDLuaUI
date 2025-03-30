@@ -81,8 +81,8 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     -- รอให้แถบโหลดถึง 80%
     barTween1.Completed:Wait()
 
-    -- รอเวลาที่กำหนด (เช่น 1.5 วินาที) ก่อนไปถึง 100%
-    wait(1.5)
+    -- รอเวลาที่กำหนดก่อนไปถึง 100%
+    wait(3)
 
     -- อะนิเมชั่นสุดท้าย (เพิ่มจาก 80% ไป 100% ใน 0.5 วินาที)
     local barTweenInfo2 = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In)
