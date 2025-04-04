@@ -464,9 +464,53 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     end
 
     -- เมธอด AddToggle (เพิ่มอนิเมชั่นตอนเปิด/ปิด)
-    function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
-        -- ... (โค้ดส่วนบนเหมือนเดิมจนถึง switchHandle) ...
+        function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
+        local toggleButton = Instance.new("TextButton", tabContent)
+        toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
+        toggleButton.AnchorPoint = Vector2.new(0.5, 0)
+        toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+        toggleButton.Text = ""
 
+        local toggleCorner = Instance.new("UICorner", toggleButton)
+        toggleCorner.CornerRadius = UDim.new(0, 8)
+
+        local contentFrame = Instance.new("Frame", toggleButton)
+        contentFrame.Size = UDim2.new(1, 0, 1, 0)
+        contentFrame.Position = UDim2.new(0, 0, 0, 0)
+        contentFrame.BackgroundTransparency = 1
+
+        local switchFrame = Instance.new("Frame", contentFrame)
+        switchFrame.Size = UDim2.new(0, 40, 0, 20)
+        switchFrame.Position = UDim2.new(0, 5, 0.5, 0)
+        switchFrame.AnchorPoint = Vector2.new(0, 0.5)
+        switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        switchFrame.BorderSizePixel = 0
+
+        local switchCorner = Instance.new("UICorner", switchFrame)
+        switchCorner.CornerRadius = UDim.new(1, 0)
+
+        local switchHandle = Instance.new("TextButton", switchFrame)
+        switchHandle.Size = UDim2.new(0, 16, 0, 16)
+        switchHandle.Position = UDim2.new(1, -18, 0.5, 0)
+        switchHandle.AnchorPoint = Vector2.new(0, 0.5)
+        switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        switchHandle.BorderSizePixel = 0
+        switchHandle.Text = ""
+
+        local handleCorner = Instance.new("UICorner", switchHandle)
+        handleCorner.CornerRadius = UDim.new(1, 0)
+
+        local textLabel = Instance.new("TextLabel", contentFrame)
+        textLabel.Size = UDim2.new(0, 0, 0, 20)
+        textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+        textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+        textLabel.BackgroundTransparency = 1
+        textLabel.Text = toggleText
+        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textLabel.Font = Enum.Font.GothamBold
+        textLabel.TextSize = 14
+        textLabel.AutomaticSize = Enum.AutomaticSize.X
+    
         local isToggled = defaultState or false
         if isToggled then
             switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
