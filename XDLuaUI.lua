@@ -455,7 +455,28 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end
     end
 
-    -- เมธอดเพิ่มปุ่มปกติ (เพิ่มอะนิเมชั่น)
+    -- เมธอด AddToggle (เพิ่มอนิเมชั่นตอนเปิด/ปิด)
+    function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
+        -- ... (โค้ดส่วนบนเหมือนเดิมจนถึง switchHandle) ...
+
+        local isToggled = defaultState or false
+        if isToggled then
+            switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
+            switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
+        end
+
+        toggleButton.MouseButton1Click:Connect(function()
+            isToggled = not isToggled
+            local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+            local goal = isToggled and {Position = UDim2.new(0, 2, 0.5, 0), BackgroundColor3 = Color3.fromRGB(255, 50, 255)} 
+                                 or {Position = UDim2.new(1, -18, 0.5, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255)}
+            local tween = TweenService:Create(switchHandle, tweenInfo, goal)
+            tween:Play()
+            callback(isToggled)
+        end)
+    end
+
+    -- เมธอด AddButton (เพิ่มอนิเมชั่นตอนกดปุ่ม)
     function XDLuaUI:AddButton(tabContent, buttonText, callback)
         local button = Instance.new("TextButton", tabContent)
         button.Size = UDim2.new(0.9, 0, 0, 30)
@@ -471,83 +492,16 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
 
         button.MouseButton1Click:Connect(function()
             local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-            local pressTween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = Color3.fromRGB(150, 0, 150)})
+            local pressTween = TweenService:Create(button, tweenInfo, {Size = UDim2.new(0.85, 0, 0, 28)})
+            local releaseTween = TweenService:Create(button, tweenInfo, {Size = UDim2.new(0.9, 0, 0, 30)})
             pressTween:Play()
             pressTween.Completed:Connect(function()
-                local releaseTween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = Color3.fromRGB(100, 0, 100)})
                 releaseTween:Play()
             end)
             callback()
         end)
     end
-
-    -- เมธอดเพิ่ม Toggle (เพิ่มอะนิเมชั่น)
-    function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
-        local toggleButton = Instance.new("TextButton", tabContent)
-        toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
-        toggleButton.AnchorPoint = Vector2.new(0.5, 0)
-        toggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
-        toggleButton.Text = ""
-
-        local toggleCorner = Instance.new("UICorner", toggleButton)
-        toggleCorner.CornerRadius = UDim.new(0, 8)
-
-        local contentFrame = Instance.new("Frame", toggleButton)
-        contentFrame.Size = UDim2.new(1, 0, 1, 0)
-        contentFrame.Position = UDim2.new(0, 0, 0, 0)
-        contentFrame.BackgroundTransparency = 1
-
-        local switchFrame = Instance.new("Frame", contentFrame)
-        switchFrame.Size = UDim2.new(0, 40, 0, 20)
-        switchFrame.Position = UDim2.new(0, 5, 0.5, 0)
-        switchFrame.AnchorPoint = Vector2.new(0, 0.5)
-        switchFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        switchFrame.BorderSizePixel = 0
-
-        local switchCorner = Instance.new("UICorner", switchFrame)
-        switchCorner.CornerRadius = UDim.new(1, 0)
-
-        local switchHandle = Instance.new("TextButton", switchFrame)
-        switchHandle.Size = UDim2.new(0, 16, 0, 16)
-        switchHandle.Position = UDim2.new(1, -18, 0.5, 0)
-        switchHandle.AnchorPoint = Vector2.new(0, 0.5)
-        switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        switchHandle.BorderSizePixel = 0
-        switchHandle.Text = ""
-
-        local handleCorner = Instance.new("UICorner", switchHandle)
-        handleCorner.CornerRadius = UDim.new(1, 0)
-
-        local textLabel = Instance.new("TextLabel", contentFrame)
-        textLabel.Size = UDim2.new(0, 0, 0, 20)
-        textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-        textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-        textLabel.BackgroundTransparency = 1
-        textLabel.Text = toggleText
-        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        textLabel.Font = Enum.Font.GothamBold
-        textLabel.TextSize = 14
-        textLabel.AutomaticSize = Enum.AutomaticSize.X
-
-        local isToggled = defaultState or false
-        if isToggled then
-            switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
-            switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
-        end
-
-        toggleButton.MouseButton1Click:Connect(function()
-            isToggled = not isToggled
-            local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-            local goal = isToggled and {Position = UDim2.new(0, 2, 0.5, 0)} or {Position = UDim2.new(1, -18, 0.5, 0)}
-            local colorGoal = isToggled and Color3.fromRGB(255, 50, 255) or Color3.fromRGB(255, 255, 255)
-            local moveTween = TweenService:Create(switchHandle, tweenInfo, goal)
-            local colorTween = TweenService:Create(switchHandle, tweenInfo, {BackgroundColor3 = colorGoal})
-            moveTween:Play()
-            colorTween:Play()
-            callback(isToggled)
-        end)
-    end
-
+    
     -- เมธอดเพิ่มปุ่มสไลด์
     function XDLuaUI:AddSlider(tabContent, sliderText, minValue, maxValue, defaultValue, callback)
         local sliderFrame = Instance.new("Frame", tabContent)
