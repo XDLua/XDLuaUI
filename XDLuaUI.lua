@@ -199,19 +199,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     titleLabelMain.TextSize = 20
     titleLabelMain.TextStrokeTransparency = 0.2
 
-    -- สร้างปุ่มฟันเฟือง
-    local settingsButton = Instance.new("TextButton", mainFrame)
-    settingsButton.Size = UDim2.new(0, 30, 0, 30)
-    settingsButton.Position = UDim2.new(1, -40, 0, 5)
-    settingsButton.Text = "⚙️"
-    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    settingsButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
-    settingsButton.Font = Enum.Font.GothamBold
-    settingsButton.TextSize = 16
-    local settingsCorner = Instance.new("UICorner", settingsButton)
-    settingsCorner.CornerRadius = UDim.new(0, 8)
-
-    -- สร้างปุ่ม X
+    -- เพิ่มปุ่ม X (ปิด UI)
     local closeButton = Instance.new("TextButton", mainFrame)
     closeButton.Size = UDim2.new(0, 30, 0, 30)
     closeButton.Position = UDim2.new(1, -40, 0, 5)
@@ -223,8 +211,17 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local closeCorner = Instance.new("UICorner", closeButton)
     closeCorner.CornerRadius = UDim.new(0, 8)
 
-    -- ย้ายปุ่มฟันเฟืองไปทางซ้ายของปุ่ม X
-    settingsButton.Position = UDim2.new(1, -80, 0, 5)
+    -- เปลี่ยนปุ่มฟันเฟืองให้เลื่อนตำแหน่งไปทางซ้าย
+    local settingsButton = Instance.new("TextButton", mainFrame)
+    settingsButton.Size = UDim2.new(0, 30, 0, 30)
+    settingsButton.Position = UDim2.new(1, -75, 0, 5) -- เลื่อนซ้ายจากปุ่ม X
+    settingsButton.Text = "⚙️"
+    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    settingsButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+    settingsButton.Font = Enum.Font.GothamBold
+    settingsButton.TextSize = 16
+    local settingsCorner = Instance.new("UICorner", settingsButton)
+    settingsCorner.CornerRadius = UDim.new(0, 8)
 
     -- สร้างเฟรมแท็บ
     local tabFrame = Instance.new("Frame", mainFrame)
@@ -358,6 +355,22 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
 
     -- เพิ่มการทำงานให้ปุ่มฟันเฟือง
     settingsButton.MouseButton1Click:Connect(toggleSettings)
+
+    -- ฟังก์ชันอนิเมชั่นเปิด/ซ่อน UI
+    local function animateMainFrame(show)
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local goal = show and {Size = UDim2.new(0, 450, 0, 300)} or {Size = UDim2.new(0, 450, 0, 0)}
+        local tween = TweenService:Create(mainFrame, tweenInfo, goal)
+        if show then
+            mainFrame.Visible = true
+            tween:Play()
+        else
+            tween.Completed:Connect(function()
+                mainFrame.Visible = false
+            end)
+            tween:Play()
+        end
+    end
 
     -- เมธอดเพิ่มแท็บ
     function XDLuaUI:AddTab(tabName, emoji, emojiPosition)
@@ -804,26 +817,27 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end)
     end
 
-    -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อน UI
-    logoButton.MouseButton1Click:Connect(function()
-        mainFrame.Visible = not mainFrame.Visible
+    -- การทำงานของปุ่ม X
+    closeButton.MouseButton1Click:Connect(function()
+        animateMainFrame(false) -- ซ่อน UI
     end)
 
-    
+    -- การทำงานของปุ่มโลโก้ (แก้ไขเพื่อใช้อนิเมชั่น)
+    logoButton.MouseButton1Click:Connect(function()
+        animateMainFrame(not mainFrame.Visible)
+    end)
 
     -- เมื่อโหลดเสร็จ
         barTween2.Completed:Connect(function()
-        loadingFrame:Destroy() -- ลบหน้าโหลด
-        textTween:Cancel() -- หยุดอะนิเมชั่นข้อความกระพริบ
+        loadingFrame:Destroy()
+        textTween:Cancel()
         
-        -- แสดงหน้ายินดีต้อนรับ
         welcomeFrame.Visible = true
-        
-        -- รอ 2 วินาทีแล้วเปลี่ยนไปแสดง UI หลัก
         wait(2)
-        welcomeFrame:Destroy() -- ลบหน้ายินดีต้อนรับ
-        logoButton.Visible = true -- แสดงปุ่มโลโก้
-        mainFrame.Visible = true -- แสดง UI หลัก
+        welcomeFrame:Destroy()
+        
+        logoButton.Visible = true
+        animateMainFrame(true) -- ใช้อนิเมชั่นเปิด UI
     end)
     
     return XDLuaUI
