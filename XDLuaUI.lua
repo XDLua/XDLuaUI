@@ -309,19 +309,27 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local selectedTab = nil
     local settingsVisible = false
 
-    -- ฟังก์ชันสลับแท็บ
+    -- ฟังก์ชัน switchTab (เพิ่มอนิเมชั่นตอนเปลี่ยนแท็บ)
     local function switchTab(tabIndex)
         if selectedTab then
-            selectedTab.Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-            if selectedTab.Button:FindFirstChild("Stroke") then
-                selectedTab.Button:FindFirstChild("Stroke").Transparency = 1
+            local oldButton = selectedTab.Button
+            local tweenOut = TweenService:Create(oldButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), 
+                {BackgroundColor3 = Color3.fromRGB(40, 40, 40)})
+            tweenOut:Play()
+            if oldButton:FindFirstChild("Stroke") then
+                oldButton:FindFirstChild("Stroke").Transparency = 1
             end
         end
+
         selectedTab = tabs[tabIndex]
-        selectedTab.Button.BackgroundColor3 = Color3.fromRGB(80, 0, 80)
-        if selectedTab.Button:FindFirstChild("Stroke") then
-            selectedTab.Button:FindFirstChild("Stroke").Transparency = 0.2
+        local newButton = selectedTab.Button
+        local tweenIn = TweenService:Create(newButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), 
+            {BackgroundColor3 = Color3.fromRGB(80, 0, 80)})
+        tweenIn:Play()
+        if newButton:FindFirstChild("Stroke") then
+            newButton:FindFirstChild("Stroke").Transparency = 0.2
         end
+
         for _, tab in pairs(tabs) do
             tab.Content.Visible = false
         end
@@ -329,7 +337,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         settingsVisible = false
         selectedTab.Content.Visible = true
     end
-
+    
     -- ฟังก์ชันสลับไปหน้า "ตั้งค่า"
     local function toggleSettings()
         settingsVisible = not settingsVisible
