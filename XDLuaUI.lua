@@ -94,6 +94,46 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local textTween = TweenService:Create(loadingText, textTweenInfo, {TextTransparency = 0.8})
     textTween:Play()
 
+    -- สร้างหน้ายินดีต้อนรับ
+    local welcomeFrame = Instance.new("Frame", screenGui)
+    welcomeFrame.Size = UDim2.new(0, 300, 0, 200)
+    welcomeFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+    welcomeFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    welcomeFrame.BackgroundTransparency = 0.1
+    welcomeFrame.BorderSizePixel = 0
+    welcomeFrame.Visible = false -- ซ่อนไว้ก่อน
+
+    local welcomeCorner = Instance.new("UICorner", welcomeFrame)
+    welcomeCorner.CornerRadius = UDim.new(0, 12)
+
+    local welcomeGlow = Instance.new("UIStroke", welcomeFrame)
+    welcomeGlow.Thickness = 2
+    welcomeGlow.Color = Color3.fromRGB(255, 50, 255)
+    welcomeGlow.Transparency = 0.2
+
+    -- รูปโปรไฟล์ผู้ใช้
+    local player = game.Players.LocalPlayer
+    local userId = player.UserId
+    local profileImage = Instance.new("ImageLabel", welcomeFrame)
+    profileImage.Size = UDim2.new(0, 80, 0, 80)
+    profileImage.Position = UDim2.new(0.5, -40, 0, 20)
+    profileImage.BackgroundTransparency = 1
+    profileImage.Image = "rbxthumb://type=AvatarHeadShot&id=" .. userId .. "&w=150&h=150" -- รูปโปรไฟล์จาก Roblox
+
+    local profileCorner = Instance.new("UICorner", profileImage)
+    profileCorner.CornerRadius = UDim.new(0, 40) -- ทำให้เป็นวงกลม
+
+    -- ชื่อผู้ใช้
+    local welcomeText = Instance.new("TextLabel", welcomeFrame)
+    welcomeText.Size = UDim2.new(1, 0, 0, 40)
+    welcomeText.Position = UDim2.new(0, 0, 0, 110)
+    welcomeText.Text = "ยินดีต้อนรับ, " .. player.Name
+    welcomeText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    welcomeText.BackgroundTransparency = 1
+    welcomeText.Font = Enum.Font.GothamBold
+    welcomeText.TextSize = 20
+    welcomeText.TextStrokeTransparency = 0.2
+
     -- สร้างปุ่มโลโก้ (ปุ่มเปิด/ปิด UI)
     local logoButton = Instance.new("TextButton", screenGui)
     logoButton.Size = UDim2.new(0, 50, 0, 50)
@@ -745,10 +785,17 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         mainFrame.Visible = not mainFrame.Visible
     end)
 
-    -- แสดงหน้าโหลดแล้วซ่อนเมื่อโหลดเสร็จ
+    -- เมื่อโหลดเสร็จ
     barTween2.Completed:Connect(function()
         loadingFrame:Destroy() -- ลบหน้าโหลด
         textTween:Cancel() -- หยุดอะนิเมชั่นข้อความกระพริบ
+        
+        -- แสดงหน้ายินดีต้อนรับ
+        welcomeFrame.Visible = true
+        
+        -- รอ 2 วินาทีแล้วเปลี่ยนไปแสดง UI หลัก
+        wait(3)
+        welcomeFrame:Destroy() -- ลบหน้ายินดีต้อนรับ
         logoButton.Visible = true -- แสดงปุ่มโลโก้
         mainFrame.Visible = true -- แสดง UI หลัก
     end)
