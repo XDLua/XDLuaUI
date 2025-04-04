@@ -152,6 +152,22 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local uiCorner = Instance.new("UICorner", logoButton)
     uiCorner.CornerRadius = UDim.new(0, 12)
 
+    -- อะนิเมชั่นเปิด/ซ่อน UI
+        local function animateUI(show)
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local goal = show and {Size = UDim2.new(0, 450, 0, 300)} or {Size = UDim2.new(0, 450, 0, 0)}
+        local tween = TweenService:Create(mainFrame, tweenInfo, goal)
+        tween:Play()
+        if show then
+            mainFrame.Visible = true
+        end
+        tween.Completed:Connect(function()
+            if not show then
+                mainFrame.Visible = false
+            end
+        end)
+    end
+
     -- สร้างเฟรมหลัก
     local mainFrame = Instance.new("Frame", screenGui)
     mainFrame.Size = UDim2.new(0, 450, 0, 300)
@@ -442,7 +458,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end
     end
 
-    -- เมธอดเพิ่มปุ่มปกติ
+    -- เมธอดเพิ่มปุ่มปกติ (เพิ่มอะนิเมชั่น)
     function XDLuaUI:AddButton(tabContent, buttonText, callback)
         local button = Instance.new("TextButton", tabContent)
         button.Size = UDim2.new(0.9, 0, 0, 30)
@@ -456,10 +472,19 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         local buttonCorner = Instance.new("UICorner", button)
         buttonCorner.CornerRadius = UDim.new(0, 8)
 
-        button.MouseButton1Click:Connect(callback)
+        button.MouseButton1Click:Connect(function()
+            local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+            local pressTween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = Color3.fromRGB(150, 0, 150)})
+            pressTween:Play()
+            pressTween.Completed:Connect(function()
+                local releaseTween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = Color3.fromRGB(100, 0, 100)})
+                releaseTween:Play()
+            end)
+            callback()
+        end)
     end
 
-    -- เมธอดเพิ่มปุ่มเปิด/ปิด (Toggle)
+    -- เมธอดเพิ่ม Toggle (เพิ่มอะนิเมชั่น)
     function XDLuaUI:AddToggle(tabContent, toggleText, defaultState, callback)
         local toggleButton = Instance.new("TextButton", tabContent)
         toggleButton.Size = UDim2.new(0.9, 0, 0, 30)
@@ -515,13 +540,13 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
 
         toggleButton.MouseButton1Click:Connect(function()
             isToggled = not isToggled
-            if isToggled then
-                switchHandle.Position = UDim2.new(0, 2, 0.5, 0)
-                switchHandle.BackgroundColor3 = Color3.fromRGB(255, 50, 255)
-            else
-                switchHandle.Position = UDim2.new(1, -18, 0.5, 0)
-                switchHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            end
+            local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+            local goal = isToggled and {Position = UDim2.new(0, 2, 0.5, 0)} or {Position = UDim2.new(1, -18, 0.5, 0)}
+            local colorGoal = isToggled and Color3.fromRGB(255, 50, 255) or Color3.fromRGB(255, 255, 255)
+            local moveTween = TweenService:Create(switchHandle, tweenInfo, goal)
+            local colorTween = TweenService:Create(switchHandle, tweenInfo, {BackgroundColor3 = colorGoal})
+            moveTween:Play()
+            colorTween:Play()
             callback(isToggled)
         end)
     end
@@ -795,24 +820,27 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end)
     end
 
-    -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อนเฟรมหลัก
+    -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อน UI ด้วยอะนิเมชั่น
     logoButton.MouseButton1Click:Connect(function()
-        mainFrame.Visible = not mainFrame.Visible
+        animateUI(not mainFrame.Visible)
+    end)
+
+    -- คลิกปุ่ม X เพื่อปิด UI ด้วยอะนิเมชั่น
+    closeButton.MouseButton1Click:Connect(function()
+        animateUI(false)
     end)
 
     -- เมื่อโหลดเสร็จ
     barTween2.Completed:Connect(function()
-        loadingFrame:Destroy() -- ลบหน้าโหลด
-        textTween:Cancel() -- หยุดอะนิเมชั่นข้อความกระพริบ
+        loadingFrame:Destroy()
+        textTween:Cancel()
         
-        -- แสดงหน้ายินดีต้อนรับ
         welcomeFrame.Visible = true
+        wait(2)
+        welcomeFrame:Destroy()
         
-        -- รอ 2 วินาทีแล้วเปลี่ยนไปแสดง UI หลัก
-        wait(3)
-        welcomeFrame:Destroy() -- ลบหน้ายินดีต้อนรับ
-        logoButton.Visible = true -- แสดงปุ่มโลโก้
-        mainFrame.Visible = true -- แสดง UI หลัก
+        logoButton.Visible = true
+        animateUI(true) -- เปิด UI ด้วยอะนิเมชั่น
     end)
     
     return XDLuaUI
