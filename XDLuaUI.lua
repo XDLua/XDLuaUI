@@ -127,7 +127,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local welcomeText = Instance.new("TextLabel", welcomeFrame)
     welcomeText.Size = UDim2.new(1, 0, 0, 40)
     welcomeText.Position = UDim2.new(0, 0, 0, 110)
-    welcomeText.Text = "ยินดีต้อนรับ, " .. player.Name
+    welcomeText.Text = "" .. player.Name
     welcomeText.TextColor3 = Color3.fromRGB(255, 255, 255)
     welcomeText.BackgroundTransparency = 1
     welcomeText.Font = Enum.Font.GothamBold
