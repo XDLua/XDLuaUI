@@ -152,22 +152,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local uiCorner = Instance.new("UICorner", logoButton)
     uiCorner.CornerRadius = UDim.new(0, 12)
 
-    -- อะนิเมชั่นเปิด/ซ่อน UI
-        local function animateUI(show)
-        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local goal = show and {Size = UDim2.new(0, 450, 0, 300)} or {Size = UDim2.new(0, 450, 0, 0)}
-        local tween = TweenService:Create(mainFrame, tweenInfo, goal)
-        tween:Play()
-        if show then
-            mainFrame.Visible = true
-        end
-        tween.Completed:Connect(function()
-            if not show then
-                mainFrame.Visible = false
-            end
-        end)
-    end
-
     -- สร้างเฟรมหลัก
     local mainFrame = Instance.new("Frame", screenGui)
     mainFrame.Size = UDim2.new(0, 450, 0, 300)
@@ -820,27 +804,26 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end)
     end
 
-    -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อน UI ด้วยอะนิเมชั่น
+    -- คลิกปุ่มโลโก้เพื่อแสดง/ซ่อน UI
     logoButton.MouseButton1Click:Connect(function()
-        animateUI(not mainFrame.Visible)
+        mainFrame.Visible = not mainFrame.Visible
     end)
 
-    -- คลิกปุ่ม X เพื่อปิด UI ด้วยอะนิเมชั่น
-    closeButton.MouseButton1Click:Connect(function()
-        animateUI(false)
-    end)
+    
 
     -- เมื่อโหลดเสร็จ
-    barTween2.Completed:Connect(function()
-        loadingFrame:Destroy()
-        textTween:Cancel()
+        barTween2.Completed:Connect(function()
+        loadingFrame:Destroy() -- ลบหน้าโหลด
+        textTween:Cancel() -- หยุดอะนิเมชั่นข้อความกระพริบ
         
+        -- แสดงหน้ายินดีต้อนรับ
         welcomeFrame.Visible = true
-        wait(2)
-        welcomeFrame:Destroy()
         
-        logoButton.Visible = true
-        animateUI(true) -- เปิด UI ด้วยอะนิเมชั่น
+        -- รอ 2 วินาทีแล้วเปลี่ยนไปแสดง UI หลัก
+        wait(2)
+        welcomeFrame:Destroy() -- ลบหน้ายินดีต้อนรับ
+        logoButton.Visible = true -- แสดงปุ่มโลโก้
+        mainFrame.Visible = true -- แสดง UI หลัก
     end)
     
     return XDLuaUI
