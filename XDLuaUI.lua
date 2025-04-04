@@ -199,7 +199,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     titleLabelMain.TextSize = 20
     titleLabelMain.TextStrokeTransparency = 0.2
 
-    -- สร้างปุ่มฟันเฟือง (แทนปุ่ม X)
+    -- สร้างปุ่มฟันเฟือง
     local settingsButton = Instance.new("TextButton", mainFrame)
     settingsButton.Size = UDim2.new(0, 30, 0, 30)
     settingsButton.Position = UDim2.new(1, -40, 0, 5)
@@ -210,6 +210,21 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     settingsButton.TextSize = 16
     local settingsCorner = Instance.new("UICorner", settingsButton)
     settingsCorner.CornerRadius = UDim.new(0, 8)
+
+    -- สร้างปุ่ม X
+    local closeButton = Instance.new("TextButton", mainFrame)
+    closeButton.Size = UDim2.new(0, 30, 0, 30)
+    closeButton.Position = UDim2.new(1, -40, 0, 5)
+    closeButton.Text = "X"
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.TextSize = 16
+    local closeCorner = Instance.new("UICorner", closeButton)
+    closeCorner.CornerRadius = UDim.new(0, 8)
+
+    -- ย้ายปุ่มฟันเฟืองไปทางซ้ายของปุ่ม X
+    settingsButton.Position = UDim2.new(1, -80, 0, 5)
 
     -- สร้างเฟรมแท็บ
     local tabFrame = Instance.new("Frame", mainFrame)
