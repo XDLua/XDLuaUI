@@ -154,7 +154,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
 
     -- สร้างเฟรมหลัก
     local mainFrame = Instance.new("Frame", screenGui)
-    mainFrame.Size = UDim2.new(0, 450, 0, 300)
+    mainFrame.Size = UDim2.new(0, 450, 0, 0) -- เริ่มต้นที่ความสูง 0 สำหรับอนิเมชั่น
     mainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
     mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
     mainFrame.BackgroundTransparency = 0.3
@@ -200,21 +200,21 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     titleLabelMain.TextStrokeTransparency = 0.2
 
     -- เพิ่มปุ่ม X (ปิด UI)
-    local closeButton = Instance.new("TextButton", mainFrame)
-    closeButton.Size = UDim2.new(0, 30, 0, 30)
-    closeButton.Position = UDim2.new(1, -40, 0, 5)
-    closeButton.Text = "X"
-    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    closeButton.Font = Enum.Font.GothamBold
-    closeButton.TextSize = 16
-    local closeCorner = Instance.new("UICorner", closeButton)
-    closeCorner.CornerRadius = UDim.new(0, 8)
+    local deleteButton = Instance.new("TextButton", mainFrame)
+    deleteButton.Size = UDim2.new(0, 30, 0, 30)
+    deleteButton.Position = UDim2.new(1, -40, 0, 5)
+    deleteButton.Text = "X"
+    deleteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    deleteButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    deleteButton.Font = Enum.Font.GothamBold
+    deleteButton.TextSize = 16
+    local deleteCorner = Instance.new("UICorner", deleteButton)
+    deleteCorner.CornerRadius = UDim.new(0, 8)
 
-    -- เปลี่ยนปุ่มฟันเฟืองให้เลื่อนตำแหน่งไปทางซ้าย
+    -- ปุ่มฟันเฟือง (เลื่อนตำแหน่ง)
     local settingsButton = Instance.new("TextButton", mainFrame)
     settingsButton.Size = UDim2.new(0, 30, 0, 30)
-    settingsButton.Position = UDim2.new(1, -75, 0, 5) -- เลื่อนซ้ายจากปุ่ม X
+    settingsButton.Position = UDim2.new(1, -75, 0, 5)
     settingsButton.Text = "⚙️"
     settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     settingsButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
@@ -222,6 +222,54 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     settingsButton.TextSize = 16
     local settingsCorner = Instance.new("UICorner", settingsButton)
     settingsCorner.CornerRadius = UDim.new(0, 8)
+
+    -- สร้างหน้ายืนยันการลบ
+    local confirmFrame = Instance.new("Frame", screenGui)
+    confirmFrame.Size = UDim2.new(0, 200, 0, 120)
+    confirmFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
+    confirmFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    confirmFrame.BackgroundTransparency = 0.1
+    confirmFrame.BorderSizePixel = 0
+    confirmFrame.Visible = false
+
+    local confirmCorner = Instance.new("UICorner", confirmFrame)
+    confirmCorner.CornerRadius = UDim.new(0, 12)
+
+    local confirmGlow = Instance.new("UIStroke", confirmFrame)
+    confirmGlow.Thickness = 2
+    confirmGlow.Color = Color3.fromRGB(255, 50, 255)
+    confirmGlow.Transparency = 0.2
+
+    local confirmText = Instance.new("TextLabel", confirmFrame)
+    confirmText.Size = UDim2.new(1, 0, 0, 40)
+    confirmText.Position = UDim2.new(0, 0, 0, 10)
+    confirmText.Text = "ยืนยันการปิด UI?"
+    confirmText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    confirmText.BackgroundTransparency = 1
+    confirmText.Font = Enum.Font.GothamBold
+    confirmText.TextSize = 16
+
+    local yesButton = Instance.new("TextButton", confirmFrame)
+    yesButton.Size = UDim2.new(0, 80, 0, 30)
+    yesButton.Position = UDim2.new(0, 20, 0, 60)
+    yesButton.Text = "ปิดเลย"
+    yesButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    yesButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+    yesButton.Font = Enum.Font.GothamBold
+    yesButton.TextSize = 14
+    local yesCorner = Instance.new("UICorner", yesButton)
+    yesCorner.CornerRadius = UDim.new(0, 8)
+
+    local noButton = Instance.new("TextButton", confirmFrame)
+    noButton.Size = UDim2.new(0, 80, 0, 30)
+    noButton.Position = UDim2.new(0, 100, 0, 60)
+    noButton.Text = "ยกเลิก"
+    noButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    noButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+    noButton.Font = Enum.Font.GothamBold
+    noButton.TextSize = 14
+    local noCorner = Instance.new("UICorner", noButton)
+    noCorner.CornerRadius = UDim.new(0, 8)
 
     -- สร้างเฟรมแท็บ
     local tabFrame = Instance.new("Frame", mainFrame)
@@ -366,16 +414,23 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
 
     -- ฟังก์ชันอนิเมชั่นเปิด/ซ่อน UI
     local function animateMainFrame(show)
-        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local goal = show and {Size = UDim2.new(0, 450, 0, 300)} or {Size = UDim2.new(0, 450, 0, 0)}
+        local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out) -- ใช้ Back เพื่อความนุ่มนวล
+        local goal = show and {Size = UDim2.new(0, 450, 0, 300), BackgroundTransparency = 0.3} 
+                          or {Size = UDim2.new(0, 450, 0, 0), BackgroundTransparency = 1}
         local tween = TweenService:Create(mainFrame, tweenInfo, goal)
         if show then
             mainFrame.Visible = true
             tween:Play()
+            -- เพิ่มเอฟเฟกต์จางเข้า
+            local fadeIn = TweenService:Create(glowMain, tweenInfo, {Transparency = 0.1})
+            fadeIn:Play()
         else
             tween.Completed:Connect(function()
                 mainFrame.Visible = false
             end)
+            -- เพิ่มเอฟเฟกต์จางออก
+            local fadeOut = TweenService:Create(glowMain, tweenInfo, {Transparency = 1})
+            fadeOut:Play()
             tween:Play()
         end
     end
@@ -824,13 +879,23 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     end
 
     -- การทำงานของปุ่ม X
-    closeButton.MouseButton1Click:Connect(function()
-        animateMainFrame(false) -- ซ่อน UI
+    deleteButton.MouseButton1Click:Connect(function()
+        animateMainFrame(false) -- ซ่อน UI ชั่วคราว
+        confirmFrame.Visible = true -- แสดงหน้ายืนยัน
+    end)
+
+    -- การทำงานของปุ่มยืนยัน
+    yesButton.MouseButton1Click:Connect(function()
+        screenGui:Destroy() -- ลบ UI และโลโก้ทั้งหมดทันที
     end)
 
     -- การทำงานของปุ่มโลโก้ (แก้ไขเพื่อใช้อนิเมชั่น)
     logoButton.MouseButton1Click:Connect(function()
-        animateMainFrame(not mainFrame.Visible)
+        if mainFrame.Visible and not confirmFrame.Visible then
+            animateMainFrame(false)
+        elseif not confirmFrame.Visible then
+            animateMainFrame(true)
+        end
     end)
 
     -- เมื่อโหลดเสร็จ
@@ -839,11 +904,11 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         textTween:Cancel()
         
         welcomeFrame.Visible = true
-        wait(2)
+        wait(3)
         welcomeFrame:Destroy()
         
         logoButton.Visible = true
-        animateMainFrame(true) -- ใช้อนิเมชั่นเปิด UI
+        animateMainFrame(true) -- เปิด UI ด้วยอนิเมชั่นใหม่
     end)
     
     return XDLuaUI
