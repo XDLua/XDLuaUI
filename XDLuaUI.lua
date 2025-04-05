@@ -889,6 +889,11 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         screenGui:Destroy() -- ลบ UI และโลโก้ทั้งหมดทันที
     end)
 
+    noButton.MouseButton1Click:Connect(function()
+        confirmFrame.Visible = false
+        animateMainFrame(true) -- แสดง UI กลับมา
+    end)
+
     -- การทำงานของปุ่มโลโก้ (แก้ไขเพื่อใช้อนิเมชั่น)
     logoButton.MouseButton1Click:Connect(function()
         if mainFrame.Visible and not confirmFrame.Visible then
