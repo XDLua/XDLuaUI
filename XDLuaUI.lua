@@ -182,6 +182,17 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local titleLabelMain = Instance.new("TextLabel", mainFrame)
     titleLabelMain.Size = UDim2.new(1, 0, 0, 40)
 
+    -- อนิเมชั่นแสงวิ่ง
+    spawn(function()
+        while true do
+            local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+            local tween = TweenService:Create(gradient, tweenInfo, {Rotation = 360})
+            tween:Play()
+            tween.Completed:Wait()
+            gradient.Rotation = 0 -- รีเซ็ตเพื่อวนซ้ำ
+        end
+    end)
+    
     -- จัดการอิโมจิใน Title
     local emojiFront = emojiFront or "" -- ถ้าไม่ระบุอิโมจิหน้า ให้เป็นสตริงว่าง
     local emojiBack = emojiBack or "" -- ถ้าไม่ระบุอิโมจิหลัง ให้เป็นสตริงว่าง
@@ -418,17 +429,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
 
     -- เพิ่มการทำงานให้ปุ่มฟันเฟือง
     settingsButton.MouseButton1Click:Connect(toggleSettings)
-
-    -- อนิเมชั่นแสงวิ่ง
-    spawn(function()
-        while true do
-            local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-            local tween = TweenService:Create(gradient, tweenInfo, {Rotation = 360})
-            tween:Play()
-            tween.Completed:Wait()
-            gradient.Rotation = 0 -- รีเซ็ตเพื่อวนซ้ำ
-        end
-    end)
 
     -- เมธอดเพิ่มแท็บ
     function XDLuaUI:AddTab(tabName, emoji, emojiPosition)
