@@ -166,35 +166,28 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local mainCorner = Instance.new("UICorner", mainFrame)
     mainCorner.CornerRadius = UDim.new(0, 12)
 
-    -- เปลี่ยนขอบเป็นแสงวิ่ง
+    -- เปลี่ยนขอบเป็นแสงกระพริบ (เลี่ยง UIGradient)
     local glowMain = Instance.new("UIStroke", mainFrame)
     glowMain.Thickness = 4
+    glowMain.Color = Color3.fromRGB(255, 50, 255) -- สีม่วงเริ่มต้น
     glowMain.Transparency = 0
-    glowMain.ApplyStrokeMode = Enum.ApplyStrokeMode.Border -- ระบุชัดเจนว่าใช้กับขอบ
 
-    local gradient = Instance.new("UIGradient", glowMain)
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 50, 255)), -- ม่วง
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)), -- ฟ้า
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 50, 255))  -- วนกลับม่วง
-    })
-    gradient.Rotation = 0
-    gradient.Enabled = true -- เปิดใช้งาน UIGradient
-
-    -- อนิเมชั่นแสงวิ่ง
-    local function animateGlow()
-        local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-        local tween = TweenService:Create(gradient, tweenInfo, {Rotation = 360})
-        tween:Play()
-        tween.Completed:Connect(function()
-            gradient.Rotation = 0 -- รีเซ็ต
-            animateGlow() -- เรียกซ้ำเพื่อวนลูป
-        end)
-    end
-
-    -- เริ่มอนิเมชั่นทันที
-    animateGlow()
-
+    -- อนิเมชั่นแสงกระพริบ (ใช้ TweenService ง่ายๆ)
+    spawn(function()
+        while wait(0.5) do -- กระพริบทุก 0.5 วินาที
+            if mainFrame.Parent then -- ตรวจสอบว่า UI ยังอยู่
+                local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
+                local fadeOut = TweenService:Create(glowMain, tweenInfo, {Transparency = 0.8})
+                fadeOut:Play()
+                fadeOut.Completed:Wait()
+                local fadeIn = TweenService:Create(glowMain, tweenInfo, {Transparency = 0})
+                fadeIn:Play()
+            else
+                break -- หยุดลูปถ้า UI ถูกลบ
+            end
+        end
+    end)
+    
     -- เพิ่มข้อความหัวเรื่อง
     local titleLabelMain = Instance.new("TextLabel", mainFrame)
     titleLabelMain.Size = UDim2.new(1, 0, 0, 40)
