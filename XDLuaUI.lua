@@ -166,22 +166,25 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local mainCorner = Instance.new("UICorner", mainFrame)
     mainCorner.CornerRadius = UDim.new(0, 12)
 
-    -- เปลี่ยนขอบเป็นแสงกระพริบ (เลี่ยง UIGradient)
+    -- เปลี่ยนขอบเป็นแสงวิ่ง (ใช้ UIStroke และเปลี่ยนสี)
     local glowMain = Instance.new("UIStroke", mainFrame)
     glowMain.Thickness = 4
-    glowMain.Color = Color3.fromRGB(255, 50, 255) -- สีม่วงเริ่มต้น
+    glowMain.Color = Color3.fromRGB(255, 50, 255) -- สีเริ่มต้น (ม่วง)
     glowMain.Transparency = 0
 
-    -- อนิเมชั่นแสงกระพริบ (ใช้ TweenService ง่ายๆ)
+    -- อนิเมชั่นแสงวิ่งโดยเปลี่ยนสี
     spawn(function()
-        while wait(0.5) do -- กระพริบทุก 0.5 วินาที
+        while wait() do -- อัปเดตต่อเนื่อง
             if mainFrame.Parent then -- ตรวจสอบว่า UI ยังอยู่
-                local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
-                local fadeOut = TweenService:Create(glowMain, tweenInfo, {Transparency = 0.8})
-                fadeOut:Play()
-                fadeOut.Completed:Wait()
-                local fadeIn = TweenService:Create(glowMain, tweenInfo, {Transparency = 0})
-                fadeIn:Play()
+                local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear) -- 1 วินาทีต่อรอบสี
+                -- เปลี่ยนจากม่วง -> ฟ้า
+                local tween1 = TweenService:Create(glowMain, tweenInfo, {Color = Color3.fromRGB(0, 255, 255)})
+                tween1:Play()
+                tween1.Completed:Wait()
+                -- เปลี่ยนจากฟ้า -> ม่วง
+                local tween2 = TweenService:Create(glowMain, tweenInfo, {Color = Color3.fromRGB(255, 50, 255)})
+                tween2:Play()
+                tween2.Completed:Wait()
             else
                 break -- หยุดลูปถ้า UI ถูกลบ
             end
