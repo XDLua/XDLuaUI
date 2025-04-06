@@ -154,7 +154,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
 
     -- สร้างเฟรมหลัก
     local mainFrame = Instance.new("Frame", screenGui)
-    mainFrame.Size = UDim2.new(0, 450, 0, 0) -- เริ่มต้นที่ความสูง 0 สำหรับอนิเมชั่น
+    mainFrame.Size = UDim2.new(0, 450, 0, 300)
     mainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
     mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
     mainFrame.BackgroundTransparency = 0.3
@@ -163,13 +163,20 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     mainFrame.Active = true
     mainFrame.Draggable = true
 
-    local glowMain = Instance.new("UIStroke", mainFrame)
-    glowMain.Thickness = 4
-    glowMain.Color = Color3.fromRGB(255, 50, 255)
-    glowMain.Transparency = 0.1
-
     local mainCorner = Instance.new("UICorner", mainFrame)
     mainCorner.CornerRadius = UDim.new(0, 12)
+
+    -- เปลี่ยนขอบเป็นแสงวิ่ง
+    local glowMain = Instance.new("UIStroke", mainFrame)
+    glowMain.Thickness = 4
+    glowMain.Transparency = 0
+    local gradient = Instance.new("UIGradient", glowMain)
+    gradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 50, 255)), -- สีเริ่มต้น
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)), -- สีกลาง
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 50, 255))  -- สีท้าย (วนกลับ)
+    })
+    gradient.Rotation = 0
 
     -- เพิ่มข้อความหัวเรื่อง
     local titleLabelMain = Instance.new("TextLabel", mainFrame)
@@ -412,28 +419,16 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     -- เพิ่มการทำงานให้ปุ่มฟันเฟือง
     settingsButton.MouseButton1Click:Connect(toggleSettings)
 
-    -- ฟังก์ชันอนิเมชั่นเปิด/ซ่อน UI
-    local function animateMainFrame(show)
-        local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out) -- ใช้ Back เพื่อความนุ่มนวล
-        local goal = show and {Size = UDim2.new(0, 450, 0, 300), BackgroundTransparency = 0.3} 
-                          or {Size = UDim2.new(0, 450, 0, 0), BackgroundTransparency = 1}
-        local tween = TweenService:Create(mainFrame, tweenInfo, goal)
-        if show then
-            mainFrame.Visible = true
+    -- อนิเมชั่นแสงวิ่ง
+    spawn(function()
+        while true do
+            local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+            local tween = TweenService:Create(gradient, tweenInfo, {Rotation = 360})
             tween:Play()
-            -- เพิ่มเอฟเฟกต์จางเข้า
-            local fadeIn = TweenService:Create(glowMain, tweenInfo, {Transparency = 0.1})
-            fadeIn:Play()
-        else
-            tween.Completed:Connect(function()
-                mainFrame.Visible = false
-            end)
-            -- เพิ่มเอฟเฟกต์จางออก
-            local fadeOut = TweenService:Create(glowMain, tweenInfo, {Transparency = 1})
-            fadeOut:Play()
-            tween:Play()
+            tween.Completed:Wait()
+            gradient.Rotation = 0 -- รีเซ็ตเพื่อวนซ้ำ
         end
-    end
+    end)
 
     -- เมธอดเพิ่มแท็บ
     function XDLuaUI:AddTab(tabName, emoji, emojiPosition)
@@ -878,9 +873,9 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end)
     end
 
-    -- การทำงานของปุ่ม X
+    -- การทำงานของปุ่มลบ UI
     deleteButton.MouseButton1Click:Connect(function()
-        animateMainFrame(false) -- ซ่อน UI ชั่วคราว
+        mainFrame.Visible = false -- ซ่อน UI
         confirmFrame.Visible = true -- แสดงหน้ายืนยัน
     end)
 
@@ -891,20 +886,20 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
 
     noButton.MouseButton1Click:Connect(function()
         confirmFrame.Visible = false
-        animateMainFrame(true) -- แสดง UI กลับมา
+        mainFrame.Visible = true -- แสดง UI
     end)
 
-    -- การทำงานของปุ่มโลโก้ (แก้ไขเพื่อใช้อนิเมชั่น)
+    -- การทำงานของปุ่มโลโก้
     logoButton.MouseButton1Click:Connect(function()
         if mainFrame.Visible and not confirmFrame.Visible then
-            animateMainFrame(false)
+            mainFrame.Visible = false
         elseif not confirmFrame.Visible then
-            animateMainFrame(true)
+            mainFrame.Visible = true
         end
     end)
 
-    -- เมื่อโหลดเสร็จ
-        barTween2.Completed:Connect(function()
+    -- แก้ไขการแสดง UI หลังหน้ายินดีต้อนรับ
+    barTween2.Completed:Connect(function()
         loadingFrame:Destroy()
         textTween:Cancel()
         
@@ -913,7 +908,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         welcomeFrame:Destroy()
         
         logoButton.Visible = true
-        animateMainFrame(true) -- เปิด UI ด้วยอนิเมชั่นใหม่
+        mainFrame.Visible = true -- แสดง UI โดยไม่มีอนิเมชั่น
     end)
     
     return XDLuaUI
