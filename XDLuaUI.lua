@@ -170,29 +170,35 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local glowMain = Instance.new("UIStroke", mainFrame)
     glowMain.Thickness = 4
     glowMain.Transparency = 0
+    glowMain.ApplyStrokeMode = Enum.ApplyStrokeMode.Border -- ระบุชัดเจนว่าใช้กับขอบ
+
     local gradient = Instance.new("UIGradient", glowMain)
     gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 50, 255)), -- สีเริ่มต้น
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)), -- สีกลาง
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 50, 255))  -- สีท้าย (วนกลับ)
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 50, 255)), -- ม่วง
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)), -- ฟ้า
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 50, 255))  -- วนกลับม่วง
     })
     gradient.Rotation = 0
+    gradient.Enabled = true -- เปิดใช้งาน UIGradient
+
+    -- อนิเมชั่นแสงวิ่ง
+    local function animateGlow()
+        local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+        local tween = TweenService:Create(gradient, tweenInfo, {Rotation = 360})
+        tween:Play()
+        tween.Completed:Connect(function()
+            gradient.Rotation = 0 -- รีเซ็ต
+            animateGlow() -- เรียกซ้ำเพื่อวนลูป
+        end)
+    end
+
+    -- เริ่มอนิเมชั่นทันที
+    animateGlow()
 
     -- เพิ่มข้อความหัวเรื่อง
     local titleLabelMain = Instance.new("TextLabel", mainFrame)
     titleLabelMain.Size = UDim2.new(1, 0, 0, 40)
 
-    -- อนิเมชั่นแสงวิ่ง
-    spawn(function()
-        while true do
-            local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-            local tween = TweenService:Create(gradient, tweenInfo, {Rotation = 360})
-            tween:Play()
-            tween.Completed:Wait()
-            gradient.Rotation = 0 -- รีเซ็ตเพื่อวนซ้ำ
-        end
-    end)
-    
     -- จัดการอิโมจิใน Title
     local emojiFront = emojiFront or "" -- ถ้าไม่ระบุอิโมจิหน้า ให้เป็นสตริงว่าง
     local emojiBack = emojiBack or "" -- ถ้าไม่ระบุอิโมจิหลัง ให้เป็นสตริงว่าง
