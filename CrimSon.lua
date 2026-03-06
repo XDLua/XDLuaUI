@@ -1,21 +1,22 @@
--- [[ XDLua UI Library: Professional Loadstring Edition ]] --
+-- [[ XDLua UI Library - Modern Edition 2026 ]] --
+-- สคริปต์นี้ออกแบบมาเพื่อใช้งานผ่าน loadstring() โดยเฉพาะ
 
-local XDLua = {} -- สร้างตารางหลัก
+local XDLua = {}
 XDLua.__index = XDLua
 
--- บริการต่างๆ ของ Roblox
+-- บริการของ Roblox
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 
--- ตั้งค่าเริ่มต้น (Themes)
+-- ตั้งค่าธีมและฟอนต์
 XDLua.AccentColor = Color3.fromRGB(0, 162, 255)
-XDLua.Font = Enum.Font.GothamMedium
-XDLua.SecondaryColor = Color3.fromRGB(30, 30, 30)
 XDLua.MainColor = Color3.fromRGB(15, 15, 15)
+XDLua.SecondaryColor = Color3.fromRGB(30, 30, 30)
+XDLua.Font = Enum.Font.GothamMedium
 
--- [ Internal Helper: Smooth Drag ]
+-- ฟังก์ชันภายใน: ระบบลากหน้าต่างแบบสมูท
 local function MakeDraggable(topbar, object)
     local dragging, dragInput, dragStart, startPos
     topbar.InputBegan:Connect(function(input)
@@ -39,66 +40,103 @@ local function MakeDraggable(topbar, object)
     end)
 end
 
--- [ Function: Create Window ]
+-- [ API: สร้างหน้าต่างหลัก ]
 function XDLua:CreateWindow(title)
     local ScreenGui = Instance.new("ScreenGui", CoreGui)
-    ScreenGui.Name = "XDLua_" .. math.random(100, 999)
-    
+    ScreenGui.Name = "XDLua_" .. math.random(1000, 9999)
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
     local MainFrame = Instance.new("Frame", ScreenGui)
     MainFrame.Size = UDim2.new(0, 550, 0, 350)
     MainFrame.Position = UDim2.new(0.5, -275, 0.5, -175)
-    MainFrame.BackgroundColor3 = self.MainColor
+    MainFrame.BackgroundColor3 = XDLua.MainColor
     MainFrame.BorderSizePixel = 0
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
-    Instance.new("UIStroke", MainFrame).Color = Color3.fromRGB(45, 45, 45)
+    local Stroke = Instance.new("UIStroke", MainFrame)
+    Stroke.Color = Color3.fromRGB(45, 45, 45)
+    Stroke.Thickness = 1
 
-    -- Sidebar & Topbar (ส่วนตกแต่ง)
     local Topbar = Instance.new("Frame", MainFrame)
     Topbar.Size = UDim2.new(1, 0, 0, 40); Topbar.BackgroundTransparency = 1
     MakeDraggable(Topbar, MainFrame)
 
-    local TitleLabel = Instance.new("TextLabel", Topbar)
-    TitleLabel.Text = "  " .. (title or "XDLua UI")
-    TitleLabel.Size = UDim2.new(1, 0, 1, 0); TitleLabel.TextColor3 = Color3.new(1,1,1)
-    TitleLabel.Font = self.Font; TitleLabel.TextSize = 18; TitleLabel.BackgroundTransparency = 1; TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    local Title = Instance.new("TextLabel", Topbar)
+    Title.Text = "  " .. (title or "XDLua UI")
+    Title.Size = UDim2.new(1, 0, 1, 0); Title.TextColor3 = Color3.new(1,1,1)
+    Title.Font = XDLua.Font; Title.TextSize = 18; Title.BackgroundTransparency = 1; Title.TextXAlignment = Enum.TextXAlignment.Left
 
-    local Pages = Instance.new("Frame", MainFrame)
-    Pages.Size = UDim2.new(1, -160, 1, -50); Pages.Position = UDim2.new(0, 155, 0, 45); Pages.BackgroundTransparency = 1
+    local TabScroll = Instance.new("ScrollingFrame", MainFrame)
+    TabScroll.Size = UDim2.new(0, 140, 1, -50); TabScroll.Position = UDim2.new(0, 10, 0, 45); TabScroll.BackgroundTransparency = 1; TabScroll.ScrollBarThickness = 0
+    local TabList = Instance.new("UIListLayout", TabScroll); TabList.Padding = UDim.new(0, 5)
 
-    local TabContainer = Instance.new("ScrollingFrame", MainFrame)
-    TabContainer.Size = UDim2.new(0, 140, 1, -50); TabContainer.Position = UDim2.new(0, 10, 0, 45); TabContainer.BackgroundTransparency = 1; TabContainer.ScrollBarThickness = 0
-    Instance.new("UIListLayout", TabContainer).Padding = UDim.new(0, 5)
+    local PageContainer = Instance.new("Frame", MainFrame)
+    PageContainer.Size = UDim2.new(1, -170, 1, -50); PageContainer.Position = UDim2.new(0, 160, 0, 45); PageContainer.BackgroundTransparency = 1
 
     local WindowAPI = { CurrentPage = nil }
 
-    -- [ Function: Create Tab ]
+    -- [ API: สร้างแท็บ ]
     function WindowAPI:CreateTab(name)
-        local Page = Instance.new("ScrollingFrame", Pages)
-        Page.Size = UDim2.new(1, 0, 1, 0); Page.BackgroundTransparency = 1; Page.Visible = false; Page.CanvasSize = UDim2.new(0,0,0,0); Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
-        Instance.new("UIListLayout", Page).Padding = UDim.new(0, 8)
+        local Page = Instance.new("ScrollingFrame", PageContainer)
+        Page.Size = UDim2.new(1, 0, 1, 0); Page.BackgroundTransparency = 1; Page.Visible = false; Page.CanvasSize = UDim2.new(0,0,0,0); Page.AutomaticCanvasSize = Enum.AutomaticSize.Y; Page.ScrollBarThickness = 2
+        local PageLayout = Instance.new("UIListLayout", Page); PageLayout.Padding = UDim.new(0, 7)
 
-        local TabBtn = Instance.new("TextButton", TabContainer)
-        TabBtn.Size = UDim2.new(1, 0, 0, 35); TabBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25); TabBtn.Text = name; TabBtn.TextColor3 = Color3.fromRGB(150, 150, 150); TabBtn.Font = XDLua.Font; Instance.new("UICorner", TabBtn)
+        local TabBtn = Instance.new("TextButton", TabScroll)
+        TabBtn.Size = UDim2.new(1, 0, 0, 32); TabBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25); TabBtn.Text = name; TabBtn.TextColor3 = Color3.fromRGB(180, 180, 180); TabBtn.Font = XDLua.Font; Instance.new("UICorner", TabBtn)
 
         TabBtn.MouseButton1Click:Connect(function()
-            for _, v in pairs(Pages:GetChildren()) do v.Visible = false end
-            Page.Visible = true
+            for _, v in pairs(PageContainer:GetChildren()) do v.Visible = false end
+            for _, v in pairs(TabScroll:GetChildren()) do if v:IsA("TextButton") then v.TextColor3 = Color3.fromRGB(180, 180, 180) end end
+            Page.Visible = true; TabBtn.TextColor3 = XDLua.AccentColor
         end)
 
-        if not self.CurrentPage then Page.Visible = true; self.CurrentPage = Page end
+        if not WindowAPI.CurrentPage then Page.Visible = true; WindowAPI.CurrentPage = Page; TabBtn.TextColor3 = XDLua.AccentColor end
 
         local PageAPI = {}
+
+        -- สร้าง Button
         function PageAPI:AddButton(text, callback)
-            local b = Instance.new("TextButton", Page)
-            b.Size = UDim2.new(1, -10, 0, 35); b.BackgroundColor3 = XDLua.SecondaryColor; b.Text = text; b.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", b)
-            b.MouseButton1Click:Connect(callback)
+            local Btn = Instance.new("TextButton", Page)
+            Btn.Size = UDim2.new(1, -10, 0, 35); Btn.BackgroundColor3 = XDLua.SecondaryColor; Btn.Text = text; Btn.TextColor3 = Color3.new(1,1,1); Btn.Font = XDLua.Font; Instance.new("UICorner", Btn)
+            Btn.MouseButton1Click:Connect(callback)
         end
-        
+
+        -- สร้าง Toggle
+        function PageAPI:AddToggle(text, default, callback)
+            local Toggled = default
+            local TBtn = Instance.new("TextButton", Page)
+            TBtn.Size = UDim2.new(1, -10, 0, 35); TBtn.BackgroundColor3 = XDLua.SecondaryColor; TBtn.Text = "  " .. text; TBtn.TextColor3 = Color3.new(0.8,0.8,0.8); TBtn.Font = XDLua.Font; TBtn.TextXAlignment = Enum.TextXAlignment.Left; Instance.new("UICorner", TBtn)
+            local Box = Instance.new("Frame", TBtn); Box.Size = UDim2.new(0, 20, 0, 20); Box.Position = UDim2.new(1, -30, 0.5, -10); Box.BackgroundColor3 = Toggled and XDLua.AccentColor or Color3.fromRGB(60,60,60); Instance.new("UICorner", Box)
+            TBtn.MouseButton1Click:Connect(function()
+                Toggled = not Toggled
+                Box.BackgroundColor3 = Toggled and XDLua.AccentColor or Color3.fromRGB(60,60,60)
+                callback(Toggled)
+            end)
+        end
+
+        -- สร้าง Slider
+        function PageAPI:AddSlider(text, min, max, default, callback)
+            local SFrame = Instance.new("Frame", Page); SFrame.Size = UDim2.new(1, -10, 0, 45); SFrame.BackgroundColor3 = XDLua.SecondaryColor; Instance.new("UICorner", SFrame)
+            local L = Instance.new("TextLabel", SFrame); L.Text = "  "..text; L.Size = UDim2.new(1,0,0,25); L.BackgroundTransparency = 1; L.TextColor3 = Color3.new(1,1,1); L.Font = XDLua.Font; L.TextXAlignment = Enum.TextXAlignment.Left
+            local V = Instance.new("TextLabel", SFrame); V.Text = tostring(default).." "; V.Size = UDim2.new(1,0,0,25); V.BackgroundTransparency = 1; V.TextColor3 = Color3.new(1,1,1); V.TextXAlignment = Enum.TextXAlignment.Right
+            local B = Instance.new("TextButton", SFrame); B.Size = UDim2.new(1, -20, 0, 6); B.Position = UDim2.new(0, 10, 0, 30); B.BackgroundColor3 = Color3.fromRGB(50,50,50); B.Text = ""; Instance.new("UICorner", B)
+            local F = Instance.new("Frame", B); F.Size = UDim2.new((default-min)/(max-min), 0, 1, 0); F.BackgroundColor3 = XDLua.AccentColor; Instance.new("UICorner", F)
+            local move = false
+            B.MouseButton1Down:Connect(function() move = true end)
+            UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then move = false end end)
+            UserInputService.InputChanged:Connect(function(i)
+                if move and i.UserInputType == Enum.UserInputType.MouseMovement then
+                    local p = math.clamp((UserInputService:GetMouseLocation().X - B.AbsolutePosition.X) / B.AbsoluteSize.X, 0, 1)
+                    local val = math.floor(min + (max - min) * p)
+                    F.Size = UDim2.new(p, 0, 1, 0); V.Text = tostring(val).." "; callback(val)
+                end
+            end)
+        end
+
         return PageAPI
     end
 
     return WindowAPI
 end
 
--- *** สำคัญมาก: ต้อง return ตารางหลักเพื่อให้ loadstring() รับค่าไปได้ ***
+-- จุดสำคัญที่สุด: ต้องส่งค่าคืนเพื่อให้ loadstring รับไปใช้งานได้
 return XDLua
