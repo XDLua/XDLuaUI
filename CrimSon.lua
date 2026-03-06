@@ -1,4 +1,4 @@
--- XDLuaUI (Professional Version)
+-- XDLuaUI (Professional Version - Fixed Dragging)
 local XDLuaUI = {}
 
 -- [Services]
@@ -8,7 +8,7 @@ local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 
--- [Theme Configuration] - ปรับแต่งสีและสไตล์ที่นี่ที่เดียว
+-- [Theme Configuration]
 local Theme = {
     Main = Color3.fromRGB(15, 15, 15),
     Secondary = Color3.fromRGB(25, 25, 25),
@@ -28,38 +28,34 @@ local function ApplyTween(obj, goal, duration)
     return tween
 end
 
-local function MakeDraggable(gui)
+-- ระบบลากที่ปรับปรุงใหม่ (รับ GUI ที่ต้องการให้เลื่อน และ GUI ที่เป็นตัวจับลาก)
+local function MakeDraggable(dragPart, mainFrame)
     local dragging, dragInput, dragStart, startPos
     
-    gui.InputBegan:Connect(function(input)
+    dragPart.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            -- ตรวจสอบว่าเมาส์ไม่ได้จิ้มโดนพวก Button, Slider หรือ TextBox
-            -- โดยการเช็คผ่าน GetGuiObjectsAtPosition หรือเช็คเป้าหมายของ Input
-            local target = input.Target
-            -- ถ้าสิ่งที่คลิกไม่ใช่เฟรมหลัก (เช่น คลิกโดนปุ่มในหน้าต่าง) จะไม่ให้ลากหน้าต่าง
-            if target ~= gui and not target:IsDescendantOf(gui.Parent:FindFirstChild("TopBar") or gui) then
-                return 
-            end
-
             dragging = true
             dragStart = input.Position
-            startPos = gui.Position
+            startPos = mainFrame.Position
         end
     end)
-    gui.InputEnded:Connect(function(input)
+
+    dragPart.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = false
         end
     end)
+
     UserInputService.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement then
             dragInput = input
         end
     end)
+
     RunService.RenderStepped:Connect(function()
         if dragging and dragInput then
             local delta = dragInput.Position - dragStart
-            ApplyTween(gui, {
+            ApplyTween(mainFrame, {
                 Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
             }, 0.1)
         end
@@ -68,7 +64,6 @@ end
 
 -- [Main Library Function]
 function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
-    -- Clean existing UI
     if CoreGui:FindFirstChild("XDLuaGUI") then
         CoreGui:FindFirstChild("XDLuaGUI"):Destroy()
     end
@@ -77,13 +72,11 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     screenGui.Name = "XDLuaGUI"
     screenGui.IgnoreGuiInset = true
 
-    -- 1. Loading Frame
+    -- 1. Loading Frame (คงเดิม)
     local loadingFrame = Instance.new("Frame", screenGui)
     loadingFrame.Size = UDim2.new(0, 320, 0, 160)
     loadingFrame.Position = UDim2.new(0.5, -160, 0.5, -80)
     loadingFrame.BackgroundColor3 = Theme.Main
-    loadingFrame.BorderSizePixel = 0
-    
     Instance.new("UICorner", loadingFrame).CornerRadius = Theme.Rounding
     local loadStroke = Instance.new("UIStroke", loadingFrame)
     loadStroke.Color = Theme.Accent
@@ -108,13 +101,12 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     bar.BackgroundColor3 = Theme.Accent
     Instance.new("UICorner", bar).CornerRadius = UDim.new(1, 0)
 
-    -- Animation Loading
     local barTween = ApplyTween(bar, {Size = UDim2.new(1, 0, 1, 0)}, 2.5)
     barTween.Completed:Wait()
     task.wait(0.5)
     loadingFrame:Destroy()
 
-    -- 2. Logo Button (Toggle UI)
+    -- 2. Logo Button
     local logoButton = Instance.new("TextButton", screenGui)
     logoButton.Size = UDim2.new(0, 45, 0, 45)
     logoButton.Position = UDim2.new(0.05, 0, 0.1, 0)
@@ -122,11 +114,8 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     logoButton.Text = "👾"
     logoButton.TextSize = 22
     logoButton.TextColor3 = Theme.Accent
-    logoButton.AutoButtonColor = false
     Instance.new("UICorner", logoButton).CornerRadius = UDim.new(0, 10)
-    local logoStroke = Instance.new("UIStroke", logoButton)
-    logoStroke.Color = Theme.Stroke
-    MakeDraggable(logoButton)
+    MakeDraggable(logoButton, logoButton)
 
     -- 3. Main Frame
     local mainFrame = Instance.new("Frame", screenGui)
@@ -134,15 +123,19 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     mainFrame.Position = UDim2.new(0.5, -250, 0.5, -170)
     mainFrame.BackgroundColor3 = Theme.Main
     mainFrame.BorderSizePixel = 0
-    mainFrame.Visible = true
-    mainFrame.ClipsDescendants = true
     Instance.new("UICorner", mainFrame).CornerRadius = Theme.Rounding
     local mainStroke = Instance.new("UIStroke", mainFrame)
     mainStroke.Color = Theme.Stroke
     mainStroke.Thickness = 1.2
-    MakeDraggable(mainFrame)
 
-    -- Top Bar Title
+    -- [หัวใจหลัก] Drag Handle (แถบบนสุดที่ใช้ลาก)
+    local dragHandle = Instance.new("Frame", mainFrame)
+    dragHandle.Name = "DragHandle"
+    dragHandle.Size = UDim2.new(1, 0, 0, 45)
+    dragHandle.BackgroundTransparency = 1 -- โปร่งใสเพื่อให้เห็น Title ข้างหลัง
+    dragHandle.ZIndex = 5
+    MakeDraggable(dragHandle, mainFrame)
+
     local topTitle = Instance.new("TextLabel", mainFrame)
     topTitle.Size = UDim2.new(1, -80, 0, 45)
     topTitle.Position = UDim2.new(0, 15, 0, 0)
@@ -153,7 +146,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     topTitle.TextSize = 18
     topTitle.BackgroundTransparency = 1
 
-    -- Close Button
     local closeBtn = Instance.new("TextButton", mainFrame)
     closeBtn.Size = UDim2.new(0, 30, 0, 30)
     closeBtn.Position = UDim2.new(1, -40, 0, 8)
@@ -161,10 +153,11 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     closeBtn.Text = "×"
     closeBtn.TextColor3 = Theme.Text
     closeBtn.TextSize = 20
+    closeBtn.ZIndex = 6 -- อยู่เหนือ DragHandle
     Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
     closeBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
 
-    -- Layouts
+    -- Layouts (คงเดิม)
     local tabContainer = Instance.new("ScrollingFrame", mainFrame)
     tabContainer.Size = UDim2.new(0, 130, 1, -60)
     tabContainer.Position = UDim2.new(0, 10, 0, 50)
@@ -190,7 +183,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         tabBtn.TextColor3 = Theme.TextDark
         tabBtn.Font = Enum.Font.GothamMedium
         tabBtn.TextSize = 13
-        tabBtn.AutoButtonColor = false
         Instance.new("UICorner", tabBtn).CornerRadius = UDim.new(0, 6)
         local tStroke = Instance.new("UIStroke", tabBtn)
         tStroke.Color = Theme.Stroke
@@ -227,7 +219,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         return tabContent
     end
 
-    -- Components
+    -- Components (AddButton, AddToggle, AddSlider, AddDropdown คงเดิมจากที่ปรับปรุงล่าสุด)
     function XDLuaUI:AddButton(parent, text, callback)
         local btn = Instance.new("TextButton", parent)
         btn.Size = UDim2.new(0.95, 0, 0, 35)
@@ -289,7 +281,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end)
     end
 
-    -- [Component: AddSlider - Version with Knob]
     function XDLuaUI:AddSlider(parent, text, min, max, default, callback)
         local sliderFrame = Instance.new("Frame", parent)
         sliderFrame.Size = UDim2.new(0.95, 0, 0, 50)
@@ -309,7 +300,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         label.TextXAlignment = Enum.TextXAlignment.Left
 
         local barBg = Instance.new("Frame", sliderFrame)
-        barBg.Size = UDim2.new(1, -30, 0, 6) -- ปรับขนาดให้สั้นลงนิดหน่อยเพื่อให้ Knob ไม่เลยขอบ
+        barBg.Size = UDim2.new(1, -30, 0, 6)
         barBg.Position = UDim2.new(0, 15, 0, 32)
         barBg.BackgroundColor3 = Theme.Secondary
         Instance.new("UICorner", barBg).CornerRadius = UDim.new(1, 0)
@@ -319,17 +310,12 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         barFill.BackgroundColor3 = Theme.Accent
         Instance.new("UICorner", barFill).CornerRadius = UDim.new(1, 0)
 
-        -- ส่วนของจุดกลมๆ (Knob)
         local knob = Instance.new("Frame", barFill)
         knob.AnchorPoint = Vector2.new(0.5, 0.5)
-        knob.Size = UDim2.new(0, 14, 0, 14) -- ขนาดจุดกลม
+        knob.Size = UDim2.new(0, 14, 0, 14)
         knob.Position = UDim2.new(1, 0, 0.5, 0)
         knob.BackgroundColor3 = Theme.Text
-        knob.BorderSizePixel = 0
-        local kCorner = Instance.new("UICorner", knob)
-        kCorner.CornerRadius = UDim.new(1, 0) -- ทำให้เป็นวงกลม
-        
-        -- เพิ่มเงาหรือขอบให้จุดกลมดูเด่นขึ้น
+        Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
         local kStroke = Instance.new("UIStroke", knob)
         kStroke.Color = Theme.Accent
         kStroke.Thickness = 1.5
@@ -341,27 +327,14 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
             local barSize = barBg.AbsoluteSize.X
             local percent = math.clamp((mousePos - barPos) / barSize, 0, 1)
             local value = math.floor(min + (max - min) * percent)
-            
-            -- อนิเมชั่นการเลื่อน
             ApplyTween(barFill, {Size = UDim2.new(percent, 0, 1, 0)}, 0.1)
             label.Text = text .. " : " .. value
             callback(value)
         end
 
-        -- เอฟเฟกต์ตอนกดและลาก
         barBg.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 then
                 dragging = true
-                -- หยุดไม่ให้การคลิกนี้ส่งไปถึง Frame ที่อยู่ข้างหลัง (MainFrame)
-                local connection
-                connection = UserInputService.InputEnded:Connect(function(endedInput)
-                    if endedInput.UserInputType == Enum.UserInputType.MouseButton1 then
-                        dragging = false
-                        ApplyTween(knob, {Size = UDim2.new(0, 14, 0, 14)}, 0.1)
-                        connection:Disconnect()
-                    end
-                end)
-                
                 ApplyTween(knob, {Size = UDim2.new(0, 18, 0, 18)}, 0.1)
                 UpdateSlider()
             end
@@ -370,7 +343,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         UserInputService.InputEnded:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 then
                 dragging = false
-                ApplyTween(knob, {Size = UDim2.new(0, 14, 0, 14)}, 0.1) -- ย่อขนาดกลับเท่าเดิม
+                ApplyTween(knob, {Size = UDim2.new(0, 14, 0, 14)}, 0.1)
             end
         end)
 
@@ -379,16 +352,8 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
                 UpdateSlider()
             end
         end)
-        
-        -- Hover Effect สำหรับจุดกลม
-        knob.MouseEnter:Connect(function()
-            ApplyTween(kStroke, {Thickness = 2.5}, 0.2)
-        end)
-        knob.MouseLeave:Connect(function()
-            ApplyTween(kStroke, {Thickness = 1.5}, 0.2)
-        end)
     end
-    -- [Component: AddDropdown]
+
     function XDLuaUI:AddDropdown(parent, text, list, callback)
         local dropped = false
         local dropFrame = Instance.new("Frame", parent)
@@ -438,7 +403,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end
     end
 
-    -- Toggle Main UI Visibility
     logoButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
     end)
