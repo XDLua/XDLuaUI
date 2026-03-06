@@ -188,11 +188,11 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local dragHandle = Instance.new("Frame", mainFrame)
     dragHandle.Name = "DragHandle"
     dragHandle.Size = UDim2.new(1, 0, 0, 45)
-    dragHandle.BakgroundTransparency = 1 -- โปร่งใสเพื่อให้เห็น Title ข้างหลัง
+    dragHandle.BackgroundTransparency = 1 -- โปร่งใสเพื่อให้เห็น Title ข้างหลัง
     dragHandle.ZIndex = 5
     MakeDraggable(dragHandle, mainFrame)
 
-    loal topTitle = Instane.new("TextLabel", mainFrame)
+    local topTitle = Instane.new("TextLabel", mainFrame)
     topTitle.Size = UDim2.new(1, -80, 0, 45)
     topTitle.Position = UDim2.new(0, 15, 0, 0)
     topTitle.Text = title or "XDLua Professional"
