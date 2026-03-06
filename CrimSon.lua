@@ -280,7 +280,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end)
     end
 
-    -- [Component: AddSlider]
+    -- [Component: AddSlider - Version with Knob]
     function XDLuaUI:AddSlider(parent, text, min, max, default, callback)
         local sliderFrame = Instance.new("Frame", parent)
         sliderFrame.Size = UDim2.new(0.95, 0, 0, 50)
@@ -300,8 +300,8 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         label.TextXAlignment = Enum.TextXAlignment.Left
 
         local barBg = Instance.new("Frame", sliderFrame)
-        barBg.Size = UDim2.new(1, -20, 0, 6)
-        barBg.Position = UDim2.new(0, 10, 0, 32)
+        barBg.Size = UDim2.new(1, -30, 0, 6) -- ปรับขนาดให้สั้นลงนิดหน่อยเพื่อให้ Knob ไม่เลยขอบ
+        barBg.Position = UDim2.new(0, 15, 0, 32)
         barBg.BackgroundColor3 = Theme.Secondary
         Instance.new("UICorner", barBg).CornerRadius = UDim.new(1, 0)
 
@@ -309,6 +309,21 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         barFill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
         barFill.BackgroundColor3 = Theme.Accent
         Instance.new("UICorner", barFill).CornerRadius = UDim.new(1, 0)
+
+        -- ส่วนของจุดกลมๆ (Knob)
+        local knob = Instance.new("Frame", barFill)
+        knob.AnchorPoint = Vector2.new(0.5, 0.5)
+        knob.Size = UDim2.new(0, 14, 0, 14) -- ขนาดจุดกลม
+        knob.Position = UDim2.new(1, 0, 0.5, 0)
+        knob.BackgroundColor3 = Theme.Text
+        knob.BorderSizePixel = 0
+        local kCorner = Instance.new("UICorner", knob)
+        kCorner.CornerRadius = UDim.new(1, 0) -- ทำให้เป็นวงกลม
+        
+        -- เพิ่มเงาหรือขอบให้จุดกลมดูเด่นขึ้น
+        local kStroke = Instance.new("UIStroke", knob)
+        kStroke.Color = Theme.Accent
+        kStroke.Thickness = 1.5
 
         local dragging = false
         local function UpdateSlider()
@@ -318,14 +333,17 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
             local percent = math.clamp((mousePos - barPos) / barSize, 0, 1)
             local value = math.floor(min + (max - min) * percent)
             
+            -- อนิเมชั่นการเลื่อน
             ApplyTween(barFill, {Size = UDim2.new(percent, 0, 1, 0)}, 0.1)
             label.Text = text .. " : " .. value
             callback(value)
         end
 
+        -- เอฟเฟกต์ตอนกดและลาก
         barBg.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 then
                 dragging = true
+                ApplyTween(knob, {Size = UDim2.new(0, 18, 0, 18)}, 0.1) -- ขยายจุดกลมตอนลาก
                 UpdateSlider()
             end
         end)
@@ -333,6 +351,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         UserInputService.InputEnded:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 then
                 dragging = false
+                ApplyTween(knob, {Size = UDim2.new(0, 14, 0, 14)}, 0.1) -- ย่อขนาดกลับเท่าเดิม
             end
         end)
 
@@ -341,8 +360,15 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
                 UpdateSlider()
             end
         end)
+        
+        -- Hover Effect สำหรับจุดกลม
+        knob.MouseEnter:Connect(function()
+            ApplyTween(kStroke, {Thickness = 2.5}, 0.2)
+        end)
+        knob.MouseLeave:Connect(function()
+            ApplyTween(kStroke, {Thickness = 1.5}, 0.2)
+        end)
     end
-
     -- [Component: AddDropdown]
     function XDLuaUI:AddDropdown(parent, text, list, callback)
         local dropped = false
