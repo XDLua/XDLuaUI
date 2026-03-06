@@ -280,6 +280,119 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end)
     end
 
+    -- [Component: AddSlider]
+    function XDLuaUI:AddSlider(parent, text, min, max, default, callback)
+        local sliderFrame = Instance.new("Frame", parent)
+        sliderFrame.Size = UDim2.new(0.95, 0, 0, 50)
+        sliderFrame.BackgroundColor3 = Theme.Main
+        Instance.new("UICorner", sliderFrame).CornerRadius = Theme.Rounding
+        local sStroke = Instance.new("UIStroke", sliderFrame)
+        sStroke.Color = Theme.Stroke
+
+        local label = Instance.new("TextLabel", sliderFrame)
+        label.Size = UDim2.new(1, -20, 0, 20)
+        label.Position = UDim2.new(0, 10, 0, 5)
+        label.Text = text .. " : " .. default
+        label.TextColor3 = Theme.TextDark
+        label.BackgroundTransparency = 1
+        label.Font = Enum.Font.GothamMedium
+        label.TextSize = 13
+        label.TextXAlignment = Enum.TextXAlignment.Left
+
+        local barBg = Instance.new("Frame", sliderFrame)
+        barBg.Size = UDim2.new(1, -20, 0, 6)
+        barBg.Position = UDim2.new(0, 10, 0, 32)
+        barBg.BackgroundColor3 = Theme.Secondary
+        Instance.new("UICorner", barBg).CornerRadius = UDim.new(1, 0)
+
+        local barFill = Instance.new("Frame", barBg)
+        barFill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
+        barFill.BackgroundColor3 = Theme.Accent
+        Instance.new("UICorner", barFill).CornerRadius = UDim.new(1, 0)
+
+        local dragging = false
+        local function UpdateSlider()
+            local mousePos = UserInputService:GetMouseLocation().X
+            local barPos = barBg.AbsolutePosition.X
+            local barSize = barBg.AbsoluteSize.X
+            local percent = math.clamp((mousePos - barPos) / barSize, 0, 1)
+            local value = math.floor(min + (max - min) * percent)
+            
+            ApplyTween(barFill, {Size = UDim2.new(percent, 0, 1, 0)}, 0.1)
+            label.Text = text .. " : " .. value
+            callback(value)
+        end
+
+        barBg.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+                UpdateSlider()
+            end
+        end)
+
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = false
+            end
+        end)
+
+        UserInputService.InputChanged:Connect(function(input)
+            if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                UpdateSlider()
+            end
+        end)
+    end
+
+    -- [Component: AddDropdown]
+    function XDLuaUI:AddDropdown(parent, text, list, callback)
+        local dropped = false
+        local dropFrame = Instance.new("Frame", parent)
+        dropFrame.Size = UDim2.new(0.95, 0, 0, 35)
+        dropFrame.BackgroundColor3 = Theme.Main
+        dropFrame.ClipsDescendants = true
+        Instance.new("UICorner", dropFrame).CornerRadius = Theme.Rounding
+        local dStroke = Instance.new("UIStroke", dropFrame)
+        dStroke.Color = Theme.Stroke
+
+        local btn = Instance.new("TextButton", dropFrame)
+        btn.Size = UDim2.new(1, 0, 0, 35)
+        btn.BackgroundTransparency = 1
+        btn.Text = text .. "  ▼"
+        btn.TextColor3 = Theme.Text
+        btn.Font = Enum.Font.GothamMedium
+        btn.TextSize = 13
+
+        local container = Instance.new("Frame", dropFrame)
+        container.Size = UDim2.new(1, 0, 0, #list * 30)
+        container.Position = UDim2.new(0, 0, 0, 35)
+        container.BackgroundTransparency = 1
+        local layout = Instance.new("UIListLayout", container)
+
+        btn.MouseButton1Click:Connect(function()
+            dropped = not dropped
+            local targetSize = dropped and UDim2.new(0.95, 0, 0, 35 + (#list * 30)) or UDim2.new(0.95, 0, 0, 35)
+            ApplyTween(dropFrame, {Size = targetSize}, 0.2)
+            btn.Text = dropped and text .. "  ▲" or text .. "  ▼"
+        end)
+
+        for _, item in pairs(list) do
+            local itemBtn = Instance.new("TextButton", container)
+            itemBtn.Size = UDim2.new(1, 0, 0, 30)
+            itemBtn.BackgroundTransparency = 1
+            itemBtn.Text = tostring(item)
+            itemBtn.TextColor3 = Theme.TextDark
+            itemBtn.Font = Enum.Font.Gotham
+            itemBtn.TextSize = 12
+
+            itemBtn.MouseButton1Click:Connect(function()
+                btn.Text = text .. " : " .. item .. "  ▼"
+                dropped = false
+                ApplyTween(dropFrame, {Size = UDim2.new(0.95, 0, 0, 35)}, 0.2)
+                callback(item)
+            end)
+        end
+    end
+
     -- Toggle Main UI Visibility
     logoButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
