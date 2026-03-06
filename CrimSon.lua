@@ -430,6 +430,64 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end
     end
 
+    เพื่อให้ระบบแจ้งเตือน (Notification) ของคุณดูเป็นมืออาชีพและเข้ากับสถาปัตยกรรมสคริปต์เดิม ผมได้ออกแบบฟังก์ชัน XDLuaUI:Notify ที่มีระบบ Queue (คิว) พื้นฐาน เพื่อไม่ให้การแจ้งเตือนทับซ้อนกัน และมี Animation เลื่อนเข้า-ออกจากขอบจอครับ
+
+ให้นำโค้ดนี้ไปเพิ่มไว้ใน [Main Library Function] (ก่อน return XDLuaUI) ครับ:
+
+โค้ดระบบแจ้งเตือน (Notification System)
+Lua
+
+-- [System: Notification]
+function XDLuaUI:Notify(nTitle, nText, duration)
+    local nFrame = Instance.new("Frame", screenGui)
+    nFrame.Name = "Notification"
+    nFrame.Size = UDim2.new(0, 260, 0, 65)
+    -- เริ่มต้นที่นอกจอฝั่งขวา
+    nFrame.Position = UDim2.new(1, 10, 1, -80) 
+    nFrame.BackgroundColor3 = Theme.Main
+    nFrame.ZIndex = 10
+    
+    local nCorner = Instance.new("UICorner", nFrame)
+    nCorner.CornerRadius = Theme.Rounding
+    
+    local nStroke = Instance.new("UIStroke", nFrame)
+    nStroke.Color = Theme.Accent
+    nStroke.Thickness = 1.5
+
+    -- หัวข้อแจ้งเตือน
+    local tLabel = Instance.new("TextLabel", nFrame)
+    tLabel.Size = UDim2.new(1, -20, 0, 25)
+    tLabel.Position = UDim2.new(0, 10, 0, 5)
+    tLabel.Text = nTitle or "Notification"
+    tLabel.TextColor3 = Theme.Accent
+    tLabel.Font = Enum.Font.GothamBold
+    tLabel.TextSize = 14
+    tLabel.BackgroundTransparency = 1
+    tLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- เนื้อหาแจ้งเตือน
+    local dLabel = Instance.new("TextLabel", nFrame)
+    dLabel.Size = UDim2.new(1, -20, 0, 30)
+    dLabel.Position = UDim2.new(0, 10, 0, 28)
+    dLabel.Text = nText or "Message here..."
+    dLabel.TextColor3 = Theme.Text
+    dLabel.Font = Enum.Font.Gotham
+    dLabel.TextSize = 12
+    dLabel.BackgroundTransparency = 1
+    dLabel.TextXAlignment = Enum.TextXAlignment.Left
+    dLabel.TextWrapped = true
+
+    -- Animation: เลื่อนเข้ามาในจอ
+    ApplyTween(nFrame, {Position = UDim2.new(1, -275, 1, -80)}, 0.4)
+
+    -- รอเวลาตามที่กำหนดแล้วเลื่อนออก
+    task.delay(duration or 4, function()
+        local outTween = ApplyTween(nFrame, {Position = UDim2.new(1, 10, 1, -80)}, 0.4)
+        outTween.Completed:Wait()
+        nFrame:Destroy()
+    end)
+end
+
     logoButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
     end)
