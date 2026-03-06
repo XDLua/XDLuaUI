@@ -1,20 +1,16 @@
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
 
 local XDLua = {
-    AccentColor = Color3.fromRGB(0, 162, 255), -- ปรับสีตรงนี้ที่เดียว เปลี่ยนทั้ง UI
+    AccentColor = Color3.fromRGB(0, 162, 255),
     Font = Enum.Font.GothamMedium,
-    Open = true
+    SecondaryColor = Color3.fromRGB(30, 30, 30),
+    MainColor = Color3.fromRGB(15, 15, 15)
 }
 
--- [ Helper Functions ]
-local function Create(class, props)
-    local obj = Instance.new(class)
-    for k, v in pairs(props) do obj[k] = v end
-    return obj
-end
-
+-- [ Helper: Smooth Drag ]
 local function MakeDraggable(topbar, object)
     local dragging, dragInput, dragStart, startPos
     topbar.InputBegan:Connect(function(input)
@@ -23,9 +19,12 @@ local function MakeDraggable(topbar, object)
         end
     end)
     UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            TweenService:Create(object, TweenInfo.new(0.15), {
+        if input.UserInputType == Enum.UserInputType.MouseMovement then dragInput = input end
+    end)
+    RunService.RenderStepped:Connect(function()
+        if dragging and dragInput then
+            local delta = dragInput.Position - dragStart
+            TweenService:Create(object, TweenInfo.new(0.15, Enum.EasingStyle.Quart), {
                 Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
             }):Play()
         end
@@ -35,213 +34,214 @@ local function MakeDraggable(topbar, object)
     end)
 end
 
--- [ Main Library ]
 function XDLua:CreateWindow(title)
-    local ScreenGui = Create("ScreenGui", {Name = "XDLua_"..math.random(100), Parent = CoreGui})
+    local ScreenGui = Instance.new("ScreenGui", CoreGui)
+    ScreenGui.Name = "XDLua_Ultimate"
     
-    local MainFrame = Create("Frame", {
-        Name = "MainFrame", Parent = ScreenGui, Size = UDim2.new(0, 480, 0, 350),
-        Position = UDim2.new(0.5, -240, 0.5, -175), BackgroundColor3 = Color3.fromRGB(15, 15, 15),
-        BorderSizePixel = 0, ClipsDescendants = true
-    })
-    Create("UICorner", {CornerRadius = UDim.new(0, 10), Parent = MainFrame})
-    Create("UIStroke", {Color = Color3.fromRGB(40, 40, 40), Thickness = 1.5, Parent = MainFrame})
+    local MainFrame = Instance.new("Frame", ScreenGui)
+    MainFrame.Size = UDim2.new(0, 550, 0, 350)
+    MainFrame.Position = UDim2.new(0.5, -275, 0.5, -175)
+    MainFrame.BackgroundColor3 = self.MainColor
+    MainFrame.BorderSizePixel = 0
+    
+    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+    local MainStroke = Instance.new("UIStroke", MainFrame)
+    MainStroke.Color = Color3.fromRGB(40, 40, 40)
+    MainStroke.Thickness = 1
 
-    local Topbar = Create("Frame", {
-        Size = UDim2.new(1, 0, 0, 40), BackgroundTransparency = 1, Parent = MainFrame
-    })
+    -- [ Sidebar / Tabs ]
+    local Sidebar = Instance.new("Frame", MainFrame)
+    Sidebar.Size = UDim2.new(0, 150, 1, -40)
+    Sidebar.Position = UDim2.new(0, 0, 0, 40)
+    Sidebar.BackgroundTransparency = 1
+
+    local TabContainer = Instance.new("ScrollingFrame", Sidebar)
+    TabContainer.Size = UDim2.new(1, 0, 1, 0)
+    TabContainer.BackgroundTransparency = 1
+    TabContainer.BorderSizePixel = 0
+    TabContainer.ScrollBarThickness = 0
+    
+    local TabList = Instance.new("UIListLayout", TabContainer)
+    TabList.Padding = UDim.new(0, 5)
+    TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+    -- [ Topbar ]
+    local Topbar = Instance.new("Frame", MainFrame)
+    Topbar.Size = UDim2.new(1, 0, 0, 40)
+    Topbar.BackgroundTransparency = 1
     MakeDraggable(Topbar, MainFrame)
 
-    Create("TextLabel", {
-        Parent = Topbar, Size = UDim2.new(1, -20, 1, 0), Position = UDim2.new(0, 15, 0, 0),
-        BackgroundTransparency = 1, Text = title, TextColor3 = Color3.fromRGB(255, 255, 255),
-        Font = self.Font, TextSize = 18, TextXAlignment = Enum.TextXAlignment.Left
-    })
+    local TitleLabel = Instance.new("TextLabel", Topbar)
+    TitleLabel.Text = "  " .. title
+    TitleLabel.Size = UDim2.new(1, 0, 1, 0)
+    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TitleLabel.Font = self.Font
+    TitleLabel.TextSize = 18
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.BackgroundTransparency = 1
 
-    local Container = Create("ScrollingFrame", {
-        Parent = MainFrame, Size = UDim2.new(1, -10, 1, -50), Position = UDim2.new(0, 5, 0, 45),
-        BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 2,
-        ScrollBarImageColor3 = self.AccentColor, AutomaticCanvasSize = Enum.AutomaticSize.Y,
-        CanvasSize = UDim2.new(0,0,0,0)
-    })
-    Create("UIListLayout", {Padding = UDim.new(0, 7), HorizontalAlignment = "Center", SortOrder = "LayoutOrder", Parent = Container})
-    Create("UIPadding", {PaddingTop = UDim.new(0, 5), PaddingBottom = UDim.new(0, 10), Parent = Container})
+    -- [ Pages Container ]
+    local Pages = Instance.new("Frame", MainFrame)
+    Pages.Size = UDim2.new(1, -160, 1, -50)
+    Pages.Position = UDim2.new(0, 155, 0, 45)
+    Pages.BackgroundTransparency = 1
 
-    local Window = {}
+    local WindowAPI = { CurrentPage = nil }
 
-    -- 1. Section (หัวข้อแยกส่วน)
-    function Window:AddSection(text)
-        local Section = Create("TextLabel", {
-            Parent = Container, Size = UDim2.new(1, -20, 0, 20), BackgroundTransparency = 1,
-            Text = text:upper(), TextColor3 = XDLua.AccentColor, Font = Enum.Font.GothamBold,
-            TextSize = 12, TextXAlignment = "Left"
-        })
-        Create("UIPadding", {PaddingLeft = UDim.new(0, 5), Parent = Section})
-    end
-
-    -- 2. Button
-    function Window:AddButton(text, callback)
-        local Btn = Create("TextButton", {
-            Parent = Container, Size = UDim2.new(1, -20, 0, 38), BackgroundColor3 = Color3.fromRGB(25, 25, 25),
-            Text = "", AutoButtonColor = false
-        })
-        Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Btn})
-        local Stroke = Create("UIStroke", {Color = Color3.fromRGB(45, 45, 45), Parent = Btn})
+    function WindowAPI:CreateTab(name)
+        local Page = Instance.new("ScrollingFrame", Pages)
+        Page.Size = UDim2.new(1, 0, 1, 0)
+        Page.BackgroundTransparency = 1
+        Page.Visible = false
+        Page.ScrollBarThickness = 2
+        Page.CanvasSize = UDim2.new(0,0,0,0)
+        Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
         
-        local Label = Create("TextLabel", {
-            Parent = Btn, Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1,
-            Text = text, TextColor3 = Color3.fromRGB(200, 200, 200), Font = XDLua.Font, TextSize = 14
-        })
+        local PageLayout = Instance.new("UIListLayout", Page)
+        PageLayout.Padding = UDim.new(0, 8)
+        Instance.new("UIPadding", Page).PaddingLeft = UDim.new(0, 5)
 
-        Btn.MouseEnter:Connect(function() 
-            TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
-            TweenService:Create(Stroke, TweenInfo.new(0.2), {Color = XDLua.AccentColor}):Play()
+        local TabButton = Instance.new("TextButton", TabContainer)
+        TabButton.Size = UDim2.new(0, 130, 0, 35)
+        TabButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        TabButton.Text = name
+        TabButton.TextColor3 = Color3.fromRGB(150, 150, 150)
+        TabButton.Font = XDLua.Font
+        TabButton.TextSize = 14
+        Instance.new("UICorner", TabButton)
+
+        TabButton.MouseButton1Click:Connect(function()
+            for _, v in pairs(Pages:GetChildren()) do v.Visible = false end
+            for _, v in pairs(TabContainer:GetChildren()) do 
+                if v:IsA("TextButton") then 
+                    TweenService:Create(v, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 25), TextColor3 = Color3.fromRGB(150, 150, 150)}):Play()
+                end 
+            end
+            Page.Visible = true
+            TweenService:Create(TabButton, TweenInfo.new(0.2), {BackgroundColor3 = XDLua.AccentColor, TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
         end)
-        Btn.MouseLeave:Connect(function() 
-            TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 25)}):Play()
-            TweenService:Create(Stroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(45, 45, 45)}):Play()
-        end)
-        Btn.MouseButton1Click:Connect(callback)
-    end
 
-    -- 3. Toggle
-    function Window:AddToggle(text, default, callback)
-        local state = default or false
-        local ToggleBtn = Create("TextButton", {
-            Parent = Container, Size = UDim2.new(1, -20, 0, 38), BackgroundColor3 = Color3.fromRGB(25, 25, 25), Text = ""
-        })
-        Create("UICorner", {Parent = ToggleBtn})
-        
-        Create("TextLabel", {
-            Parent = ToggleBtn, Position = UDim2.new(0, 15, 0, 0), Size = UDim2.new(1, -50, 1, 0),
-            BackgroundTransparency = 1, Text = text, TextColor3 = Color3.fromRGB(200, 200, 200),
-            Font = XDLua.Font, TextSize = 14, TextXAlignment = "Left"
-        })
-
-        local Box = Create("Frame", {
-            Parent = ToggleBtn, Position = UDim2.new(1, -35, 0.5, -10), Size = UDim2.new(0, 20, 0, 20),
-            BackgroundColor3 = state and XDLua.AccentColor or Color3.fromRGB(45, 45, 45)
-        })
-        Create("UICorner", {CornerRadius = UDim.new(0, 4), Parent = Box})
-
-        ToggleBtn.MouseButton1Click:Connect(function()
-            state = not state
-            TweenService:Create(Box, TweenInfo.new(0.2), {BackgroundColor3 = state and XDLua.AccentColor or Color3.fromRGB(45, 45, 45)}):Play()
-            callback(state)
-        end)
-    end
-
-    -- 4. Slider
-    function Window:AddSlider(text, min, max, default, callback)
-        local SliderFrame = Create("Frame", {
-            Parent = Container, Size = UDim2.new(1, -20, 0, 50), BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-        })
-        Create("UICorner", {Parent = SliderFrame})
-        
-        local Label = Create("TextLabel", {
-            Parent = SliderFrame, Position = UDim2.new(0, 15, 0, 8), Text = text, 
-            TextColor3 = Color3.fromRGB(200, 200, 200), Font = XDLua.Font, TextSize = 13, BackgroundTransparency = 1
-        })
-        
-        local ValueLabel = Create("TextLabel", {
-            Parent = SliderFrame, Position = UDim2.new(1, -45, 0, 8), Text = tostring(default),
-            TextColor3 = XDLua.AccentColor, Font = XDLua.Font, TextSize = 13, BackgroundTransparency = 1
-        })
-
-        local SlideBar = Create("Frame", {
-            Parent = SliderFrame, Position = UDim2.new(0, 15, 0, 32), Size = UDim2.new(1, -30, 0, 6),
-            BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-        })
-        Create("UICorner", {Parent = SlideBar})
-
-        local Fill = Create("Frame", {
-            Parent = SlideBar, Size = UDim2.new((default-min)/(max-min), 0, 1, 0),
-            BackgroundColor3 = XDLua.AccentColor
-        })
-        Create("UICorner", {Parent = Fill})
-
-        local function Update(input)
-            local pos = math.clamp((input.Position.X - SlideBar.AbsolutePosition.X) / SlideBar.AbsoluteSize.X, 0, 1)
-            local val = math.floor(min + (max - min) * pos)
-            ValueLabel.Text = tostring(val)
-            Fill.Size = UDim2.new(pos, 0, 1, 0)
-            callback(val)
+        if not WindowAPI.CurrentPage then
+            Page.Visible = true
+            WindowAPI.CurrentPage = Page
+            TabButton.BackgroundColor3 = XDLua.AccentColor
+            TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
         end
 
-        SlideBar.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                local connection
-                connection = UserInputService.InputChanged:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseMovement then Update(input) end
-                end)
-                UserInputService.InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then connection:Disconnect() end
-                end)
-                Update(input)
-            end
-        end)
-    end
+        local PageAPI = {}
 
-    -- 5. Dropdown (พื้นฐาน)
-    function Window:AddDropdown(text, list, callback)
-        local DropFrame = Create("TextButton", {
-            Parent = Container, Size = UDim2.new(1, -20, 0, 38), BackgroundColor3 = Color3.fromRGB(25, 25, 25),
-            Text = "", ClipsDescendants = true
-        })
-        Create("UICorner", {Parent = DropFrame})
-        
-        local Title = Create("TextLabel", {
-            Parent = DropFrame, Position = UDim2.new(0, 15, 0, 0), Size = UDim2.new(1, -30, 0, 38),
-            BackgroundTransparency = 1, Text = text .. " : ...", TextColor3 = Color3.fromRGB(200, 200, 200),
-            Font = XDLua.Font, TextSize = 14, TextXAlignment = "Left"
-        })
+        -- [ 1. Button ]
+        function PageAPI:AddButton(text, callback)
+            local Btn = Instance.new("TextButton", Page)
+            Btn.Size = UDim2.new(1, -10, 0, 35)
+            Btn.BackgroundColor3 = XDLua.SecondaryColor
+            Btn.Text = text
+            Btn.TextColor3 = Color3.fromRGB(230, 230, 230)
+            Btn.Font = XDLua.Font
+            Btn.TextSize = 14
+            Instance.new("UICorner", Btn)
+            Btn.MouseButton1Click:Connect(callback)
+        end
 
-        local expanded = false
-        DropFrame.MouseButton1Click:Connect(function()
-            expanded = not expanded
-            TweenService:Create(DropFrame, TweenInfo.new(0.3), {Size = UDim2.new(1, -20, 0, expanded and (40 + (#list * 30)) or 38)}):Play()
-        end)
+        -- [ 2. Toggle ]
+        function PageAPI:AddToggle(text, default, callback)
+            local Toggled = default
+            local ToggleBtn = Instance.new("TextButton", Page)
+            ToggleBtn.Size = UDim2.new(1, -10, 0, 35)
+            ToggleBtn.BackgroundColor3 = XDLua.SecondaryColor
+            ToggleBtn.Text = "  " .. text
+            ToggleBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+            ToggleBtn.TextXAlignment = Enum.TextXAlignment.Left
+            ToggleBtn.Font = XDLua.Font
+            Instance.new("UICorner", ToggleBtn)
 
-        for i, v in ipairs(list) do
-            local Item = Create("TextButton", {
-                Parent = DropFrame, Position = UDim2.new(0, 10, 0, 40 + (i-1)*30), Size = UDim2.new(1, -20, 0, 25),
-                BackgroundTransparency = 1, Text = v, TextColor3 = Color3.fromRGB(150, 150, 150),
-                Font = XDLua.Font, TextSize = 13
-            })
-            Item.MouseButton1Click:Connect(function()
-                Title.Text = text .. " : " .. v
-                expanded = false
-                TweenService:Create(DropFrame, TweenInfo.new(0.3), {Size = UDim2.new(1, -20, 0, 38)}):Play()
-                callback(v)
+            local Status = Instance.new("Frame", ToggleBtn)
+            Status.Size = UDim2.new(0, 24, 0, 24)
+            Status.Position = UDim2.new(1, -34, 0.5, -12)
+            Status.BackgroundColor3 = Toggled and XDLua.AccentColor or Color3.fromRGB(50, 50, 50)
+            Instance.new("UICorner", Status).CornerRadius = UDim.new(1, 0)
+
+            ToggleBtn.MouseButton1Click:Connect(function()
+                Toggled = not Toggled
+                TweenService:Create(Status, TweenInfo.new(0.2), {BackgroundColor3 = Toggled and XDLua.AccentColor or Color3.fromRGB(50, 50, 50)}):Play()
+                callback(Toggled)
             end)
         end
+
+        -- [ 3. Slider ]
+        function PageAPI:AddSlider(text, min, max, default, callback)
+            local SliderFrame = Instance.new("Frame", Page)
+            SliderFrame.Size = UDim2.new(1, -10, 0, 45)
+            SliderFrame.BackgroundColor3 = XDLua.SecondaryColor
+            Instance.new("UICorner", SliderFrame)
+
+            local Label = Instance.new("TextLabel", SliderFrame)
+            Label.Text = "  " .. text
+            Label.Size = UDim2.new(1, 0, 0, 25)
+            Label.BackgroundTransparency = 1
+            Label.TextColor3 = Color3.fromRGB(200, 200, 200)
+            Label.Font = XDLua.Font
+            Label.TextXAlignment = Enum.TextXAlignment.Left
+
+            local ValLabel = Instance.new("TextLabel", SliderFrame)
+            ValLabel.Text = tostring(default) .. " "
+            ValLabel.Size = UDim2.new(1, 0, 0, 25)
+            ValLabel.BackgroundTransparency = 1
+            ValLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            ValLabel.TextXAlignment = Enum.TextXAlignment.Right
+
+            local BarArea = Instance.new("TextButton", SliderFrame)
+            BarArea.Size = UDim2.new(1, -20, 0, 5)
+            BarArea.Position = UDim2.new(0, 10, 0, 32)
+            BarArea.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            BarArea.Text = ""
+            Instance.new("UICorner", BarArea)
+
+            local Fill = Instance.new("Frame", BarArea)
+            Fill.Size = UDim2.new((default - min)/(max - min), 0, 1, 0)
+            Fill.BackgroundColor3 = XDLua.AccentColor
+            Instance.new("UICorner", Fill)
+
+            local function UpdateSlider()
+                local percent = math.clamp((UserInputService:GetMouseLocation().X - BarArea.AbsolutePosition.X) / BarArea.AbsoluteSize.X, 0, 1)
+                local value = math.floor(min + (max - min) * percent)
+                Fill.Size = UDim2.new(percent, 0, 1, 0)
+                ValLabel.Text = tostring(value) .. " "
+                callback(value)
+            end
+
+            local sliding = false
+            BarArea.MouseButton1Down:Connect(function() sliding = true end)
+            UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = false end end)
+            UserInputService.InputChanged:Connect(function(input) if sliding and input.UserInputType == Enum.UserInputType.MouseMovement then UpdateSlider() end end)
+        end
+
+        -- [ 4. Dropdown (Simplified) ]
+        function PageAPI:AddDropdown(text, list, callback)
+            local DropFrame = Instance.new("TextButton", Page)
+            DropFrame.Size = UDim2.new(1, -10, 0, 35)
+            DropFrame.BackgroundColor3 = XDLua.SecondaryColor
+            DropFrame.Text = "  " .. text .. " : Select..."
+            DropFrame.TextColor3 = Color3.fromRGB(200, 200, 200)
+            DropFrame.TextXAlignment = Enum.TextXAlignment.Left
+            DropFrame.Font = XDLua.Font
+            Instance.new("UICorner", DropFrame)
+
+            local isOpen = false
+            DropFrame.MouseButton1Click:Connect(function()
+                -- ในเวอร์ชันเต็มต้องมีระบบขยาย List ลงมา
+                -- นี่คือตัวอย่าง Logic การเปลี่ยนค่าวนรอบ
+                local currentIdx = 1
+                isOpen = true
+                DropFrame.Text = "  " .. text .. " : " .. list[1]
+                callback(list[1])
+            end)
+        end
+
+        return PageAPI
     end
 
-    -- 6. TextBox (ช่องกรอกข้อมูล)
-    function Window:AddTextbox(text, placeholder, callback)
-        local TBoxFrame = Create("Frame", {
-            Parent = Container, Size = UDim2.new(1, -20, 0, 55), BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-        })
-        Create("UICorner", {Parent = TBoxFrame})
-        
-        Create("TextLabel", {
-            Parent = TBoxFrame, Position = UDim2.new(0, 15, 0, 8), Text = text, 
-            TextColor3 = Color3.fromRGB(200, 200, 200), Font = XDLua.Font, TextSize = 13, BackgroundTransparency = 1
-        })
-
-        local Input = Create("TextBox", {
-            Parent = TBoxFrame, Position = UDim2.new(0, 15, 0, 28), Size = UDim2.new(1, -30, 0, 20),
-            BackgroundColor3 = Color3.fromRGB(35, 35, 35), Text = "", PlaceholderText = placeholder,
-            TextColor3 = Color3.fromRGB(255, 255, 255), Font = XDLua.Font, TextSize = 12
-        })
-        Create("UICorner", {CornerRadius = UDim.new(0, 4), Parent = Input})
-
-        Input.FocusLost:Connect(function(enter)
-            if enter then callback(Input.Text) end
-        end)
-    end
-
-    return Window
+    return WindowAPI
 end
 
 return XDLua
