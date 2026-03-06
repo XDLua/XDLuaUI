@@ -1,4 +1,3 @@
--- XDLuaUI (Professional Version - Fixed Dragging)
 local XDLuaUI = {}
 
 -- [Services]
