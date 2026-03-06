@@ -84,7 +84,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
 
     local titleLabel = Instance.new("TextLabel", loadingFrame)
     titleLabel.Size = UDim2.new(1, 0, 0, 50)
-    titleLabel.Text = "BY C • J"
+    titleLabel.Text = "CRIM SON SCRIPT"
     titleLabel.TextColor3 = Theme.Accent
     titleLabel.BackgroundTransparency = 1
     titleLabel.Font = Enum.Font.GothamBlack
@@ -189,11 +189,11 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     local dragHandle = Instance.new("Frame", mainFrame)
     dragHandle.Name = "DragHandle"
     dragHandle.Size = UDim2.new(1, 0, 0, 45)
-    dragHandle.BackgroundTransparency = 1 -- โปร่งใสเพื่อให้เห็น Title ข้างหลัง
+    dragHandle.BakgroundTransparency = 1 -- โปร่งใสเพื่อให้เห็น Title ข้างหลัง
     dragHandle.ZIndex = 5
     MakeDraggable(dragHandle, mainFrame)
 
-    local topTitle = Instance.new("TextLabel", mainFrame)
+    loal topTitle = Instane.new("TextLabel", mainFrame)
     topTitle.Size = UDim2.new(1, -80, 0, 45)
     topTitle.Position = UDim2.new(0, 15, 0, 0)
     topTitle.Text = title or "XDLua Professional"
