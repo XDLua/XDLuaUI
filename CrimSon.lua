@@ -403,39 +403,9 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end
     end
 
-    -- [Component: AddKeybind]
-    function XDLuaUI:AddKeybind(parent, text, default, callback)
-        local key = default
-        local btn = Instance.new("TextButton", parent)
-        btn.Size = UDim2.new(0.95, 0, 0, 35); btn.BackgroundColor3 = Theme.Main; btn.Text = text .. " : " .. key.Name; btn.TextColor3 = Theme.Text; btn.Font = Enum.Font.GothamMedium; btn.TextSize = 13; Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-        
-        btn.MouseButton1Click:Connect(function()
-            btn.Text = "Press any key..."; local connection
-            connection = UserInputService.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.Keyboard then
-                    key = input.KeyCode; btn.Text = text .. " : " .. key.Name
-                    callback(key); connection:Disconnect()
-                end
-            end)
-        end)
-    end
-
-    -- [Component: AddColorPicker (Simplified)]
-    function XDLuaUI:AddColorPicker(parent, text, default, callback)
-        local btn = Instance.new("TextButton", parent)
-        btn.Size = UDim2.new(0.95, 0, 0, 35); btn.BackgroundColor3 = Theme.Main; btn.Text = text; btn.TextColor3 = default; btn.Font = Enum.Font.GothamMedium; btn.TextSize = 13; Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-        btn.MouseButton1Click:Connect(function()
-            local randomColor = Color3.fromHSV(math.random(), 1, 1)
-            btn.TextColor3 = randomColor
-            callback(randomColor)
-        end)
-    end
-
-    -- Toggle UI logic
-    UserInputService.InputBegan:Connect(function(input, gpe)
-        if not gpe and input.KeyCode == CurrentKeybind then mainFrame.Visible = not mainFrame.Visible end
+    logoButton.MouseButton1Click:Connect(function()
+        mainFrame.Visible = not mainFrame.Visible
     end)
-    logoButton.MouseButton1Click:Connect(function() mainFrame.Visible = not mainFrame.Visible end)
 
     return XDLuaUI
 end
