@@ -110,9 +110,29 @@ function XDLuaUI:CreateWindow(title)
     logoButton.TextSize = 24
     logoButton.TextColor3 = Theme.Accent
     logoButton.AutoButtonColor = false
+    logoButton.Active = true -- ต้องเปิด Active เพื่อให้รับ Input การลากได้
     Instance.new("UICorner", logoButton).CornerRadius = UDim.new(0, 10)
-    Instance.new("UIStroke", logoButton).Color = Theme.Accent
+    local lStroke = Instance.new("UIStroke", logoButton)
+    lStroke.Color = Theme.Accent
+    lStroke.Thickness = 1.5
+
+    -- เรียกใช้ฟังก์ชันลาก (ส่งตัวมันเองเป็นทั้งตัวลากและตัวเคลื่อนที่)
     MakeDraggable(logoButton, logoButton)
+
+    -- เอฟเฟกต์ Hover
+    logoButton.MouseEnter:Connect(function()
+        ApplyTween(logoButton, {Size = UDim2.new(0, 50, 0, 50), Rotation = 15}, 0.2)
+    end)
+
+    logoButton.MouseLeave:Connect(function()
+        ApplyTween(logoButton, {Size = UDim2.new(0, 45, 0, 45), Rotation = 0}, 0.2)
+    end)
+
+    -- การคลิกเพื่อเปิด-ปิด Main Frame
+    logoButton.MouseButton1Click:Connect(function()
+        -- ตรวจสอบว่าเมนูแสดงอยู่หรือไม่ แล้วสลับค่า
+        mainFrame.Visible = not mainFrame.Visible
+    end)
 
     local mainFrame = Instance.new("Frame", screenGui)
     mainFrame.Size = UDim2.new(0, 500, 0, 340)
