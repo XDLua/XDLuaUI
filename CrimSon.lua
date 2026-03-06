@@ -112,6 +112,7 @@ function XDLuaUI:CreateWindow(title)
     logoButton.AutoButtonColor = false
     Instance.new("UICorner", logoButton).CornerRadius = UDim.new(0, 10)
     Instance.new("UIStroke", logoButton).Color = Theme.Accent
+    MakeDraggable(logoButton, logoButton)
 
     local mainFrame = Instance.new("Frame", screenGui)
     mainFrame.Size = UDim2.new(0, 500, 0, 340)
