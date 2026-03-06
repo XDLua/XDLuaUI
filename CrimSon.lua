@@ -430,13 +430,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         end
     end
 
-    เพื่อให้ระบบแจ้งเตือน (Notification) ของคุณดูเป็นมืออาชีพและเข้ากับสถาปัตยกรรมสคริปต์เดิม ผมได้ออกแบบฟังก์ชัน XDLuaUI:Notify ที่มีระบบ Queue (คิว) พื้นฐาน เพื่อไม่ให้การแจ้งเตือนทับซ้อนกัน และมี Animation เลื่อนเข้า-ออกจากขอบจอครับ
-
-ให้นำโค้ดนี้ไปเพิ่มไว้ใน [Main Library Function] (ก่อน return XDLuaUI) ครับ:
-
-โค้ดระบบแจ้งเตือน (Notification System)
-Lua
-
 -- [System: Notification]
 function XDLuaUI:Notify(nTitle, nText, duration)
     local nFrame = Instance.new("Frame", screenGui)
