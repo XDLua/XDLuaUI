@@ -488,6 +488,54 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
             end)
         end
     end
+
+    -- [Function: เพิ่มข้อความอธิบาย]
+function XDLuaUI:AddLabel(parent, text, color)
+    local label = Instance.new("TextLabel", parent)
+    label.Name = "Label"
+    label.Size = UDim2.new(0.95, 0, 0, 20)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = color or Theme.TextDark
+    label.Font = Enum.Font.GothamMedium
+    label.TextSize = 13
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.TextWrapped = true
+    
+    local padding = Instance.new("UIPadding", label)
+    padding.PaddingLeft = UDim.new(0, 12)
+    
+    return label
+end
+
+-- [Function: เพิ่มเส้นแบ่งหมวดหมู่]
+function XDLuaUI:AddSection(parent, text)
+    local sectionFrame = Instance.new("Frame", parent)
+    sectionFrame.Name = "Section"
+    sectionFrame.Size = UDim2.new(0.95, 0, 0, 25)
+    sectionFrame.BackgroundTransparency = 1
+
+    local sLabel = Instance.new("TextLabel", sectionFrame)
+    sLabel.Size = UDim2.new(1, 0, 1, 0)
+    sLabel.Text = text:upper() -- ทำให้เป็นตัวพิมพ์ใหญ่เพื่อความเท่
+    sLabel.TextColor3 = Theme.Accent
+    sLabel.Font = Enum.Font.GothamBold
+    sLabel.TextSize = 12
+    sLabel.TextXAlignment = Enum.TextXAlignment.Left
+    sLabel.BackgroundTransparency = 1
+    
+    local padding = Instance.new("UIPadding", sLabel)
+    padding.PaddingLeft = UDim.new(0, 5)
+
+    -- เส้นขีดข้างๆ ข้อความ
+    local line = Instance.new("Frame", sectionFrame)
+    line.Size = UDim2.new(1, - (sLabel.TextBounds.X + 15), 0, 1)
+    line.Position = UDim2.new(0, sLabel.TextBounds.X + 10, 0.5, 0)
+    line.BackgroundColor3 = Theme.Stroke
+    line.BorderSizePixel = 0
+    
+    return sectionFrame
+end
     
     logoButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
