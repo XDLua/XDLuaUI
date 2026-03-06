@@ -412,6 +412,8 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
 
     function XDLuaUI:AddDropdown(parent, text, list, callback)
         local dropped = false
+        local selectedItems = {} -- เก็บรายการที่ถูกเลือก
+        
         local dropFrame = Instance.new("Frame", parent)
         dropFrame.Size = UDim2.new(0.95, 0, 0, 35)
         dropFrame.BackgroundColor3 = Theme.Main
@@ -428,15 +430,23 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         btn.Font = Enum.Font.GothamMedium
         btn.TextSize = 13
 
-        local container = Instance.new("Frame", dropFrame)
-        container.Size = UDim2.new(1, 0, 0, #list * 30)
+        -- แก้ปัญหาตัวเลือกเยอะ: ใช้ ScrollingFrame แทน Frame ธรรมดา
+        local container = Instance.new("ScrollingFrame", dropFrame)
+        container.Size = UDim2.new(1, 0, 0, 120) -- จำกัดความสูงไว้ที่ 120 (ประมาณ 4 รายการ)
         container.Position = UDim2.new(0, 0, 0, 35)
         container.BackgroundTransparency = 1
+        container.BorderSizePixel = 0
+        container.ScrollBarThickness = 3
+        container.ScrollBarImageColor3 = Theme.Accent
+        container.CanvasSize = UDim2.new(0, 0, 0, #list * 30) -- ปรับขนาดตามจำนวนรายการ
+
         local layout = Instance.new("UIListLayout", container)
+        layout.SortOrder = Enum.SortOrder.LayoutOrder
 
         btn.MouseButton1Click:Connect(function()
             dropped = not dropped
-            local targetSize = dropped and UDim2.new(0.95, 0, 0, 35 + (#list * 30)) or UDim2.new(0.95, 0, 0, 35)
+            -- ปรับความสูงรวม: 35 (ปุ่มหลัก) + 120 (พื้นที่ Scroll) = 155
+            local targetSize = dropped and UDim2.new(0.95, 0, 0, 155) or UDim2.new(0.95, 0, 0, 35)
             ApplyTween(dropFrame, {Size = targetSize}, 0.2)
             btn.Text = dropped and text .. "  ▲" or text .. "  ▼"
         end)
@@ -451,14 +461,34 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
             itemBtn.TextSize = 12
 
             itemBtn.MouseButton1Click:Connect(function()
-                btn.Text = text .. " : " .. item .. "  ▼"
-                dropped = false
-                ApplyTween(dropFrame, {Size = UDim2.new(0.95, 0, 0, 35)}, 0.2)
-                callback(item)
+                -- ระบบเลือกหลายอย่าง (Multi-select Logic)
+                if selectedItems[item] then
+                    selectedItems[item] = nil -- ยกเลิกการเลือก
+                    ApplyTween(itemBtn, {TextColor3 = Theme.TextDark}, 0.2)
+                else
+                    selectedItems[item] = true -- เลือกรายการนี้
+                    ApplyTween(itemBtn, {TextColor3 = Theme.Accent}, 0.2)
+                end
+
+                -- สรุปรายการที่เลือกมาแสดงที่ปุ่มหลัก
+                local result = {}
+                local count = 0
+                for k, _ in pairs(selectedItems) do
+                    table.insert(result, k)
+                    count = count + 1
+                end
+                
+                if count == 0 then
+                    btn.Text = text .. "  ▲"
+                else
+                    btn.Text = text .. " (" .. count .. ")  ▲"
+                end
+                
+                callback(result) -- ส่งค่ากลับเป็น Table ของสิ่งที่เลือกทั้งหมด
             end)
         end
     end
-
+    
     logoButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
     end)
