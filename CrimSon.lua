@@ -106,13 +106,53 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     task.wait(0.5)
     loadingFrame:Destroy()
 
-    -- 2. Logo Button (ฉบับปรับปรุง: รองรับรูปภาพและเอฟเฟกต์)
+    -- -- 2. Logo Button (ฉบับปรับปรุง: รองรับรูปภาพและเอฟเฟกต์)
+    -- local logoButton = Instance.new("TextButton", screenGui)
+    -- logoButton.Name = "LogoButton"
+    -- logoButton.Size = UDim2.new(0, 45, 0, 45)
+    -- logoButton.Position = UDim2.new(0.05, 0, 0.1, 0)
+    -- logoButton.BackgroundColor3 = Theme.Main
+    -- logoButton.Text = "" -- ลบ Emoji ออก
+    -- logoButton.AutoButtonColor = false
+    -- Instance.new("UICorner", logoButton).CornerRadius = UDim.new(0, 10)
+    
+    -- local logoStroke = Instance.new("UIStroke", logoButton)
+    -- logoStroke.Color = Theme.Accent
+    -- logoStroke.Thickness = 1.5
+
+    -- -- ส่วนแสดงรูปภาพโลโก้
+    -- local logoImage = Instance.new("ImageLabel", logoButton)
+    -- logoImage.Name = "LogoImage"
+    -- logoImage.Size = UDim2.new(0.7, 0, 0.7, 0) -- ขนาดรูปภาพ (70% ของปุ่ม)
+    -- logoImage.Position = UDim2.new(0.5, 0, 0.5, 0)
+    -- logoImage.AnchorPoint = Vector2.new(0.5, 0.5)
+    -- logoImage.BackgroundTransparency = 1
+    -- logoImage.Image = "rbxassetid://118933158736973" -- ใส่ ID รูปภาพของคุณตรงนี้
+    -- logoImage.ImageColor3 = Theme.Accent -- ให้รูปเปลี่ยนสีตาม Theme (ถ้าเป็นรูปสีขาวล้วน)
+    -- logoImage.ScaleType = Enum.ScaleType.Fit
+
+    -- -- เอฟเฟกต์เวลาเอาเมาส์ชี้ (Hover Effect)
+    -- logoButton.MouseEnter:Connect(function()
+    --     ApplyTween(logoButton, {Size = UDim2.new(0, 50, 0, 50)}, 0.2)
+    --     ApplyTween(logoImage, {Rotation = 90}, 0.3)
+    -- end)
+
+    -- logoButton.MouseLeave:Connect(function()
+    --     ApplyTween(logoButton, {Size = UDim2.new(0, 45, 0, 45)}, 0.2)
+    --     ApplyTween(logoImage, {Rotation = 0}, 0.3)
+    -- end)
+
+    -- MakeDraggable(logoButton, logoButton)
+
+    -- 2. Logo Button (เวอร์ชันชั่วคราว: ใช้ Emoji 🎯 ระหว่างรอตรวจสอบรูป)
     local logoButton = Instance.new("TextButton", screenGui)
     logoButton.Name = "LogoButton"
     logoButton.Size = UDim2.new(0, 45, 0, 45)
     logoButton.Position = UDim2.new(0.05, 0, 0.1, 0)
     logoButton.BackgroundColor3 = Theme.Main
-    logoButton.Text = "" -- ลบ Emoji ออก
+    logoButton.Text = "🎯" -- เปลี่ยนเป็น Emoji ที่ต้องการ
+    logoButton.TextSize = 24
+    logoButton.TextColor3 = Theme.Accent -- ให้สี Emoji ล้อไปตามสี Accent
     logoButton.AutoButtonColor = false
     Instance.new("UICorner", logoButton).CornerRadius = UDim.new(0, 10)
     
@@ -120,26 +160,16 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     logoStroke.Color = Theme.Accent
     logoStroke.Thickness = 1.5
 
-    -- ส่วนแสดงรูปภาพโลโก้
-    local logoImage = Instance.new("ImageLabel", logoButton)
-    logoImage.Name = "LogoImage"
-    logoImage.Size = UDim2.new(0.7, 0, 0.7, 0) -- ขนาดรูปภาพ (70% ของปุ่ม)
-    logoImage.Position = UDim2.new(0.5, 0, 0.5, 0)
-    logoImage.AnchorPoint = Vector2.new(0.5, 0.5)
-    logoImage.BackgroundTransparency = 1
-    logoImage.Image = "rbxassetid://118933158736973" -- ใส่ ID รูปภาพของคุณตรงนี้
-    logoImage.ImageColor3 = Theme.Accent -- ให้รูปเปลี่ยนสีตาม Theme (ถ้าเป็นรูปสีขาวล้วน)
-    logoImage.ScaleType = Enum.ScaleType.Fit
-
-    -- เอฟเฟกต์เวลาเอาเมาส์ชี้ (Hover Effect)
+    -- เอฟเฟกต์เวลาเอาเมาส์ชี้ (Hover Effect สำหรับ Emoji)
     logoButton.MouseEnter:Connect(function()
         ApplyTween(logoButton, {Size = UDim2.new(0, 50, 0, 50)}, 0.2)
-        ApplyTween(logoImage, {Rotation = 90}, 0.3)
+        -- ถ้าอยากให้ Emoji หมุนด้วย สามารถใส่ Rotation ได้ที่ logoButton ตรงๆ
+        ApplyTween(logoButton, {Rotation = 15}, 0.2) 
     end)
 
     logoButton.MouseLeave:Connect(function()
         ApplyTween(logoButton, {Size = UDim2.new(0, 45, 0, 45)}, 0.2)
-        ApplyTween(logoImage, {Rotation = 0}, 0.3)
+        ApplyTween(logoButton, {Rotation = 0}, 0.2)
     end)
 
     MakeDraggable(logoButton, logoButton)
@@ -429,57 +459,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
             end)
         end
     end
-
--- -- [System: Notification]
--- function XDLuaUI:Notify(nTitle, nText, duration)
---     local nFrame = Instance.new("Frame", screenGui)
---     nFrame.Name = "Notification"
---     nFrame.Size = UDim2.new(0, 260, 0, 65)
---     -- เริ่มต้นที่นอกจอฝั่งขวา
---     nFrame.Position = UDim2.new(1, 10, 1, -80) 
---     nFrame.BackgroundColor3 = Theme.Main
---     nFrame.ZIndex = 10
-    
---     local nCorner = Instance.new("UICorner", nFrame)
---     nCorner.CornerRadius = Theme.Rounding
-    
---     local nStroke = Instance.new("UIStroke", nFrame)
---     nStroke.Color = Theme.Accent
---     nStroke.Thickness = 1.5
-
---     -- หัวข้อแจ้งเตือน
---     local tLabel = Instance.new("TextLabel", nFrame)
---     tLabel.Size = UDim2.new(1, -20, 0, 25)
---     tLabel.Position = UDim2.new(0, 10, 0, 5)
---     tLabel.Text = nTitle or "Notification"
---     tLabel.TextColor3 = Theme.Accent
---     tLabel.Font = Enum.Font.GothamBold
---     tLabel.TextSize = 14
---     tLabel.BackgroundTransparency = 1
---     tLabel.TextXAlignment = Enum.TextXAlignment.Left
-
---     -- เนื้อหาแจ้งเตือน
---     local dLabel = Instance.new("TextLabel", nFrame)
---     dLabel.Size = UDim2.new(1, -20, 0, 30)
---     dLabel.Position = UDim2.new(0, 10, 0, 28)
---     dLabel.Text = nText or "Message here..."
---     dLabel.TextColor3 = Theme.Text
---     dLabel.Font = Enum.Font.Gotham
---     dLabel.TextSize = 12
---     dLabel.BackgroundTransparency = 1
---     dLabel.TextXAlignment = Enum.TextXAlignment.Left
---     dLabel.TextWrapped = true
-
---     -- Animation: เลื่อนเข้ามาในจอ
---     ApplyTween(nFrame, {Position = UDim2.new(1, -275, 1, -80)}, 0.4)
-
---     -- รอเวลาตามที่กำหนดแล้วเลื่อนออก
---     task.delay(duration or 4, function()
---         local outTween = ApplyTween(nFrame, {Position = UDim2.new(1, 10, 1, -80)}, 0.4)
---         outTween.Completed:Wait()
---         nFrame:Destroy()
---     end)
--- end
 
     logoButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
