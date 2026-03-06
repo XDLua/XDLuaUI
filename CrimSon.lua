@@ -106,15 +106,42 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     task.wait(0.5)
     loadingFrame:Destroy()
 
-    -- 2. Logo Button
+    -- 2. Logo Button (ฉบับปรับปรุง: รองรับรูปภาพและเอฟเฟกต์)
     local logoButton = Instance.new("TextButton", screenGui)
+    logoButton.Name = "LogoButton"
     logoButton.Size = UDim2.new(0, 45, 0, 45)
     logoButton.Position = UDim2.new(0.05, 0, 0.1, 0)
     logoButton.BackgroundColor3 = Theme.Main
-    logoButton.Text = "👾"
-    logoButton.TextSize = 22
-    logoButton.TextColor3 = Theme.Accent
+    logoButton.Text = "" -- ลบ Emoji ออก
+    logoButton.AutoButtonColor = false
     Instance.new("UICorner", logoButton).CornerRadius = UDim.new(0, 10)
+    
+    local logoStroke = Instance.new("UIStroke", logoButton)
+    logoStroke.Color = Theme.Accent
+    logoStroke.Thickness = 1.5
+
+    -- ส่วนแสดงรูปภาพโลโก้
+    local logoImage = Instance.new("ImageLabel", logoButton)
+    logoImage.Name = "LogoImage"
+    logoImage.Size = UDim2.new(0.7, 0, 0.7, 0) -- ขนาดรูปภาพ (70% ของปุ่ม)
+    logoImage.Position = UDim2.new(0.5, 0, 0.5, 0)
+    logoImage.AnchorPoint = Vector2.new(0.5, 0.5)
+    logoImage.BackgroundTransparency = 1
+    logoImage.Image = "rbxassetid://6031094678" -- ใส่ ID รูปภาพของคุณตรงนี้
+    logoImage.ImageColor3 = Theme.Accent -- ให้รูปเปลี่ยนสีตาม Theme (ถ้าเป็นรูปสีขาวล้วน)
+    logoImage.ScaleType = Enum.ScaleType.Fit
+
+    -- เอฟเฟกต์เวลาเอาเมาส์ชี้ (Hover Effect)
+    logoButton.MouseEnter:Connect(function()
+        ApplyTween(logoButton, {Size = UDim2.new(0, 50, 0, 50)}, 0.2)
+        ApplyTween(logoImage, {Rotation = 90}, 0.3)
+    end)
+
+    logoButton.MouseLeave:Connect(function()
+        ApplyTween(logoButton, {Size = UDim2.new(0, 45, 0, 45)}, 0.2)
+        ApplyTween(logoImage, {Rotation = 0}, 0.3)
+    end)
+
     MakeDraggable(logoButton, logoButton)
 
     -- 3. Main Frame
