@@ -128,12 +128,6 @@ function XDLuaUI:CreateWindow(title)
         ApplyTween(logoButton, {Size = UDim2.new(0, 45, 0, 45), Rotation = 0}, 0.2)
     end)
 
-    -- การคลิกเพื่อเปิด-ปิด Main Frame
-    logoButton.MouseButton1Click:Connect(function()
-        -- ตรวจสอบว่าเมนูแสดงอยู่หรือไม่ แล้วสลับค่า
-        mainFrame.Visible = not mainFrame.Visible
-    end)
-
     local mainFrame = Instance.new("Frame", screenGui)
     mainFrame.Size = UDim2.new(0, 500, 0, 340)
     mainFrame.Position = UDim2.new(0.5, -250, 0.5, -170)
