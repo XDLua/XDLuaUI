@@ -30,8 +30,17 @@ end
 
 local function MakeDraggable(gui)
     local dragging, dragInput, dragStart, startPos
+    
     gui.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            -- ตรวจสอบว่าเมาส์ไม่ได้จิ้มโดนพวก Button, Slider หรือ TextBox
+            -- โดยการเช็คผ่าน GetGuiObjectsAtPosition หรือเช็คเป้าหมายของ Input
+            local target = input.Target
+            -- ถ้าสิ่งที่คลิกไม่ใช่เฟรมหลัก (เช่น คลิกโดนปุ่มในหน้าต่าง) จะไม่ให้ลากหน้าต่าง
+            if target ~= gui and not target:IsDescendantOf(gui.Parent:FindFirstChild("TopBar") or gui) then
+                return 
+            end
+
             dragging = true
             dragStart = input.Position
             startPos = gui.Position
