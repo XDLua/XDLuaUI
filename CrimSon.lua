@@ -127,7 +127,7 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     logoImage.Position = UDim2.new(0.5, 0, 0.5, 0)
     logoImage.AnchorPoint = Vector2.new(0.5, 0.5)
     logoImage.BackgroundTransparency = 1
-    logoImage.Image = "rbxassetid://6031094678" -- ใส่ ID รูปภาพของคุณตรงนี้
+    logoImage.Image = "rbxassetid://118933158736973" -- ใส่ ID รูปภาพของคุณตรงนี้
     logoImage.ImageColor3 = Theme.Accent -- ให้รูปเปลี่ยนสีตาม Theme (ถ้าเป็นรูปสีขาวล้วน)
     logoImage.ScaleType = Enum.ScaleType.Fit
 
