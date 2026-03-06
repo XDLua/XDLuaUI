@@ -160,13 +160,6 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
     logoStroke.Color = Theme.Accent
     logoStroke.Thickness = 1.5
 
-    -- เอฟเฟกต์เวลาเอาเมาส์ชี้ (Hover Effect สำหรับ Emoji)
-    logoButton.MouseEnter:Connect(function()
-        ApplyTween(logoButton, {Size = UDim2.new(0, 50, 0, 50)}, 0.2)
-        -- ถ้าอยากให้ Emoji หมุนด้วย สามารถใส่ Rotation ได้ที่ logoButton ตรงๆ
-        ApplyTween(logoButton, {Rotation = 15}, 0.2) 
-    end)
-
     logoButton.MouseLeave:Connect(function()
         ApplyTween(logoButton, {Size = UDim2.new(0, 45, 0, 45)}, 0.2)
         ApplyTween(logoButton, {Rotation = 0}, 0.2)
