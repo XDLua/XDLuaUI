@@ -343,7 +343,17 @@ function XDLuaUI:CreateWindow(title, emojiFront, emojiBack, spacing)
         barBg.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 then
                 dragging = true
-                ApplyTween(knob, {Size = UDim2.new(0, 18, 0, 18)}, 0.1) -- ขยายจุดกลมตอนลาก
+                -- หยุดไม่ให้การคลิกนี้ส่งไปถึง Frame ที่อยู่ข้างหลัง (MainFrame)
+                local connection
+                connection = UserInputService.InputEnded:Connect(function(endedInput)
+                    if endedInput.UserInputType == Enum.UserInputType.MouseButton1 then
+                        dragging = false
+                        ApplyTween(knob, {Size = UDim2.new(0, 14, 0, 14)}, 0.1)
+                        connection:Disconnect()
+                    end
+                end)
+                
+                ApplyTween(knob, {Size = UDim2.new(0, 18, 0, 18)}, 0.1)
                 UpdateSlider()
             end
         end)
