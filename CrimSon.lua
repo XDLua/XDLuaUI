@@ -66,40 +66,6 @@ function XDLuaUI:CreateWindow(title)
     screenGui.Name = "XDLuaGUI"
     screenGui.IgnoreGuiInset = true
 
-    -- -- [Loading Frame Logic]
-    -- local loadingFrame = Instance.new("Frame", screenGui)
-    -- loadingFrame.Size = UDim2.new(0, 320, 0, 160)
-    -- loadingFrame.Position = UDim2.new(0.5, -160, 0.5, -80)
-    -- loadingFrame.BackgroundColor3 = Theme.Main
-    -- Instance.new("UICorner", loadingFrame).CornerRadius = Theme.Rounding
-    -- local loadStroke = Instance.new("UIStroke", loadingFrame)
-    -- loadStroke.Color = Theme.Accent
-    -- loadStroke.Thickness = 1.5
-
-    -- local titleLabel = Instance.new("TextLabel", loadingFrame)
-    -- titleLabel.Size = UDim2.new(1, 0, 0, 50)
-    -- titleLabel.Text = "CRIM SON SCRIPT"
-    -- titleLabel.TextColor3 = Theme.Accent
-    -- titleLabel.BackgroundTransparency = 1
-    -- titleLabel.Font = Enum.Font.GothamBlack
-    -- titleLabel.TextSize = 24
-
-    -- local barFrame = Instance.new("Frame", loadingFrame)
-    -- barFrame.Size = UDim2.new(0.8, 0, 0, 4)
-    -- barFrame.Position = UDim2.new(0.1, 0, 0.5, 10)
-    -- barFrame.BackgroundColor3 = Theme.Secondary
-    -- Instance.new("UICorner", barFrame).CornerRadius = UDim.new(1, 0)
-
-    -- local bar = Instance.new("Frame", barFrame)
-    -- bar.Size = UDim2.new(0, 0, 1, 0)
-    -- bar.BackgroundColor3 = Theme.Accent
-    -- Instance.new("UICorner", bar).CornerRadius = UDim.new(1, 0)
-
-    -- local barTween = ApplyTween(bar, {Size = UDim2.new(1, 0, 1, 0)}, 2.5)
-    -- barTween.Completed:Wait()
-    -- task.wait(0.5)
-    -- loadingFrame:Destroy()
-
     -- [Blur Effect เมื่อโหลด]
     local blur = Instance.new("BlurEffect", game.Lighting)
     blur.Size = 0
@@ -134,7 +100,7 @@ function XDLuaUI:CreateWindow(title)
     local statusLabel = Instance.new("TextLabel", loadingFrame)
     statusLabel.Size = UDim2.new(1, 0, 0, 20)
     statusLabel.Position = UDim2.new(0, 0, 0.5, 35)
-    statusLabel.Text = "Loading Resources..."
+    statusLabel.Text = "กำลังโหลด..."
     statusLabel.TextColor3 = Theme.TextDark
     statusLabel.TextTransparency = 1
     statusLabel.BackgroundTransparency = 1
@@ -172,15 +138,15 @@ function XDLuaUI:CreateWindow(title)
     -- เพิ่มลูกเล่นเปลี่ยนข้อความขณะโหลด
     task.spawn(function()
         task.wait(0.8)
-        statusLabel.Text = "Checking Version..."
+        statusLabel.Text = "กำลังเช็คเวอร์ชั่น..."
         task.wait(0.8)
-        statusLabel.Text = "Finalizing Assets..."
+        statusLabel.Text = "กำลังเตรียมพร้อม..."
     end)
 
     local barTween = ApplyTween(bar, {Size = UDim2.new(1, 0, 1, 0)}, 2.8)
     barTween.Completed:Wait()
     
-    statusLabel.Text = "Ready to Use!"
+    statusLabel.Text = "พร้อมใช้งาน !"
     task.wait(0.5)
 
     -- [Animation: Fade Out]
