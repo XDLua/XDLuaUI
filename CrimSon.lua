@@ -118,7 +118,7 @@ function XDLuaUI:CreateWindow(title)
     -- ส่วนแสดงรูปภาพ (ใส่ ID รูปของคุณที่นี่)
     local logoImage = Instance.new("ImageLabel", logoButton)
     logoImage.Name = "LogoImage"
-    logoImage.Size = UDim2.new(1, 0, 1, 0) -- ขนาดรูป 70% ของปุ่ม
+    logoImage.Size = UDim2.new(1, 0, 1, 0) -- ขนาดรูป
     logoImage.Position = UDim2.new(0.5, 0, 0.5, 0)
     logoImage.AnchorPoint = Vector2.new(0.5, 0.5)
     logoImage.BackgroundTransparency = 1
