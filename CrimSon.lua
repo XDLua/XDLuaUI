@@ -150,7 +150,7 @@ function XDLuaUI:CreateWindow(title)
     logoImage.Position = UDim2.new(0.5, 0, 0.5, 0)
     logoImage.AnchorPoint = Vector2.new(0.5, 0.5)
     logoImage.BackgroundTransparency = 1
-    logoImage.Image = "rbxassetid://118933158736973" -- ID รูปภาพของคุณ
+    logoImage.Image = "rbxassetid://6031075929" -- ID รูปภาพของคุณ
     logoImage.ImageColor3 = Color3.fromRGB(255, 255, 255) -- เปลี่ยนเป็น Theme.Accent ถ้าอยากให้รูปเปลี่ยนสีตามธีม
     logoImage.ScaleType = Enum.ScaleType.Fit
 
