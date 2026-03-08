@@ -100,34 +100,6 @@ function XDLuaUI:CreateWindow(title)
     task.wait(0.5)
     loadingFrame:Destroy()
 
-    -- -- [Logo & Main UI Setup]
-    -- local logoButton = Instance.new("TextButton", screenGui)
-    -- logoButton.Name = "LogoButton"
-    -- logoButton.Size = UDim2.new(0, 45, 0, 45)
-    -- logoButton.Position = UDim2.new(0.05, 0, 0.1, 0)
-    -- logoButton.BackgroundColor3 = Theme.Main
-    -- logoButton.Text = "🎯"
-    -- logoButton.TextSize = 24
-    -- logoButton.TextColor3 = Theme.Accent
-    -- logoButton.AutoButtonColor = false
-    -- logoButton.Active = true -- ต้องเปิด Active เพื่อให้รับ Input การลากได้
-    -- Instance.new("UICorner", logoButton).CornerRadius = UDim.new(0, 10)
-    -- local lStroke = Instance.new("UIStroke", logoButton)
-    -- lStroke.Color = Theme.Accent
-    -- lStroke.Thickness = 1.5
-
-    -- -- เรียกใช้ฟังก์ชันลาก (ส่งตัวมันเองเป็นทั้งตัวลากและตัวเคลื่อนที่)
-    -- MakeDraggable(logoButton, logoButton)
-
-    -- -- เอฟเฟกต์ Hover
-    -- logoButton.MouseEnter:Connect(function()
-    --     ApplyTween(logoButton, {Size = UDim2.new(0, 50, 0, 50), Rotation = 15}, 0.2)
-    -- end)
-
-    -- logoButton.MouseLeave:Connect(function()
-    --     ApplyTween(logoButton, {Size = UDim2.new(0, 45, 0, 45), Rotation = 0}, 0.2)
-    -- end)
-
     -- 2. Logo Button (เวอร์ชันใส่รูปภาพ + ลากได้สมบูรณ์)
     local logoButton = Instance.new("TextButton", screenGui)
     logoButton.Name = "LogoButton"
@@ -146,7 +118,7 @@ function XDLuaUI:CreateWindow(title)
     -- ส่วนแสดงรูปภาพ (ใส่ ID รูปของคุณที่นี่)
     local logoImage = Instance.new("ImageLabel", logoButton)
     logoImage.Name = "LogoImage"
-    logoImage.Size = UDim2.new(0.7, 0, 0.7, 0) -- ขนาดรูป 70% ของปุ่ม
+    logoImage.Size = UDim2.new(1, 0, 1, 0) -- ขนาดรูป 70% ของปุ่ม
     logoImage.Position = UDim2.new(0.5, 0, 0.5, 0)
     logoImage.AnchorPoint = Vector2.new(0.5, 0.5)
     logoImage.BackgroundTransparency = 1
@@ -160,12 +132,10 @@ function XDLuaUI:CreateWindow(title)
     -- เอฟเฟกต์เวลาเมาส์ชี้ (Hover)
     logoButton.MouseEnter:Connect(function()
         ApplyTween(logoButton, {Size = UDim2.new(0, 52, 0, 52)}, 0.2)
-        ApplyTween(logoImage, {Rotation = 90}, 0.3) -- รูปหมุนเท่ๆ
     end)
 
     logoButton.MouseLeave:Connect(function()
         ApplyTween(logoButton, {Size = UDim2.new(0, 45, 0, 45)}, 0.2)
-        ApplyTween(logoImage, {Rotation = 0}, 0.3)
     end)
 
     -- ระบบคลิก เปิด-ปิด
