@@ -405,43 +405,110 @@ function XDLuaUI:CreateWindow(title)
         end)
     end
 
-    function XDLuaUI:AddDropdown(parent, text, list, callback)
-        local dropped = false
-        local selectedItems = {}
+    -- function XDLuaUI:AddDropdown(parent, text, list, callback)
+    --     local dropped = false
+    --     local selectedItems = {}
         
-        local dropFrame = Instance.new("Frame", parent)
-        dropFrame.LayoutOrder = GetNextOrder(parent)
-        dropFrame.Size = UDim2.new(0.95, 0, 0, 35)
-        dropFrame.BackgroundColor3 = Theme.Main
-        dropFrame.ClipsDescendants = true
-        Instance.new("UICorner", dropFrame).CornerRadius = Theme.Rounding
-        Instance.new("UIStroke", dropFrame).Color = Theme.Stroke
+    --     local dropFrame = Instance.new("Frame", parent)
+    --     dropFrame.LayoutOrder = GetNextOrder(parent)
+    --     dropFrame.Size = UDim2.new(0.95, 0, 0, 35)
+    --     dropFrame.BackgroundColor3 = Theme.Main
+    --     dropFrame.ClipsDescendants = true
+    --     Instance.new("UICorner", dropFrame).CornerRadius = Theme.Rounding
+    --     Instance.new("UIStroke", dropFrame).Color = Theme.Stroke
 
-        local btn = Instance.new("TextButton", dropFrame)
-        btn.Size = UDim2.new(1, 0, 0, 35)
-        btn.BackgroundTransparency = 1
-        btn.Text = text .. "  ▼"
-        btn.TextColor3 = Theme.Text
-        btn.Font = Enum.Font.GothamMedium
-        btn.TextSize = 13
+    --     local btn = Instance.new("TextButton", dropFrame)
+    --     btn.Size = UDim2.new(1, 0, 0, 35)
+    --     btn.BackgroundTransparency = 1
+    --     btn.Text = text .. "  ▼"
+    --     btn.TextColor3 = Theme.Text
+    --     btn.Font = Enum.Font.GothamMedium
+    --     btn.TextSize = 13
 
-        local container = Instance.new("ScrollingFrame", dropFrame)
-        container.Size = UDim2.new(1, 0, 0, 120)
-        container.Position = UDim2.new(0, 0, 0, 35)
-        container.BackgroundTransparency = 1
-        container.ScrollBarThickness = 3
-        container.ScrollBarImageColor3 = Theme.Accent
-        container.CanvasSize = UDim2.new(0, 0, 0, #list * 30)
-        Instance.new("UIListLayout", container).SortOrder = Enum.SortOrder.LayoutOrder
+    --     local container = Instance.new("ScrollingFrame", dropFrame)
+    --     container.Size = UDim2.new(1, 0, 0, 120)
+    --     container.Position = UDim2.new(0, 0, 0, 35)
+    --     container.BackgroundTransparency = 1
+    --     container.ScrollBarThickness = 3
+    --     container.ScrollBarImageColor3 = Theme.Accent
+    --     container.CanvasSize = UDim2.new(0, 0, 0, #list * 30)
+    --     Instance.new("UIListLayout", container).SortOrder = Enum.SortOrder.LayoutOrder
 
-        btn.MouseButton1Click:Connect(function()
-            dropped = not dropped
-            local targetSize = dropped and UDim2.new(0.95, 0, 0, 155) or UDim2.new(0.95, 0, 0, 35)
-            ApplyTween(dropFrame, {Size = targetSize}, 0.2)
-            btn.Text = dropped and text .. "  ▲" or text .. "  ▼"
-        end)
+    --     btn.MouseButton1Click:Connect(function()
+    --         dropped = not dropped
+    --         local targetSize = dropped and UDim2.new(0.95, 0, 0, 155) or UDim2.new(0.95, 0, 0, 35)
+    --         ApplyTween(dropFrame, {Size = targetSize}, 0.2)
+    --         btn.Text = dropped and text .. "  ▲" or text .. "  ▼"
+    --     end)
 
-        for _, item in pairs(list) do
+    --     for _, item in pairs(list) do
+    --         local itemBtn = Instance.new("TextButton", container)
+    --         itemBtn.Size = UDim2.new(1, 0, 0, 30)
+    --         itemBtn.BackgroundTransparency = 1
+    --         itemBtn.Text = tostring(item)
+    --         itemBtn.TextColor3 = Theme.TextDark
+    --         itemBtn.Font = Enum.Font.Gotham
+    --         itemBtn.TextSize = 12
+
+    --         itemBtn.MouseButton1Click:Connect(function()
+    --             if selectedItems[item] then
+    --                 selectedItems[item] = nil
+    --                 ApplyTween(itemBtn, {TextColor3 = Theme.TextDark}, 0.2)
+    --             else
+    --                 selectedItems[item] = true
+    --                 ApplyTween(itemBtn, {TextColor3 = Theme.Accent}, 0.2)
+    --             end
+    --             local result = {}
+    --             for k, _ in pairs(selectedItems) do table.insert(result, k) end
+    --             btn.Text = #result == 0 and text .. "  ▲" or text .. " (" .. #result .. ")  ▲"
+    --             callback(result)
+    --         end)
+    --     end
+    -- end
+
+    function XDLuaUI:AddDropdown(parent, text, list, callback)
+    local dropped = false
+    local selectedItems = {}
+    local currentList = list
+    
+    local dropFrame = Instance.new("Frame", parent)
+    dropFrame.LayoutOrder = GetNextOrder(parent)
+    dropFrame.Size = UDim2.new(0.95, 0, 0, 35)
+    dropFrame.BackgroundColor3 = Theme.Main
+    dropFrame.ClipsDescendants = true
+    Instance.new("UICorner", dropFrame).CornerRadius = Theme.Rounding
+    local dStroke = Instance.new("UIStroke", dropFrame)
+    dStroke.Color = Theme.Stroke
+
+    local btn = Instance.new("TextButton", dropFrame)
+    btn.Size = UDim2.new(1, 0, 0, 35)
+    btn.BackgroundTransparency = 1
+    btn.Text = text .. "  ▼"
+    btn.TextColor3 = Theme.Text
+    btn.Font = Enum.Font.GothamMedium
+    btn.TextSize = 13
+
+    local container = Instance.new("ScrollingFrame", dropFrame)
+    container.Size = UDim2.new(1, 0, 0, 120)
+    container.Position = UDim2.new(0, 0, 0, 35)
+    container.BackgroundTransparency = 1
+    container.ScrollBarThickness = 3
+    container.ScrollBarImageColor3 = Theme.Accent
+    container.CanvasSize = UDim2.new(0, 0, 0, 0)
+    local layout = Instance.new("UIListLayout", container)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- ฟังก์ชันสร้างปุ่มรายการ (Internal)
+    local function CreateItems(items)
+        -- ล้างรายการเก่าออกก่อน
+        for _, child in pairs(container:GetChildren()) do
+            if child:IsA("TextButton") then child:Destroy() end
+        end
+        
+        selectedItems = {} -- รีเซ็ตค่าที่เลือกเมื่อมีการรีเฟรช (หรือจะไม่รีเซ็ตก็ได้แล้วแต่การใช้งาน)
+        btn.Text = text .. (dropped and "  ▲" or "  ▼")
+
+        for _, item in pairs(items) do
             local itemBtn = Instance.new("TextButton", container)
             itemBtn.Size = UDim2.new(1, 0, 0, 30)
             itemBtn.BackgroundTransparency = 1
@@ -458,13 +525,35 @@ function XDLuaUI:CreateWindow(title)
                     selectedItems[item] = true
                     ApplyTween(itemBtn, {TextColor3 = Theme.Accent}, 0.2)
                 end
+                
                 local result = {}
                 for k, _ in pairs(selectedItems) do table.insert(result, k) end
                 btn.Text = #result == 0 and text .. "  ▲" or text .. " (" .. #result .. ")  ▲"
                 callback(result)
             end)
         end
+        container.CanvasSize = UDim2.new(0, 0, 0, #items * 30)
     end
+
+    -- เริ่มต้นสร้างครั้งแรก
+    CreateItems(currentList)
+
+    btn.MouseButton1Click:Connect(function()
+        dropped = not dropped
+        local targetSize = dropped and UDim2.new(0.95, 0, 0, 155) or UDim2.new(0.95, 0, 0, 35)
+        ApplyTween(dropFrame, {Size = targetSize}, 0.2)
+        btn.Text = dropped and text .. "  ▲" or text .. "  ▼"
+    end)
+
+    -- ส่งฟังก์ชัน Refresh กลับไปให้ผู้ใช้เรียกใช้
+    local DropdownFuncs = {}
+    function DropdownFuncs:Refresh(newList)
+        currentList = newList
+        CreateItems(newList)
+    end
+    
+    return DropdownFuncs
+end
 
     logoButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
