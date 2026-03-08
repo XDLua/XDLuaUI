@@ -469,7 +469,7 @@ function XDLuaUI:CreateWindow(title)
     function XDLuaUI:AddDropdown(parent, text, list, callback)
     local dropped = false
     local selectedItems = {}
-    local currentList = list
+    local currentList = list or {}
     
     local dropFrame = Instance.new("Frame", parent)
     dropFrame.LayoutOrder = GetNextOrder(parent)
@@ -480,13 +480,28 @@ function XDLuaUI:CreateWindow(title)
     local dStroke = Instance.new("UIStroke", dropFrame)
     dStroke.Color = Theme.Stroke
 
+    -- ปุ่มหลัก (สำหรับคลิกเปิด/ปิด)
     local btn = Instance.new("TextButton", dropFrame)
-    btn.Size = UDim2.new(1, 0, 0, 35)
+    btn.Size = UDim2.new(1, -35, 0, 35) -- เว้นที่ไว้ให้ปุ่ม Refresh
     btn.BackgroundTransparency = 1
     btn.Text = text .. "  ▼"
     btn.TextColor3 = Theme.Text
     btn.Font = Enum.Font.GothamMedium
     btn.TextSize = 13
+    btn.TextXAlignment = Enum.TextXAlignment.Center
+
+    -- [NEW] ปุ่ม Refresh (🔄)
+    local refreshBtn = Instance.new("TextButton", dropFrame)
+    refreshBtn.Size = UDim2.new(0, 30, 0, 30)
+    refreshBtn.Position = UDim2.new(1, -32, 0, 2.5)
+    refreshBtn.BackgroundColor3 = Theme.Secondary
+    refreshBtn.Text = "🔄"
+    refreshBtn.TextColor3 = Theme.Accent
+    refreshBtn.TextSize = 14
+    Instance.new("UICorner", refreshBtn).CornerRadius = UDim.new(0, 4)
+    local rStroke = Instance.new("UIStroke", refreshBtn)
+    rStroke.Color = Theme.Stroke
+    rStroke.Thickness = 0.5
 
     local container = Instance.new("ScrollingFrame", dropFrame)
     container.Size = UDim2.new(1, 0, 0, 120)
@@ -494,26 +509,21 @@ function XDLuaUI:CreateWindow(title)
     container.BackgroundTransparency = 1
     container.ScrollBarThickness = 3
     container.ScrollBarImageColor3 = Theme.Accent
-    container.CanvasSize = UDim2.new(0, 0, 0, 0)
     local layout = Instance.new("UIListLayout", container)
     layout.SortOrder = Enum.SortOrder.LayoutOrder
 
-    -- ฟังก์ชันสร้างปุ่มรายการ (Internal)
+    -- ฟังก์ชันสร้างรายการภายใน
     local function CreateItems(items)
-        -- ล้างรายการเก่าออกก่อน
         for _, child in pairs(container:GetChildren()) do
             if child:IsA("TextButton") then child:Destroy() end
         end
         
-        selectedItems = {} -- รีเซ็ตค่าที่เลือกเมื่อมีการรีเฟรช (หรือจะไม่รีเซ็ตก็ได้แล้วแต่การใช้งาน)
-        btn.Text = text .. (dropped and "  ▲" or "  ▼")
-
         for _, item in pairs(items) do
             local itemBtn = Instance.new("TextButton", container)
             itemBtn.Size = UDim2.new(1, 0, 0, 30)
             itemBtn.BackgroundTransparency = 1
             itemBtn.Text = tostring(item)
-            itemBtn.TextColor3 = Theme.TextDark
+            itemBtn.TextColor3 = selectedItems[item] and Theme.Accent or Theme.TextDark
             itemBtn.Font = Enum.Font.Gotham
             itemBtn.TextSize = 12
 
@@ -528,7 +538,7 @@ function XDLuaUI:CreateWindow(title)
                 
                 local result = {}
                 for k, _ in pairs(selectedItems) do table.insert(result, k) end
-                btn.Text = #result == 0 and text .. "  ▲" or text .. " (" .. #result .. ")  ▲"
+                btn.Text = #result == 0 and text .. "  " .. (dropped and "▲" or "▼") or text .. " (" .. #result .. ")  " .. (dropped and "▲" or "▼")
                 callback(result)
             end)
         end
@@ -538,6 +548,7 @@ function XDLuaUI:CreateWindow(title)
     -- เริ่มต้นสร้างครั้งแรก
     CreateItems(currentList)
 
+    -- คลิกเปิด/ปิด
     btn.MouseButton1Click:Connect(function()
         dropped = not dropped
         local targetSize = dropped and UDim2.new(0.95, 0, 0, 155) or UDim2.new(0.95, 0, 0, 35)
@@ -545,13 +556,27 @@ function XDLuaUI:CreateWindow(title)
         btn.Text = dropped and text .. "  ▲" or text .. "  ▼"
     end)
 
-    -- ส่งฟังก์ชัน Refresh กลับไปให้ผู้ใช้เรียกใช้
+    -- คลิก Refresh (Manual)
+    refreshBtn.MouseButton1Click:Connect(function()
+        ApplyTween(refreshBtn, {Rotation = refreshBtn.Rotation + 360}, 0.5) -- เอฟเฟกต์หมุนปุ่ม
+        -- ตรงนี้เราสามารถส่ง callback พิเศษออกไปเพื่อให้ผู้ใช้ Update list เองได้ถ้าต้องการ
+        -- แต่ในเบื้องต้นจะใช้การสั่งผ่าน DropdownFuncs:Refresh() จากด้านนอก
+        CreateItems(currentList) 
+    end)
+
+    -- ส่งฟังก์ชันออกไปใช้งาน
     local DropdownFuncs = {}
     function DropdownFuncs:Refresh(newList)
-        currentList = newList
-        CreateItems(newList)
+        currentList = newList or {}
+        CreateItems(currentList)
     end
     
+    function DropdownFuncs:Clear()
+        selectedItems = {}
+        CreateItems(currentList)
+        btn.Text = text .. "  " .. (dropped and "▲" or "▼")
+    end
+
     return DropdownFuncs
 end
 
