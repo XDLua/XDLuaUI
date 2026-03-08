@@ -66,28 +66,87 @@ function XDLuaUI:CreateWindow(title)
     screenGui.Name = "XDLuaGUI"
     screenGui.IgnoreGuiInset = true
 
-    -- [Loading Frame Logic]
+    -- -- [Loading Frame Logic]
+    -- local loadingFrame = Instance.new("Frame", screenGui)
+    -- loadingFrame.Size = UDim2.new(0, 320, 0, 160)
+    -- loadingFrame.Position = UDim2.new(0.5, -160, 0.5, -80)
+    -- loadingFrame.BackgroundColor3 = Theme.Main
+    -- Instance.new("UICorner", loadingFrame).CornerRadius = Theme.Rounding
+    -- local loadStroke = Instance.new("UIStroke", loadingFrame)
+    -- loadStroke.Color = Theme.Accent
+    -- loadStroke.Thickness = 1.5
+
+    -- local titleLabel = Instance.new("TextLabel", loadingFrame)
+    -- titleLabel.Size = UDim2.new(1, 0, 0, 50)
+    -- titleLabel.Text = "CRIM SON SCRIPT"
+    -- titleLabel.TextColor3 = Theme.Accent
+    -- titleLabel.BackgroundTransparency = 1
+    -- titleLabel.Font = Enum.Font.GothamBlack
+    -- titleLabel.TextSize = 24
+
+    -- local barFrame = Instance.new("Frame", loadingFrame)
+    -- barFrame.Size = UDim2.new(0.8, 0, 0, 4)
+    -- barFrame.Position = UDim2.new(0.1, 0, 0.5, 10)
+    -- barFrame.BackgroundColor3 = Theme.Secondary
+    -- Instance.new("UICorner", barFrame).CornerRadius = UDim.new(1, 0)
+
+    -- local bar = Instance.new("Frame", barFrame)
+    -- bar.Size = UDim2.new(0, 0, 1, 0)
+    -- bar.BackgroundColor3 = Theme.Accent
+    -- Instance.new("UICorner", bar).CornerRadius = UDim.new(1, 0)
+
+    -- local barTween = ApplyTween(bar, {Size = UDim2.new(1, 0, 1, 0)}, 2.5)
+    -- barTween.Completed:Wait()
+    -- task.wait(0.5)
+    -- loadingFrame:Destroy()
+
+    -- [Blur Effect เมื่อโหลด]
+    local blur = Instance.new("BlurEffect", game.Lighting)
+    blur.Size = 0
+    ApplyTween(blur, {Size = 20}, 0.5)
+
+    -- [Loading Frame Setup]
     local loadingFrame = Instance.new("Frame", screenGui)
-    loadingFrame.Size = UDim2.new(0, 320, 0, 160)
-    loadingFrame.Position = UDim2.new(0.5, -160, 0.5, -80)
+    loadingFrame.Size = UDim2.new(0, 350, 0, 180) -- ขนาดใหญ่ขึ้นเล็กน้อยให้ดูไม่อึดอัด
+    loadingFrame.Position = UDim2.new(0.5, -175, 0.5, -90)
     loadingFrame.BackgroundColor3 = Theme.Main
+    loadingFrame.BackgroundTransparency = 1 -- เริ่มต้นที่โปร่งใสเพื่อทำ Fade In
     Instance.new("UICorner", loadingFrame).CornerRadius = Theme.Rounding
+    
     local loadStroke = Instance.new("UIStroke", loadingFrame)
     loadStroke.Color = Theme.Accent
-    loadStroke.Thickness = 1.5
+    loadStroke.Thickness = 2
+    loadStroke.Transparency = 1
 
+    -- ข้อความหัวข้อ
     local titleLabel = Instance.new("TextLabel", loadingFrame)
-    titleLabel.Size = UDim2.new(1, 0, 0, 50)
-    titleLabel.Text = "CRIM SON SCRIPT"
+    titleLabel.Size = UDim2.new(1, 0, 0, 60)
+    titleLabel.Position = UDim2.new(0, 0, 0, 20)
+    titleLabel.Text = "CRIMSON SCRIPT"
     titleLabel.TextColor3 = Theme.Accent
+    titleLabel.TextTransparency = 1
     titleLabel.BackgroundTransparency = 1
     titleLabel.Font = Enum.Font.GothamBlack
-    titleLabel.TextSize = 24
+    titleLabel.TextSize = 28
+    titleLabel.ZIndex = 2
 
+    -- ข้อความสถานะด้านล่าง Bar
+    local statusLabel = Instance.new("TextLabel", loadingFrame)
+    statusLabel.Size = UDim2.new(1, 0, 0, 20)
+    statusLabel.Position = UDim2.new(0, 0, 0.5, 35)
+    statusLabel.Text = "Loading Resources..."
+    statusLabel.TextColor3 = Theme.TextDark
+    statusLabel.TextTransparency = 1
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.Font = Enum.Font.GothamMedium
+    statusLabel.TextSize = 12
+
+    -- โครงสร้าง Loading Bar
     local barFrame = Instance.new("Frame", loadingFrame)
-    barFrame.Size = UDim2.new(0.8, 0, 0, 4)
-    barFrame.Position = UDim2.new(0.1, 0, 0.5, 10)
+    barFrame.Size = UDim2.new(0.8, 0, 0, 6)
+    barFrame.Position = UDim2.new(0.1, 0, 0.5, 20)
     barFrame.BackgroundColor3 = Theme.Secondary
+    barFrame.BackgroundTransparency = 1
     Instance.new("UICorner", barFrame).CornerRadius = UDim.new(1, 0)
 
     local bar = Instance.new("Frame", barFrame)
@@ -95,9 +154,46 @@ function XDLuaUI:CreateWindow(title)
     bar.BackgroundColor3 = Theme.Accent
     Instance.new("UICorner", bar).CornerRadius = UDim.new(1, 0)
 
-    local barTween = ApplyTween(bar, {Size = UDim2.new(1, 0, 1, 0)}, 2.5)
+    -- เพิ่มเงาเรืองแสงให้ Bar (ทำจาก UIStroke บางๆ)
+    local barGlow = Instance.new("UIStroke", bar)
+    barGlow.Color = Theme.Accent
+    barGlow.Thickness = 2
+    barGlow.Transparency = 0.6
+
+    -- [Animation: Fade In]
+    ApplyTween(loadingFrame, {BackgroundTransparency = 0}, 0.5)
+    ApplyTween(loadStroke, {Transparency = 0}, 0.5)
+    ApplyTween(titleLabel, {TextTransparency = 0}, 0.5)
+    ApplyTween(statusLabel, {TextTransparency = 0}, 0.5)
+    ApplyTween(barFrame, {BackgroundTransparency = 0}, 0.5)
+    task.wait(0.6)
+
+    -- [Animation: Progress Bar]
+    -- เพิ่มลูกเล่นเปลี่ยนข้อความขณะโหลด
+    task.spawn(function()
+        task.wait(0.8)
+        statusLabel.Text = "Checking Version..."
+        task.wait(0.8)
+        statusLabel.Text = "Finalizing Assets..."
+    end)
+
+    local barTween = ApplyTween(bar, {Size = UDim2.new(1, 0, 1, 0)}, 2.8)
     barTween.Completed:Wait()
+    
+    statusLabel.Text = "Ready to Use!"
     task.wait(0.5)
+
+    -- [Animation: Fade Out]
+    ApplyTween(loadingFrame, {BackgroundTransparency = 1}, 0.5)
+    ApplyTween(loadStroke, {Transparency = 1}, 0.5)
+    ApplyTween(titleLabel, {TextTransparency = 1}, 0.5)
+    ApplyTween(statusLabel, {TextTransparency = 1}, 0.5)
+    ApplyTween(barFrame, {BackgroundTransparency = 1}, 0.5)
+    ApplyTween(bar, {BackgroundTransparency = 1}, 0.5)
+    ApplyTween(blur, {Size = 0}, 0.5)
+    
+    task.wait(0.5)
+    blur:Destroy()
     loadingFrame:Destroy()
 
     -- 2. Logo Button (เวอร์ชันใส่รูปภาพ + ลากได้สมบูรณ์)
@@ -405,67 +501,6 @@ function XDLuaUI:CreateWindow(title)
         end)
     end
 
-    -- function XDLuaUI:AddDropdown(parent, text, list, callback)
-    --     local dropped = false
-    --     local selectedItems = {}
-        
-    --     local dropFrame = Instance.new("Frame", parent)
-    --     dropFrame.LayoutOrder = GetNextOrder(parent)
-    --     dropFrame.Size = UDim2.new(0.95, 0, 0, 35)
-    --     dropFrame.BackgroundColor3 = Theme.Main
-    --     dropFrame.ClipsDescendants = true
-    --     Instance.new("UICorner", dropFrame).CornerRadius = Theme.Rounding
-    --     Instance.new("UIStroke", dropFrame).Color = Theme.Stroke
-
-    --     local btn = Instance.new("TextButton", dropFrame)
-    --     btn.Size = UDim2.new(1, 0, 0, 35)
-    --     btn.BackgroundTransparency = 1
-    --     btn.Text = text .. "  ▼"
-    --     btn.TextColor3 = Theme.Text
-    --     btn.Font = Enum.Font.GothamMedium
-    --     btn.TextSize = 13
-
-    --     local container = Instance.new("ScrollingFrame", dropFrame)
-    --     container.Size = UDim2.new(1, 0, 0, 120)
-    --     container.Position = UDim2.new(0, 0, 0, 35)
-    --     container.BackgroundTransparency = 1
-    --     container.ScrollBarThickness = 3
-    --     container.ScrollBarImageColor3 = Theme.Accent
-    --     container.CanvasSize = UDim2.new(0, 0, 0, #list * 30)
-    --     Instance.new("UIListLayout", container).SortOrder = Enum.SortOrder.LayoutOrder
-
-    --     btn.MouseButton1Click:Connect(function()
-    --         dropped = not dropped
-    --         local targetSize = dropped and UDim2.new(0.95, 0, 0, 155) or UDim2.new(0.95, 0, 0, 35)
-    --         ApplyTween(dropFrame, {Size = targetSize}, 0.2)
-    --         btn.Text = dropped and text .. "  ▲" or text .. "  ▼"
-    --     end)
-
-    --     for _, item in pairs(list) do
-    --         local itemBtn = Instance.new("TextButton", container)
-    --         itemBtn.Size = UDim2.new(1, 0, 0, 30)
-    --         itemBtn.BackgroundTransparency = 1
-    --         itemBtn.Text = tostring(item)
-    --         itemBtn.TextColor3 = Theme.TextDark
-    --         itemBtn.Font = Enum.Font.Gotham
-    --         itemBtn.TextSize = 12
-
-    --         itemBtn.MouseButton1Click:Connect(function()
-    --             if selectedItems[item] then
-    --                 selectedItems[item] = nil
-    --                 ApplyTween(itemBtn, {TextColor3 = Theme.TextDark}, 0.2)
-    --             else
-    --                 selectedItems[item] = true
-    --                 ApplyTween(itemBtn, {TextColor3 = Theme.Accent}, 0.2)
-    --             end
-    --             local result = {}
-    --             for k, _ in pairs(selectedItems) do table.insert(result, k) end
-    --             btn.Text = #result == 0 and text .. "  ▲" or text .. " (" .. #result .. ")  ▲"
-    --             callback(result)
-    --         end)
-    --     end
-    -- end
-
     function XDLuaUI:AddDropdown(parent, text, list, callback)
     local dropped = false
     local selectedItems = {}
@@ -490,7 +525,7 @@ function XDLuaUI:CreateWindow(title)
     btn.TextSize = 13
     btn.TextXAlignment = Enum.TextXAlignment.Center
 
-    -- [NEW] ปุ่ม Refresh (🔄)
+    -- ปุ่ม Refresh (🔄)
     local refreshBtn = Instance.new("TextButton", dropFrame)
     refreshBtn.Size = UDim2.new(0, 30, 0, 30)
     refreshBtn.Position = UDim2.new(1, -32, 0, 2.5)
