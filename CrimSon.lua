@@ -571,6 +571,14 @@ function XDLuaUI:CreateWindow(title)
         currentList = newList or {}
         CreateItems(currentList)
     end
+
+    function DropdownFuncs:Set(val)
+        selectedItems = {} -- ล้างค่าเก่า
+        selectedItems[val] = true -- เลือกค่าใหม่
+        CreateItems(currentList) -- รีเฟรชหน้าตาปุ่ม
+        btn.Text = text .. " (1)  " .. (dropped and "▲" or "▼")
+        callback({val}) -- รันโค้ดของ Dropdown นั้นๆ
+    end
     
     function DropdownFuncs:Clear()
         selectedItems = {}
@@ -579,6 +587,64 @@ function XDLuaUI:CreateWindow(title)
     end
 
     return DropdownFuncs
+end
+
+    function XDLuaUI:AddDropdownBind(parent, dropdownFunc, text, defaultKey, targetValue)
+    self:AddKeybind(parent, text .. " (" .. tostring(targetValue) .. ")", defaultKey, function()
+        -- สั่งเปลี่ยนค่าใน Dropdown ทันที
+        dropdownFunc:Set(targetValue) 
+    end)
+end
+
+    function XDLuaUI:AddKeybind(parent, text, defaultKey, callback)
+    local currentKey = defaultKey.Name
+    local binding = false
+
+    local bindFrame = Instance.new("Frame", parent)
+    bindFrame.LayoutOrder = GetNextOrder(parent)
+    bindFrame.Size = UDim2.new(0.95, 0, 0, 35)
+    bindFrame.BackgroundColor3 = Theme.Main
+    Instance.new("UICorner", bindFrame).CornerRadius = Theme.Rounding
+    Instance.new("UIStroke", bindFrame).Color = Theme.Stroke
+
+    local label = Instance.new("TextLabel", bindFrame)
+    label.Size = UDim2.new(1, -70, 1, 0)
+    label.Position = UDim2.new(0, 12, 0, 0)
+    label.Text = text
+    label.TextColor3 = Theme.TextDark
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.BackgroundTransparency = 1
+    label.Font = Enum.Font.GothamMedium
+    label.TextSize = 13
+
+    local bindBtn = Instance.new("TextButton", bindFrame)
+    bindBtn.Size = UDim2.new(0, 60, 0, 24)
+    bindBtn.Position = UDim2.new(1, -65, 0.5, -12)
+    bindBtn.BackgroundColor3 = Theme.Secondary
+    bindBtn.Text = currentKey
+    bindBtn.TextColor3 = Theme.Accent
+    bindBtn.Font = Enum.Font.GothamBold
+    bindBtn.TextSize = 12
+    Instance.new("UICorner", bindBtn).CornerRadius = UDim.new(0, 4)
+
+    bindBtn.MouseButton1Click:Connect(function()
+        binding = true
+        bindBtn.Text = "..."
+    end)
+
+    UserInputService.InputBegan:Connect(function(input, gpe)
+        if gpe then return end
+        if binding then
+            if input.UserInputType == Enum.UserInputType.Keyboard then
+                currentKey = input.KeyCode.Name
+                bindBtn.Text = currentKey
+                binding = false
+                callback(input.KeyCode)
+            end
+        elseif input.KeyCode.Name == currentKey then
+            callback(input.KeyCode)
+        end
+    end)
 end
 
     logoButton.MouseButton1Click:Connect(function()
