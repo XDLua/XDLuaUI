@@ -27,31 +27,37 @@ local function ApplyTween(obj, goal, duration)
     return tween
 end
 
-local function MakeDraggable(dragPart, mainFrame)
+local function MakeDraggable(dragPart, moveTarget)
     local dragging, dragInput, dragStart, startPos
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        moveTarget.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+
     dragPart.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
-            startPos = mainFrame.Position
+            startPos = moveTarget.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
         end
     end)
-    dragPart.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = false
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
+
+    dragPart.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
     end)
-    RunService.RenderStepped:Connect(function()
-        if dragging and dragInput then
-            local delta = dragInput.Position - dragStart
-            ApplyTween(mainFrame, {
-                Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-            }, 0.1)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input == dragInput) then
+            update(input)
         end
     end)
 end
@@ -65,6 +71,7 @@ function XDLuaUI:CreateWindow(title)
     local screenGui = Instance.new("ScreenGui", CoreGui)
     screenGui.Name = "XDLuaGUI"
     screenGui.IgnoreGuiInset = true
+    screenGui.ResetOnSpawn = false
 
     -- [Blur Effect เมื่อโหลด]
     local blur = Instance.new("BlurEffect", game.Lighting)
@@ -213,18 +220,18 @@ function XDLuaUI:CreateWindow(title)
     Instance.new("UIStroke", mainFrame).Color = Theme.Stroke
 
     local dragHandle = Instance.new("Frame", mainFrame)
-    dragHandle.Size = UDim2.new(1, 0, 0, 45)
+    dragHandle.Size = UDim2.new(1, 0, 0, 40)
     dragHandle.BackgroundTransparency = 1
     MakeDraggable(dragHandle, mainFrame)
 
     local topTitle = Instance.new("TextLabel", mainFrame)
-    topTitle.Size = UDim2.new(1, -80, 0, 45)
+    topTitle.Size = UDim2.new(1, -50, 0, 40)
     topTitle.Position = UDim2.new(0, 15, 0, 0)
-    topTitle.Text = title or "XDLua Professional"
+    topTitle.Text = title or "CRIMSON SCRIPT"
     topTitle.TextColor3 = Theme.Accent
-    topTitle.TextXAlignment = Enum.TextXAlignment.Left
     topTitle.Font = Enum.Font.GothamBold
-    topTitle.TextSize = 18
+    topTitle.TextSize = 16
+    topTitle.TextXAlignment = Enum.TextXAlignment.Left
     topTitle.BackgroundTransparency = 1
 
     local closeBtn = Instance.new("TextButton", mainFrame)
@@ -246,10 +253,10 @@ function XDLuaUI:CreateWindow(title)
     tabLayout.Padding = UDim.new(0, 5)
 
     local contentHolder = Instance.new("Frame", mainFrame)
-    contentHolder.Size = UDim2.new(1, -160, 1, -60)
-    contentHolder.Position = UDim2.new(0, 150, 0, 50)
+    contentHolder.Size = UDim2.new(1, -20, 1, -60)
+    contentHolder.Position = UDim2.new(0, 10, 0, 50)
     contentHolder.BackgroundColor3 = Theme.Secondary
-    Instance.new("UICorner", contentHolder).CornerRadius = Theme.Rounding
+    Instance.new("UICorner", contentHolder)
 
     local tabs = {}
     local selectedTab = nil
@@ -414,56 +421,58 @@ function XDLuaUI:CreateWindow(title)
 
     function XDLuaUI:AddSlider(parent, text, min, max, default, callback)
         local sliderFrame = Instance.new("Frame", parent)
-        sliderFrame.LayoutOrder = GetNextOrder(parent)
         sliderFrame.Size = UDim2.new(0.95, 0, 0, 50)
         sliderFrame.BackgroundColor3 = Theme.Main
-        Instance.new("UICorner", sliderFrame).CornerRadius = Theme.Rounding
-        Instance.new("UIStroke", sliderFrame).Color = Theme.Stroke
+        Instance.new("UICorner", sliderFrame)
 
         local label = Instance.new("TextLabel", sliderFrame)
-        label.Size = UDim2.new(1, -20, 0, 20)
-        label.Position = UDim2.new(0, 10, 0, 5)
+        label.Size = UDim2.new(1, -20, 0, 25)
+        label.Position = UDim2.new(0, 10, 0, 0)
         label.Text = text .. " : " .. default
         label.TextColor3 = Theme.TextDark
         label.BackgroundTransparency = 1
         label.Font = Enum.Font.GothamMedium
-        label.TextSize = 13
+        label.TextSize = 12
         label.TextXAlignment = Enum.TextXAlignment.Left
 
         local barBg = Instance.new("Frame", sliderFrame)
-        barBg.Size = UDim2.new(1, -30, 0, 6)
-        barBg.Position = UDim2.new(0, 15, 0, 32)
+        barBg.Size = UDim2.new(0.9, 0, 0, 6)
+        barBg.Position = UDim2.new(0.05, 0, 0.7, 0)
         barBg.BackgroundColor3 = Theme.Secondary
-        Instance.new("UICorner", barBg).CornerRadius = UDim.new(1, 0)
+        Instance.new("UICorner", barBg)
 
         local barFill = Instance.new("Frame", barBg)
         barFill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
         barFill.BackgroundColor3 = Theme.Accent
-        Instance.new("UICorner", barFill).CornerRadius = UDim.new(1, 0)
+        Instance.new("UICorner", barFill)
 
         local dragging = false
-        local function UpdateSlider()
-            local mousePos = UserInputService:GetMouseLocation().X
-            local barPos = barBg.AbsolutePosition.X
-            local barSize = barBg.AbsoluteSize.X
-            local percent = math.clamp((mousePos - barPos) / barSize, 0, 1)
-            local value = math.floor(min + (max - min) * percent)
-            ApplyTween(barFill, {Size = UDim2.new(percent, 0, 1, 0)}, 0.1)
-            label.Text = text .. " : " .. value
-            callback(value)
+
+        local function move(input)
+            local pos = math.clamp((input.Position.X - barBg.AbsolutePosition.X) / barBg.AbsoluteSize.X, 0, 1)
+            local val = math.floor(min + (max - min) * pos)
+            barFill.Size = UDim2.new(pos, 0, 1, 0)
+            label.Text = text .. " : " .. val
+            callback(val)
         end
 
         barBg.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 dragging = true
-                UpdateSlider()
+                move(input)
             end
         end)
+
         UserInputService.InputEnded:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                dragging = false
+            end
         end)
+
         UserInputService.InputChanged:Connect(function(input)
-            if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then UpdateSlider() end
+            if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                move(input)
+            end
         end)
     end
 
