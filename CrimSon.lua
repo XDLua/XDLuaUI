@@ -27,13 +27,13 @@ local function ApplyTween(obj, goal, duration)
     return tween
 end
 
-local function MakeDraggable(dragPart, moveTarget)
+local function MakeDraggable(dragPart, mainFrame)
     local dragging, dragInput, dragStart, startPos
     dragPart.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
             dragStart = input.Position
-            startPos = moveTarget.Position
+            startPos = mainFrame.Position
         end
     end)
     dragPart.InputEnded:Connect(function(input)
@@ -49,22 +49,11 @@ local function MakeDraggable(dragPart, moveTarget)
     RunService.RenderStepped:Connect(function()
         if dragging and dragInput then
             local delta = dragInput.Position - dragStart
-            ApplyTween(moveTarget, {
+            ApplyTween(mainFrame, {
                 Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
             }, 0.1)
         end
     end)
-end
-
--- ฟังก์ชันนับลำดับสำหรับการวาง UI
-local function GetNextOrder(parent)
-    local count = 0
-    for _, v in pairs(parent:GetChildren()) do
-        if not v:IsA("UIListLayout") and not v:IsA("UIPadding") and not v:IsA("UICorner") and not v:IsA("UIStroke") then
-            count = count + 1
-        end
-    end
-    return count
 end
 
 -- [Main Library Function]
@@ -73,53 +62,21 @@ function XDLuaUI:CreateWindow(title)
         CoreGui:FindFirstChild("XDLuaGUI"):Destroy()
     end
 
-    local Window = {} -- สร้าง Object สำหรับหน้าต่างนี้โดยเฉพาะ
-    
     local screenGui = Instance.new("ScreenGui", CoreGui)
     screenGui.Name = "XDLuaGUI"
     screenGui.IgnoreGuiInset = true
 
-    -- 1. สร้าง Main Frame (แต่ซ่อนไว้ก่อนจนกว่าจะโหลดเสร็จ)
-    local mainFrame = Instance.new("Frame", screenGui)
-    mainFrame.Size = UDim2.new(0, 500, 0, 340)
-    mainFrame.Position = UDim2.new(0.5, -250, 0.5, -170)
-    mainFrame.BackgroundColor3 = Theme.Main
-    mainFrame.Visible = false
-    Instance.new("UICorner", mainFrame).CornerRadius = Theme.Rounding
-    Instance.new("UIStroke", mainFrame).Color = Theme.Stroke
-
-    -- 2. สร้าง Logo Button (ซ่อนไว้ก่อน)
-    local logoButton = Instance.new("TextButton", screenGui)
-    logoButton.Name = "LogoButton"
-    logoButton.Size = UDim2.new(0, 45, 0, 45)
-    logoButton.Position = UDim2.new(0.05, 0, 0.1, 0)
-    logoButton.BackgroundColor3 = Theme.Main
-    logoButton.Text = ""
-    logoButton.AutoButtonColor = false
-    logoButton.Visible = false
-    logoButton.Active = true 
-    Instance.new("UICorner", logoButton).CornerRadius = UDim.new(0, 10)
-    Instance.new("UIStroke", logoButton).Color = Theme.Accent
-    Instance.new("UIStroke", logoButton).Thickness = 1.5
-
-    local logoImage = Instance.new("ImageLabel", logoButton)
-    logoImage.Size = UDim2.new(1, 0, 1, 0)
-    logoImage.Position = UDim2.new(0.5, 0, 0.5, 0)
-    logoImage.AnchorPoint = Vector2.new(0.5, 0.5)
-    logoImage.BackgroundTransparency = 1
-    logoImage.Image = "rbxassetid://111935661110067"
-    logoImage.ScaleType = Enum.ScaleType.Fit
-
-    -- 3. [ระบบ Loading Screen]
+    -- [Blur Effect เมื่อโหลด]
     local blur = Instance.new("BlurEffect", game.Lighting)
     blur.Size = 0
     ApplyTween(blur, {Size = 20}, 0.5)
 
+    -- [Loading Frame Setup]
     local loadingFrame = Instance.new("Frame", screenGui)
-    loadingFrame.Size = UDim2.new(0, 350, 0, 180)
+    loadingFrame.Size = UDim2.new(0, 350, 0, 180) -- ขนาดใหญ่ขึ้นเล็กน้อยให้ดูไม่อึดอัด
     loadingFrame.Position = UDim2.new(0.5, -175, 0.5, -90)
     loadingFrame.BackgroundColor3 = Theme.Main
-    loadingFrame.BackgroundTransparency = 1
+    loadingFrame.BackgroundTransparency = 1 -- เริ่มต้นที่โปร่งใสเพื่อทำ Fade In
     Instance.new("UICorner", loadingFrame).CornerRadius = Theme.Rounding
     
     local loadStroke = Instance.new("UIStroke", loadingFrame)
@@ -127,6 +84,7 @@ function XDLuaUI:CreateWindow(title)
     loadStroke.Thickness = 2
     loadStroke.Transparency = 1
 
+    -- ข้อความหัวข้อ
     local titleLabel = Instance.new("TextLabel", loadingFrame)
     titleLabel.Size = UDim2.new(1, 0, 0, 60)
     titleLabel.Position = UDim2.new(0, 0, 0, 20)
@@ -136,7 +94,9 @@ function XDLuaUI:CreateWindow(title)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Font = Enum.Font.GothamBlack
     titleLabel.TextSize = 28
+    titleLabel.ZIndex = 2
 
+    -- ข้อความสถานะด้านล่าง Bar
     local statusLabel = Instance.new("TextLabel", loadingFrame)
     statusLabel.Size = UDim2.new(1, 0, 0, 20)
     statusLabel.Position = UDim2.new(0, 0, 0.5, 35)
@@ -147,6 +107,7 @@ function XDLuaUI:CreateWindow(title)
     statusLabel.Font = Enum.Font.GothamMedium
     statusLabel.TextSize = 12
 
+    -- โครงสร้าง Loading Bar
     local barFrame = Instance.new("Frame", loadingFrame)
     barFrame.Size = UDim2.new(0.8, 0, 0, 6)
     barFrame.Position = UDim2.new(0.1, 0, 0.5, 20)
@@ -158,13 +119,14 @@ function XDLuaUI:CreateWindow(title)
     bar.Size = UDim2.new(0, 0, 1, 0)
     bar.BackgroundColor3 = Theme.Accent
     Instance.new("UICorner", bar).CornerRadius = UDim.new(1, 0)
-    
+
+    -- เพิ่มเงาเรืองแสงให้ Bar (ทำจาก UIStroke บางๆ)
     local barGlow = Instance.new("UIStroke", bar)
     barGlow.Color = Theme.Accent
     barGlow.Thickness = 2
     barGlow.Transparency = 0.6
 
-    -- รัน Animation โหลด
+    -- [Animation: Fade In]
     ApplyTween(loadingFrame, {BackgroundTransparency = 0}, 0.5)
     ApplyTween(loadStroke, {Transparency = 0}, 0.5)
     ApplyTween(titleLabel, {TextTransparency = 0}, 0.5)
@@ -172,17 +134,22 @@ function XDLuaUI:CreateWindow(title)
     ApplyTween(barFrame, {BackgroundTransparency = 0}, 0.5)
     task.wait(0.6)
 
+    -- [Animation: Progress Bar]
+    -- เพิ่มลูกเล่นเปลี่ยนข้อความขณะโหลด
     task.spawn(function()
-        task.wait(0.8) statusLabel.Text = "กำลังเช็คเวอร์ชั่น..."
-        task.wait(0.8) statusLabel.Text = "กำลังเตรียมพร้อม..."
+        task.wait(0.8)
+        statusLabel.Text = "กำลังเช็คเวอร์ชั่น..."
+        task.wait(0.8)
+        statusLabel.Text = "กำลังเตรียมพร้อม..."
     end)
 
     local barTween = ApplyTween(bar, {Size = UDim2.new(1, 0, 1, 0)}, 2.8)
     barTween.Completed:Wait()
+    
     statusLabel.Text = "พร้อมใช้งาน !"
     task.wait(0.5)
 
-    -- จบการโหลด, นำ UI ขึ้นมาโชว์
+    -- [Animation: Fade Out]
     ApplyTween(loadingFrame, {BackgroundTransparency = 1}, 0.5)
     ApplyTween(loadStroke, {Transparency = 1}, 0.5)
     ApplyTween(titleLabel, {TextTransparency = 1}, 0.5)
@@ -194,17 +161,56 @@ function XDLuaUI:CreateWindow(title)
     task.wait(0.5)
     blur:Destroy()
     loadingFrame:Destroy()
-    
-    mainFrame.Visible = true
-    logoButton.Visible = true
 
-    -- 4. [ฟังก์ชันเชื่อมต่อสำหรับ UI หลัก]
+    -- 2. Logo Button (เวอร์ชันใส่รูปภาพ + ลากได้สมบูรณ์)
+    local logoButton = Instance.new("TextButton", screenGui)
+    logoButton.Name = "LogoButton"
+    logoButton.Size = UDim2.new(0, 45, 0, 45)
+    logoButton.Position = UDim2.new(0.05, 0, 0.1, 0)
+    logoButton.BackgroundColor3 = Theme.Main
+    logoButton.Text = "" -- ลบตัวอักษรออกเพื่อโชว์รูป
+    logoButton.AutoButtonColor = false
+    logoButton.Active = true 
+    Instance.new("UICorner", logoButton).CornerRadius = UDim.new(0, 10)
+    
+    local logoStroke = Instance.new("UIStroke", logoButton)
+    logoStroke.Color = Theme.Accent
+    logoStroke.Thickness = 1.5
+
+    -- ส่วนแสดงรูปภาพ (ใส่ ID รูปของคุณที่นี่)
+    local logoImage = Instance.new("ImageLabel", logoButton)
+    logoImage.Name = "LogoImage"
+    logoImage.Size = UDim2.new(1, 0, 1, 0) -- ขนาดรูป
+    logoImage.Position = UDim2.new(0.5, 0, 0.5, 0)
+    logoImage.AnchorPoint = Vector2.new(0.5, 0.5)
+    logoImage.BackgroundTransparency = 1
+    logoImage.Image = "rbxassetid://111935661110067" -- ID รูปภาพของคุณ
+    logoImage.ImageColor3 = Color3.fromRGB(255, 255, 255) -- เปลี่ยนเป็น Theme.Accent ถ้าอยากให้รูปเปลี่ยนสีตามธีม
+    logoImage.ScaleType = Enum.ScaleType.Fit
+
+    -- เปิดระบบลาก (ส่ง logoButton ไปทั้งสองช่อง)
     MakeDraggable(logoButton, logoButton)
-    logoButton.MouseEnter:Connect(function() ApplyTween(logoButton, {Size = UDim2.new(0, 52, 0, 52)}, 0.2) end)
-    logoButton.MouseLeave:Connect(function() ApplyTween(logoButton, {Size = UDim2.new(0, 45, 0, 45)}, 0.2) end)
+
+    -- เอฟเฟกต์เวลาเมาส์ชี้ (Hover)
+    logoButton.MouseEnter:Connect(function()
+        ApplyTween(logoButton, {Size = UDim2.new(0, 52, 0, 52)}, 0.2)
+    end)
+
+    logoButton.MouseLeave:Connect(function()
+        ApplyTween(logoButton, {Size = UDim2.new(0, 45, 0, 45)}, 0.2)
+    end)
+
+    -- ระบบคลิก เปิด-ปิด
     logoButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
     end)
+
+    local mainFrame = Instance.new("Frame", screenGui)
+    mainFrame.Size = UDim2.new(0, 500, 0, 340)
+    mainFrame.Position = UDim2.new(0.5, -250, 0.5, -170)
+    mainFrame.BackgroundColor3 = Theme.Main
+    Instance.new("UICorner", mainFrame).CornerRadius = Theme.Rounding
+    Instance.new("UIStroke", mainFrame).Color = Theme.Stroke
 
     local dragHandle = Instance.new("Frame", mainFrame)
     dragHandle.Size = UDim2.new(1, 0, 0, 45)
@@ -214,7 +220,7 @@ function XDLuaUI:CreateWindow(title)
     local topTitle = Instance.new("TextLabel", mainFrame)
     topTitle.Size = UDim2.new(1, -80, 0, 45)
     topTitle.Position = UDim2.new(0, 15, 0, 0)
-    topTitle.Text = title or "Crimson"
+    topTitle.Text = title or "XDLua Professional"
     topTitle.TextColor3 = Theme.Accent
     topTitle.TextXAlignment = Enum.TextXAlignment.Left
     topTitle.Font = Enum.Font.GothamBold
@@ -248,8 +254,18 @@ function XDLuaUI:CreateWindow(title)
     local tabs = {}
     local selectedTab = nil
 
-    -- [Window Methods] -- (เปลี่ยนจาก XDLuaUI เป็น Window)
-    function Window:AddTab(tabName, emoji)
+    -- [INTERNAL FUNCTION: Get Layout Order]
+    local function GetNextOrder(parent)
+        for _, t in pairs(tabs) do
+            if t.Content == parent then
+                t.Order = t.Order + 1
+                return t.Order
+            end
+        end
+        return 0
+    end
+
+    function XDLuaUI:AddTab(tabName, emoji)
         local tabBtn = Instance.new("TextButton", tabContainer)
         tabBtn.Size = UDim2.new(1, 0, 0, 35)
         tabBtn.BackgroundColor3 = Theme.Secondary
@@ -266,12 +282,12 @@ function XDLuaUI:CreateWindow(title)
         tabContent.BackgroundTransparency = 1
         tabContent.ScrollBarThickness = 2
         tabContent.ScrollBarImageColor3 = Theme.Accent
-        tabContent.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        tabContent.AutomaticCanvasSize = Enum.AutomaticSize.Y -- เลื่อนลงได้อัตโนมัติ
         
         local cLayout = Instance.new("UIListLayout", tabContent)
         cLayout.Padding = UDim.new(0, 8)
         cLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-        cLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        cLayout.SortOrder = Enum.SortOrder.LayoutOrder -- สำคัญสำหรับการเรียงลำดับ
 
         tabBtn.MouseButton1Click:Connect(function()
             for _, t in pairs(tabs) do
@@ -284,17 +300,18 @@ function XDLuaUI:CreateWindow(title)
             tabContent.Visible = true
         end)
 
-        tabs[tabName] = {Btn = tabBtn, Content = tabContent}
+        tabs[tabName] = {Btn = tabBtn, Content = tabContent, Order = 0}
         if not selectedTab then 
             tabBtn.TextColor3 = Theme.Accent
-            tabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
             tabContent.Visible = true
             selectedTab = tabName 
         end
         return tabContent
     end
 
-    function Window:AddSection(parent, text)
+    -- [COMPONENTS WITH AUTO-ORDER]
+
+    function XDLuaUI:AddSection(parent, text)
         local sectionFrame = Instance.new("Frame", parent)
         sectionFrame.Name = "Section"
         sectionFrame.LayoutOrder = GetNextOrder(parent)
@@ -309,7 +326,9 @@ function XDLuaUI:CreateWindow(title)
         sLabel.TextSize = 12
         sLabel.TextXAlignment = Enum.TextXAlignment.Left
         sLabel.BackgroundTransparency = 1
-        Instance.new("UIPadding", sLabel).PaddingLeft = UDim.new(0, 5)
+        
+        local padding = Instance.new("UIPadding", sLabel)
+        padding.PaddingLeft = UDim.new(0, 5)
 
         local line = Instance.new("Frame", sectionFrame)
         line.Size = UDim2.new(1, - (sLabel.TextBounds.X + 15), 0, 1)
@@ -319,7 +338,7 @@ function XDLuaUI:CreateWindow(title)
         return sectionFrame
     end
 
-    function Window:AddLabel(parent, text, color)
+    function XDLuaUI:AddLabel(parent, text, color)
         local label = Instance.new("TextLabel", parent)
         label.LayoutOrder = GetNextOrder(parent)
         label.Size = UDim2.new(0.95, 0, 0, 20)
@@ -334,7 +353,7 @@ function XDLuaUI:CreateWindow(title)
         return label
     end
 
-    function Window:AddButton(parent, text, callback)
+    function XDLuaUI:AddButton(parent, text, callback)
         local btn = Instance.new("TextButton", parent)
         btn.LayoutOrder = GetNextOrder(parent)
         btn.Size = UDim2.new(0.95, 0, 0, 35)
@@ -353,7 +372,7 @@ function XDLuaUI:CreateWindow(title)
         btn.MouseButton1Click:Connect(callback)
     end
 
-    function Window:AddToggle(parent, text, default, callback)
+    function XDLuaUI:AddToggle(parent, text, default, callback)
         local toggled = default or false
         local bg = Instance.new("TextButton", parent)
         bg.LayoutOrder = GetNextOrder(parent)
@@ -393,7 +412,7 @@ function XDLuaUI:CreateWindow(title)
         end)
     end
 
-    function Window:AddSlider(parent, text, min, max, default, callback)
+    function XDLuaUI:AddSlider(parent, text, min, max, default, callback)
         local sliderFrame = Instance.new("Frame", parent)
         sliderFrame.LayoutOrder = GetNextOrder(parent)
         sliderFrame.Size = UDim2.new(0.95, 0, 0, 50)
@@ -448,171 +467,191 @@ function XDLuaUI:CreateWindow(title)
         end)
     end
 
-    function Window:AddDropdown(parent, text, list, callback)
-        local dropped = false
-        local selectedItems = {}
-        local currentList = list or {}
-        
-        local dropFrame = Instance.new("Frame", parent)
-        dropFrame.LayoutOrder = GetNextOrder(parent)
-        dropFrame.Size = UDim2.new(0.95, 0, 0, 35)
-        dropFrame.BackgroundColor3 = Theme.Main
-        dropFrame.ClipsDescendants = true
-        Instance.new("UICorner", dropFrame).CornerRadius = Theme.Rounding
-        Instance.new("UIStroke", dropFrame).Color = Theme.Stroke
+    function XDLuaUI:AddDropdown(parent, text, list, callback)
+    local dropped = false
+    local selectedItems = {}
+    local currentList = list or {}
+    
+    local dropFrame = Instance.new("Frame", parent)
+    dropFrame.LayoutOrder = GetNextOrder(parent)
+    dropFrame.Size = UDim2.new(0.95, 0, 0, 35)
+    dropFrame.BackgroundColor3 = Theme.Main
+    dropFrame.ClipsDescendants = true
+    Instance.new("UICorner", dropFrame).CornerRadius = Theme.Rounding
+    local dStroke = Instance.new("UIStroke", dropFrame)
+    dStroke.Color = Theme.Stroke
 
-        local btn = Instance.new("TextButton", dropFrame)
-        btn.Size = UDim2.new(1, -35, 0, 35)
-        btn.BackgroundTransparency = 1
-        btn.Text = text .. "  ▼"
-        btn.TextColor3 = Theme.Text
-        btn.Font = Enum.Font.GothamMedium
-        btn.TextSize = 13
-        btn.TextXAlignment = Enum.TextXAlignment.Center
+    -- ปุ่มหลัก (สำหรับคลิกเปิด/ปิด)
+    local btn = Instance.new("TextButton", dropFrame)
+    btn.Size = UDim2.new(1, -35, 0, 35) -- เว้นที่ไว้ให้ปุ่ม Refresh
+    btn.BackgroundTransparency = 1
+    btn.Text = text .. "  ▼"
+    btn.TextColor3 = Theme.Text
+    btn.Font = Enum.Font.GothamMedium
+    btn.TextSize = 13
+    btn.TextXAlignment = Enum.TextXAlignment.Center
 
-        local refreshBtn = Instance.new("TextButton", dropFrame)
-        refreshBtn.Size = UDim2.new(0, 30, 0, 30)
-        refreshBtn.Position = UDim2.new(1, -32, 0, 2.5)
-        refreshBtn.BackgroundColor3 = Theme.Secondary
-        refreshBtn.Text = "🔄"
-        refreshBtn.TextColor3 = Theme.Accent
-        refreshBtn.TextSize = 14
-        Instance.new("UICorner", refreshBtn).CornerRadius = UDim.new(0, 4)
-        local rStroke = Instance.new("UIStroke", refreshBtn)
-        rStroke.Color = Theme.Stroke
-        rStroke.Thickness = 0.5
+    -- ปุ่ม Refresh (🔄)
+    local refreshBtn = Instance.new("TextButton", dropFrame)
+    refreshBtn.Size = UDim2.new(0, 30, 0, 30)
+    refreshBtn.Position = UDim2.new(1, -32, 0, 2.5)
+    refreshBtn.BackgroundColor3 = Theme.Secondary
+    refreshBtn.Text = "🔄"
+    refreshBtn.TextColor3 = Theme.Accent
+    refreshBtn.TextSize = 14
+    Instance.new("UICorner", refreshBtn).CornerRadius = UDim.new(0, 4)
+    local rStroke = Instance.new("UIStroke", refreshBtn)
+    rStroke.Color = Theme.Stroke
+    rStroke.Thickness = 0.5
 
-        local container = Instance.new("ScrollingFrame", dropFrame)
-        container.Size = UDim2.new(1, 0, 0, 120)
-        container.Position = UDim2.new(0, 0, 0, 35)
-        container.BackgroundTransparency = 1
-        container.ScrollBarThickness = 3
-        container.ScrollBarImageColor3 = Theme.Accent
-        local layout = Instance.new("UIListLayout", container)
-        layout.SortOrder = Enum.SortOrder.LayoutOrder
+    local container = Instance.new("ScrollingFrame", dropFrame)
+    container.Size = UDim2.new(1, 0, 0, 120)
+    container.Position = UDim2.new(0, 0, 0, 35)
+    container.BackgroundTransparency = 1
+    container.ScrollBarThickness = 3
+    container.ScrollBarImageColor3 = Theme.Accent
+    local layout = Instance.new("UIListLayout", container)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
 
-        local function CreateItems(items)
-            for _, child in pairs(container:GetChildren()) do
-                if child:IsA("TextButton") then child:Destroy() end
-            end
-            
-            for _, item in pairs(items) do
-                local itemBtn = Instance.new("TextButton", container)
-                itemBtn.Size = UDim2.new(1, 0, 0, 30)
-                itemBtn.BackgroundTransparency = 1
-                itemBtn.Text = tostring(item)
-                itemBtn.TextColor3 = selectedItems[item] and Theme.Accent or Theme.TextDark
-                itemBtn.Font = Enum.Font.Gotham
-                itemBtn.TextSize = 12
-
-                itemBtn.MouseButton1Click:Connect(function()
-                    selectedItems = {[item] = true} -- โหมดเลือกทีละ 1 ค่า
-                    btn.Text = text .. " : " .. tostring(item) .. "  " .. (dropped and "▲" or "▼")
-                    CreateItems(currentList) -- รีเฟรชให้สีเปลี่ยน
-                    callback({item})
-                end)
-            end
-            container.CanvasSize = UDim2.new(0, 0, 0, #items * 30)
-        end
-
-        CreateItems(currentList)
-
-        btn.MouseButton1Click:Connect(function()
-            dropped = not dropped
-            local targetSize = dropped and UDim2.new(0.95, 0, 0, 155) or UDim2.new(0.95, 0, 0, 35)
-            ApplyTween(dropFrame, {Size = targetSize}, 0.2)
-            
-            local currentSelection = ""
-            for k, _ in pairs(selectedItems) do currentSelection = " : " .. tostring(k) end
-            btn.Text = text .. currentSelection .. "  " .. (dropped and "▲" or "▼")
-        end)
-
-        refreshBtn.MouseButton1Click:Connect(function()
-            ApplyTween(refreshBtn, {Rotation = refreshBtn.Rotation + 360}, 0.5)
-            CreateItems(currentList) 
-        end)
-
-        local DropdownFuncs = {}
-        function DropdownFuncs:Refresh(newList)
-            currentList = newList or {}
-            CreateItems(currentList)
-        end
-
-        function DropdownFuncs:Set(val)
-            selectedItems = {[val] = true}
-            btn.Text = text .. " : " .. tostring(val) .. "  " .. (dropped and "▲" or "▼")
-            CreateItems(currentList)
-            callback({val})
+    -- ฟังก์ชันสร้างรายการภายใน
+    local function CreateItems(items)
+        for _, child in pairs(container:GetChildren()) do
+            if child:IsA("TextButton") then child:Destroy() end
         end
         
-        function DropdownFuncs:Clear()
-            selectedItems = {}
-            btn.Text = text .. "  " .. (dropped and "▲" or "▼")
-            CreateItems(currentList)
-        end
+        for _, item in pairs(items) do
+            local itemBtn = Instance.new("TextButton", container)
+            itemBtn.Size = UDim2.new(1, 0, 0, 30)
+            itemBtn.BackgroundTransparency = 1
+            itemBtn.Text = tostring(item)
+            itemBtn.TextColor3 = selectedItems[item] and Theme.Accent or Theme.TextDark
+            itemBtn.Font = Enum.Font.Gotham
+            itemBtn.TextSize = 12
 
-        return DropdownFuncs
+            itemBtn.MouseButton1Click:Connect(function()
+                if selectedItems[item] then
+                    selectedItems[item] = nil
+                    ApplyTween(itemBtn, {TextColor3 = Theme.TextDark}, 0.2)
+                else
+                    selectedItems[item] = true
+                    ApplyTween(itemBtn, {TextColor3 = Theme.Accent}, 0.2)
+                end
+                
+                local result = {}
+                for k, _ in pairs(selectedItems) do table.insert(result, k) end
+                btn.Text = #result == 0 and text .. "  " .. (dropped and "▲" or "▼") or text .. " (" .. #result .. ")  " .. (dropped and "▲" or "▼")
+                callback(result)
+            end)
+        end
+        container.CanvasSize = UDim2.new(0, 0, 0, #items * 30)
     end
 
-    function Window:AddKeybind(parent, text, defaultKey, callback)
-        local currentKey = defaultKey.Name
-        local binding = false
+    -- เริ่มต้นสร้างครั้งแรก
+    CreateItems(currentList)
 
-        local bindFrame = Instance.new("Frame", parent)
-        bindFrame.LayoutOrder = GetNextOrder(parent)
-        bindFrame.Size = UDim2.new(0.95, 0, 0, 35)
-        bindFrame.BackgroundColor3 = Theme.Main
-        Instance.new("UICorner", bindFrame).CornerRadius = Theme.Rounding
-        Instance.new("UIStroke", bindFrame).Color = Theme.Stroke
+    -- คลิกเปิด/ปิด
+    btn.MouseButton1Click:Connect(function()
+        dropped = not dropped
+        local targetSize = dropped and UDim2.new(0.95, 0, 0, 155) or UDim2.new(0.95, 0, 0, 35)
+        ApplyTween(dropFrame, {Size = targetSize}, 0.2)
+        btn.Text = dropped and text .. "  ▲" or text .. "  ▼"
+    end)
 
-        local label = Instance.new("TextLabel", bindFrame)
-        label.Size = UDim2.new(1, -70, 1, 0)
-        label.Position = UDim2.new(0, 12, 0, 0)
-        label.Text = text
-        label.TextColor3 = Theme.TextDark
-        label.TextXAlignment = Enum.TextXAlignment.Left
-        label.BackgroundTransparency = 1
-        label.Font = Enum.Font.GothamMedium
-        label.TextSize = 13
+    -- คลิก Refresh (Manual)
+    refreshBtn.MouseButton1Click:Connect(function()
+        ApplyTween(refreshBtn, {Rotation = refreshBtn.Rotation + 360}, 0.5) -- เอฟเฟกต์หมุนปุ่ม
+        -- ตรงนี้เราสามารถส่ง callback พิเศษออกไปเพื่อให้ผู้ใช้ Update list เองได้ถ้าต้องการ
+        -- แต่ในเบื้องต้นจะใช้การสั่งผ่าน DropdownFuncs:Refresh() จากด้านนอก
+        CreateItems(currentList) 
+    end)
 
-        local bindBtn = Instance.new("TextButton", bindFrame)
-        bindBtn.Size = UDim2.new(0, 60, 0, 24)
-        bindBtn.Position = UDim2.new(1, -65, 0.5, -12)
-        bindBtn.BackgroundColor3 = Theme.Secondary
-        bindBtn.Text = currentKey
-        bindBtn.TextColor3 = Theme.Accent
-        bindBtn.Font = Enum.Font.GothamBold
-        bindBtn.TextSize = 12
-        Instance.new("UICorner", bindBtn).CornerRadius = UDim.new(0, 4)
+    -- ส่งฟังก์ชันออกไปใช้งาน
+    local DropdownFuncs = {}
+    function DropdownFuncs:Refresh(newList)
+        currentList = newList or {}
+        CreateItems(currentList)
+    end
 
-        bindBtn.MouseButton1Click:Connect(function()
-            binding = true
-            bindBtn.Text = "..."
-        end)
+    function DropdownFuncs:Set(val)
+        selectedItems = {} -- ล้างค่าเก่า
+        selectedItems[val] = true -- เลือกค่าใหม่
+        CreateItems(currentList) -- รีเฟรชหน้าตาปุ่ม
+        btn.Text = text .. " (1)  " .. (dropped and "▲" or "▼")
+        callback({val}) -- รันโค้ดของ Dropdown นั้นๆ
+    end
+    
+    function DropdownFuncs:Clear()
+        selectedItems = {}
+        CreateItems(currentList)
+        btn.Text = text .. "  " .. (dropped and "▲" or "▼")
+    end
 
-        UserInputService.InputBegan:Connect(function(input, gpe)
-            if gpe then return end
-            if binding then
-                if input.UserInputType == Enum.UserInputType.Keyboard then
-                    currentKey = input.KeyCode.Name
-                    bindBtn.Text = currentKey
-                    binding = false
-                    callback(input.KeyCode)
-                end
-            elseif input.KeyCode.Name == currentKey then
+    return DropdownFuncs
+end
+
+    function XDLuaUI:AddDropdownBind(parent, dropdownFunc, text, defaultKey, targetValue)
+    self:AddKeybind(parent, text .. " (" .. tostring(targetValue) .. ")", defaultKey, function()
+        -- สั่งเปลี่ยนค่าใน Dropdown ทันที
+        dropdownFunc:Set(targetValue) 
+    end)
+end
+
+    function XDLuaUI:AddKeybind(parent, text, defaultKey, callback)
+    local currentKey = defaultKey.Name
+    local binding = false
+
+    local bindFrame = Instance.new("Frame", parent)
+    bindFrame.LayoutOrder = GetNextOrder(parent)
+    bindFrame.Size = UDim2.new(0.95, 0, 0, 35)
+    bindFrame.BackgroundColor3 = Theme.Main
+    Instance.new("UICorner", bindFrame).CornerRadius = Theme.Rounding
+    Instance.new("UIStroke", bindFrame).Color = Theme.Stroke
+
+    local label = Instance.new("TextLabel", bindFrame)
+    label.Size = UDim2.new(1, -70, 1, 0)
+    label.Position = UDim2.new(0, 12, 0, 0)
+    label.Text = text
+    label.TextColor3 = Theme.TextDark
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.BackgroundTransparency = 1
+    label.Font = Enum.Font.GothamMedium
+    label.TextSize = 13
+
+    local bindBtn = Instance.new("TextButton", bindFrame)
+    bindBtn.Size = UDim2.new(0, 60, 0, 24)
+    bindBtn.Position = UDim2.new(1, -65, 0.5, -12)
+    bindBtn.BackgroundColor3 = Theme.Secondary
+    bindBtn.Text = currentKey
+    bindBtn.TextColor3 = Theme.Accent
+    bindBtn.Font = Enum.Font.GothamBold
+    bindBtn.TextSize = 12
+    Instance.new("UICorner", bindBtn).CornerRadius = UDim.new(0, 4)
+
+    bindBtn.MouseButton1Click:Connect(function()
+        binding = true
+        bindBtn.Text = "..."
+    end)
+
+    UserInputService.InputBegan:Connect(function(input, gpe)
+        if gpe then return end
+        if binding then
+            if input.UserInputType == Enum.UserInputType.Keyboard then
+                currentKey = input.KeyCode.Name
+                bindBtn.Text = currentKey
+                binding = false
                 callback(input.KeyCode)
             end
-        end)
-    end
+        elseif input.KeyCode.Name == currentKey then
+            callback(input.KeyCode)
+        end
+    end)
+end
 
-    function Window:AddDropdownBind(parent, dropdownFunc, text, defaultKey, targetValue)
-        self:AddKeybind(parent, text .. " (" .. tostring(targetValue) .. ")", defaultKey, function()
-            dropdownFunc:Set(targetValue) 
-        end)
-    end
+    logoButton.MouseButton1Click:Connect(function()
+        mainFrame.Visible = not mainFrame.Visible
+    end)
 
-    -- ส่งคืนอ็อบเจกต์หน้าต่างหลักเพื่อให้ผู้ใช้นำไปสร้าง UI ต่อ
-    return Window
+    return XDLuaUI
 end
 
 return XDLuaUI
